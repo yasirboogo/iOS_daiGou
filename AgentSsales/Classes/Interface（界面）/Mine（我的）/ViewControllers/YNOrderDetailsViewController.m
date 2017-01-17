@@ -9,6 +9,8 @@
 #import "YNOrderDetailsViewController.h"
 #import "YNOrderDetailsCollectionView.h"
 #import "YNTipsSuccessBtnsView.h"
+#import "YNLogisticalMsgViewController.h"
+#import "YNPaySuccessViewController.h"
 
 @interface YNOrderDetailsViewController ()
 
@@ -46,10 +48,18 @@
 #pragma mark - 视图加载
 -(YNOrderDetailsCollectionView *)collectionView{
     if (!_collectionView) {
-        CGRect frame = CGRectMake(0, kUINavHeight, SCREEN_WIDTH,SCREEN_HEIGHT-kUINavHeight-HEIGHTF(_btnsView));
+        CGRect frame = CGRectMake(0, kUINavHeight, SCREEN_WIDTH,SCREEN_HEIGHT-kUINavHeight);
         YNOrderDetailsCollectionView *collectionView = [[YNOrderDetailsCollectionView alloc] initWithFrame:frame];
         _collectionView = collectionView;
         [self.view addSubview:collectionView];
+        [collectionView setViewScrollBlock:^(CGFloat alpha) {
+            self.btnsView.alpha = alpha;
+            if (alpha > 0.9f) {
+                self.btnsView.userInteractionEnabled = YES;
+            }else{
+                self.btnsView.userInteractionEnabled = NO;
+            }
+        }];
     }
     return _collectionView;
 }
@@ -58,9 +68,17 @@
         YNTipsSuccessBtnsView *btnsView = [[YNTipsSuccessBtnsView alloc] init];
         _btnsView = btnsView;
         [self.view addSubview:btnsView];
+        [self.view bringSubviewToFront:btnsView];
         btnsView.btnStyle = UIButtonStyle2;
         [btnsView setDidSelectBottomButtonClickBlock:^(NSString *str) {
-            NSLog(@"%@",str);
+            if ([str isEqualToString:@"确认收货"]) {
+                YNPaySuccessViewController *pushVC = [[YNPaySuccessViewController alloc] init];
+                pushVC.titleStr = @"确认收货";
+                [self.navigationController pushViewController:pushVC animated:NO];
+            }else if ([str isEqualToString:@"查看物流"]){
+                YNLogisticalMsgViewController *pushVC = [[YNLogisticalMsgViewController alloc] init];
+                [self.navigationController pushViewController:pushVC animated:NO];
+            }
         }];
     }
     return _btnsView;
@@ -70,8 +88,6 @@
 #pragma mark - 函数、消息
 -(void)makeData{
     [super makeData];
-    
-    self.btnsView.btnTitles = @[@"确认收货",@"查看物流"];
     
     self.collectionView.dict = @{@"manMsg":@{@"name":@"李小龙",
                                              @"phone":@"13631499887",
@@ -83,6 +99,7 @@
                                                @"status":@"代收款",},
                                  @"goodsMsg":@[],
                                  };
+    self.btnsView.btnTitles = @[@"确认收货",@"查看物流"];
 }
 -(void)makeNavigationBar{
     [super makeNavigationBar];

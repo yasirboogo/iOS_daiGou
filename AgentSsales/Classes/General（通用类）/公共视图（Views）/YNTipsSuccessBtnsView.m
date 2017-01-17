@@ -15,9 +15,7 @@
     _btnTitles = btnTitles;
     
     CGFloat height = _btnTitles.count*(W_RATIO(100)+W_RATIO(20))-W_RATIO(20)+kMidSpace*2;
-    
-    self.frame = CGRectMake(W_RATIO(20), SCREEN_HEIGHT-height-W_RATIO(20), SCREEN_WIDTH-W_RATIO(20)*2, height);
-    
+    self.frame = CGRectMake(W_RATIO(20), SCREEN_HEIGHT-height, SCREEN_WIDTH-W_RATIO(20)*2, height);
     
     [btnTitles enumerateObjectsUsingBlock:^(NSString * _Nonnull title, NSUInteger idx, BOOL * _Nonnull stop) {
         

@@ -12,6 +12,8 @@
 
 @property (nonatomic,strong) NSDictionary *dict;
 
+@property (nonatomic,strong) void(^viewScrollBlock)(CGFloat alpha);
+
 @end
 
 

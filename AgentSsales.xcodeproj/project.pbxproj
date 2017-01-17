@@ -56,6 +56,8 @@
 		BF93031A1E2CB7A000227EF0 /* NSString+Category.m in Sources */ = {isa = PBXBuildFile; fileRef = BF9303161E2CB7A000227EF0 /* NSString+Category.m */; };
 		BF93031B1E2CB7A000227EF0 /* NSString+Height.m in Sources */ = {isa = PBXBuildFile; fileRef = BF9303171E2CB7A000227EF0 /* NSString+Height.m */; };
 		BF93031C1E2CB7A000227EF0 /* NSString+Size.m in Sources */ = {isa = PBXBuildFile; fileRef = BF9303191E2CB7A000227EF0 /* NSString+Size.m */; };
+		BF93031F1E2DFE6100227EF0 /* YNLogisticalMsgViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = BF93031E1E2DFE6100227EF0 /* YNLogisticalMsgViewController.m */; };
+		BF9303221E2E004F00227EF0 /* YNLogisticalMsgTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = BF9303211E2E004F00227EF0 /* YNLogisticalMsgTableView.m */; };
 		BFA0D8BA1E234A76006897DB /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = BFA0D8B91E234A76006897DB /* Default-568h@2x.png */; };
 		BFA0D9021E248262006897DB /* YNAddressViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = BFA0D9011E248262006897DB /* YNAddressViewController.m */; };
 		BFA0D9051E2484D8006897DB /* YNAddressTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = BFA0D9041E2484D8006897DB /* YNAddressTableView.m */; };
@@ -235,6 +237,10 @@
 		BF9303171E2CB7A000227EF0 /* NSString+Height.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+Height.m"; sourceTree = "<group>"; };
 		BF9303181E2CB7A000227EF0 /* NSString+Size.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+Size.h"; sourceTree = "<group>"; };
 		BF9303191E2CB7A000227EF0 /* NSString+Size.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+Size.m"; sourceTree = "<group>"; };
+		BF93031D1E2DFE6100227EF0 /* YNLogisticalMsgViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YNLogisticalMsgViewController.h; sourceTree = "<group>"; };
+		BF93031E1E2DFE6100227EF0 /* YNLogisticalMsgViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YNLogisticalMsgViewController.m; sourceTree = "<group>"; };
+		BF9303201E2E004F00227EF0 /* YNLogisticalMsgTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YNLogisticalMsgTableView.h; sourceTree = "<group>"; };
+		BF9303211E2E004F00227EF0 /* YNLogisticalMsgTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YNLogisticalMsgTableView.m; sourceTree = "<group>"; };
 		BFA0D8B91E234A76006897DB /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Default-568h@2x.png"; path = "AgentSsales/testFiles/Default-568h@2x.png"; sourceTree = "<group>"; };
 		BFA0D9001E248262006897DB /* YNAddressViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YNAddressViewController.h; sourceTree = "<group>"; };
 		BFA0D9011E248262006897DB /* YNAddressViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YNAddressViewController.m; sourceTree = "<group>"; };
@@ -896,6 +902,8 @@
 				BF9302A91E2B0EF800227EF0 /* YNGoodsCartCollectionView.m */,
 				BF9302B61E2C67C000227EF0 /* YNOrderDetailsCollectionView.h */,
 				BF9302B71E2C67C000227EF0 /* YNOrderDetailsCollectionView.m */,
+				BF9303201E2E004F00227EF0 /* YNLogisticalMsgTableView.h */,
+				BF9303211E2E004F00227EF0 /* YNLogisticalMsgTableView.m */,
 			);
 			name = "订单处理";
 			sourceTree = "<group>";
@@ -1156,6 +1164,8 @@
 				BF93029A1E28A82500227EF0 /* YNOrderViewController.m */,
 				BF9302B31E2C63C100227EF0 /* YNOrderDetailsViewController.h */,
 				BF9302B41E2C63C100227EF0 /* YNOrderDetailsViewController.m */,
+				BF93031D1E2DFE6100227EF0 /* YNLogisticalMsgViewController.h */,
+				BF93031E1E2DFE6100227EF0 /* YNLogisticalMsgViewController.m */,
 			);
 			name = "订单处理";
 			sourceTree = "<group>";
@@ -1511,6 +1521,7 @@
 				BFBEE8881E1DD65F00FB6E3D /* YNMineImgHeaderView.m in Sources */,
 				BF9302951E28773400227EF0 /* YNNewsDetailViewController.m in Sources */,
 				BF9302921E285EB600227EF0 /* YNNewsListTableView.m in Sources */,
+				BF9303221E2E004F00227EF0 /* YNLogisticalMsgTableView.m in Sources */,
 				55DCAB741E039862003041CF /* UIView+Extension.m in Sources */,
 				BFD8D19E1E0D4D09006E6AA8 /* ImagesPlayer.m in Sources */,
 				BFBEE89F1E1E400000FB6E3D /* YNPaymentTableView.m in Sources */,
@@ -1533,6 +1544,7 @@
 				BFBEE8A61E1F341F00FB6E3D /* YNTipsSuccessTopView.m in Sources */,
 				BF6147AD1E263886004E990F /* YNMineCodeViewController.m in Sources */,
 				BFA0D9021E248262006897DB /* YNAddressViewController.m in Sources */,
+				BF93031F1E2DFE6100227EF0 /* YNLogisticalMsgViewController.m in Sources */,
 				BFA0D90E1E251527006897DB /* YNSettingViewController.m in Sources */,
 				BF9302981E28A66700227EF0 /* YNMineOrderViewController.m in Sources */,
 				BF9302A41E28BA4C00227EF0 /* YNGoodsViewController.m in Sources */,

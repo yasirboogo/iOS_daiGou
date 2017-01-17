@@ -9,7 +9,7 @@
 #import "YNOrderDetailsCollectionView.h"
 #import "YNGoodsCartCollectionView.h"
 
-@interface YNOrderDetailsCollectionView ()<UICollectionViewDelegate,UICollectionViewDataSource,UICollectionViewDelegateFlowLayout>
+@interface YNOrderDetailsCollectionView ()<UICollectionViewDelegate,UICollectionViewDataSource,UICollectionViewDelegateFlowLayout,UIScrollViewDelegate>
 
 @property (nonatomic,strong) NSArray * manMsgArray;
 @property (nonatomic,strong) NSArray * orderMsgArray;
@@ -28,10 +28,11 @@
     self = [super initWithFrame:frame collectionViewLayout:flowLayout];
     if (self) {
         self.backgroundColor = COLOR_EDEDED;
+        self.bounces = NO;
         self.dataSource = self;
         self.delegate = self;
     }
-    [self registerClass:[UICollectionViewCell class] forCellWithReuseIdentifier:@"goodsCell"];
+    [self registerClass:[UICollectionViewCell class] forCellWithReuseIdentifier:@"cell"];
     
     [self registerClass:[YNDetailsManMsgCell class] forCellWithReuseIdentifier:@"manMsgCell"];
     
@@ -41,12 +42,7 @@
     
     [self registerClass:[YNOrderDetailsHeaderView class] forSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:@"headerView"];
     [self registerClass:[YNOrderDetailsFooterView class] forSupplementaryViewOfKind:UICollectionElementKindSectionFooter withReuseIdentifier:@"footerView"];
-    
-    
-    
-//    [self registerClass:[YNOrderGoodsCell class] forCellWithReuseIdentifier:@"goodsCell"];
-//    [self registerClass:[YNOrderGoodsHeaderView class] forSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:@"headerView"];
-//    [self registerClass:[YNOrderGoodsFooterView class] forSupplementaryViewOfKind:UICollectionElementKindSectionFooter withReuseIdentifier:@"footerView"];
+
     return self;
 }
 -(void)setDict:(NSDictionary *)dict{
@@ -56,6 +52,20 @@
     self.orderMsgArray = [YNOrderMsgCellFrame initWithFromDictionaries:@[dict[@"orderMsg"]]];
     self.goodsMsgDict = dict[@"goodsMsg"];
     [self reloadData];
+}
+#pragma mark - UITableView delegate
+-(void)scrollViewDidScroll:(UIScrollView *)scrollView{
+    if (self.viewScrollBlock) {
+        CGFloat alpha = (scrollView.contentOffset.y)/(self.contentSize.height - HEIGHTF(self));
+        self.viewScrollBlock(alpha);
+//        self.offsetY = scrollView.contentOffset.y;//将当前位移变成缓存位移
+//        if (scrollView.contentOffset.y > self.offsetY && scrollView.contentOffset.y > 0) {
+//            //向上滑动,视图消失
+//        }else if (scrollView.contentOffset.y < self.offsetY ){
+//            //向下滑动，视图出现
+//        }
+//        self.offsetY = scrollView.contentOffset.y;//将当前位移变成缓存位移
+    }
 }
 -(CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath{
     if (indexPath.section == 0) {
@@ -67,11 +77,13 @@
         return CGSizeMake(WIDTHF(self)-W_RATIO(20)*2, cellFrame.cellHeight);
     }else if (indexPath.section == 2){
         return CGSizeMake(WIDTHF(self)-W_RATIO(20)*2, W_RATIO(185));
+    }else if (indexPath.section == 3){
+        return CGSizeMake(WIDTHF(self)-W_RATIO(20)*2, W_RATIO(300));
     }
     return CGSizeZero;
 }
 -(NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView{
-    return 3;
+    return 4;
 }
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section{
     if (section == 0) {
@@ -80,10 +92,15 @@
         return 1;
     }else if (section == 2){
         return 2;
+    }else if (section == 3){
+        return 1;
     }
     return 0;
 }
 -(CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout referenceSizeForHeaderInSection:(NSInteger)section{
+    if (section == 3) {
+        return CGSizeZero;
+    }
     return CGSizeMake(WIDTHF(self)-W_RATIO(20)*2, W_RATIO(86)+W_RATIO(20));
 }
 -(CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout referenceSizeForFooterInSection:(NSInteger)section{
@@ -116,10 +133,13 @@
         YNDetailsOrderMsgCell *orderMsgCell = [collectionView dequeueReusableCellWithReuseIdentifier:@"orderMsgCell" forIndexPath:indexPath];
         orderMsgCell.cellFrame = self.orderMsgArray[0];
         return orderMsgCell;
-    }else if (indexPath.section){
+    }else if (indexPath.section == 2){
         YNOrderGoodsCell *goodsMsgCell = [collectionView dequeueReusableCellWithReuseIdentifier:@"goodsMsgCell" forIndexPath:indexPath];
         goodsMsgCell.dict = @{@"image":@"testGoods",@"title":@"书籍-设计师的自我修养",@"subTitle":@"2016年出版版本",@"price":@"501.21",@"amount":@"2"};
         return goodsMsgCell;
+    }else if (indexPath.section == 3){
+        UICollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"cell" forIndexPath:indexPath];
+        return cell;
     }
     return nil;
 }

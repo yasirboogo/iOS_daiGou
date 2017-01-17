@@ -58,6 +58,8 @@
     
     // tabBar
     self.pagerBarView.backgroundColor = _pagerBarColor;
+    self.pagerBarView.layer.borderWidth = 1;
+    self.pagerBarView.layer.borderColor = [UIColor colorWithWhite:0.8 alpha:0.5].CGColor;
     self.collectionViewBar.backgroundColor = _collectionViewBarColor;
 }
 

@@ -14,6 +14,8 @@
 
 @property (nonatomic,weak) YNGoodsCartCollectionView * collectionView;
 
+@property (nonatomic,weak) YNShowEmptyView * emptyView;
+
 @end
 
 @implementation YNOrderViewController
@@ -58,6 +60,17 @@
     }
     return _collectionView;
 }
+-(YNShowEmptyView *)emptyView{
+    if (!_emptyView) {
+        CGRect frame = CGRectMake(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT-kUINavHeight-W_RATIO(84));
+        YNShowEmptyView *emptyView = [[YNShowEmptyView alloc] initWithFrame:frame];
+        _emptyView = emptyView;
+        [self.view addSubview:emptyView];
+        emptyView.tipImg = [UIImage imageNamed:@"wudingdan"];
+        emptyView.tips = @"当前没有订单信息";
+    }
+    return _emptyView;
+}
 #pragma mark - 代理实现
 
 #pragma mark - 函数、消息
@@ -69,7 +82,7 @@
     
 }
 -(void)makeUI{
-    
+    self.emptyView.hidden = _collectionView.dataArray.count;
 }
 #pragma mark - 数据懒加载
 
