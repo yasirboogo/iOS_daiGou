@@ -37,6 +37,7 @@
 #import "UIView+Extension.h"
 #import "UIButton+Position.h"
 #import "NSString+Size.h"
+#import "UIView+CornerRadius.h"
 #import "UIColor+HEX.h"
 #import "HttpTool.h"
 #import "PDVersionTool.h"

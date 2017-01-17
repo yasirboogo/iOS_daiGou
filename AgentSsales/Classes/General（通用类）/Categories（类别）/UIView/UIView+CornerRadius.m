@@ -10,4 +10,15 @@
 
 @implementation UIView (CornerRadius)
 
+
+
+-(UIView*)setViewCornerRadiusWithRectCorner:(UIRectCorner)rectCorner cornerSize:(CGSize)cornerSize{
+    UIBezierPath *maskPath = [UIBezierPath bezierPathWithRoundedRect:self.bounds byRoundingCorners:rectCorner cornerRadii:cornerSize];
+    CAShapeLayer *maskLayer = [[CAShapeLayer alloc] init];
+    maskLayer.frame = self.bounds;
+    maskLayer.path = maskPath.CGPath;
+    self.layer.mask = maskLayer;
+    return self;
+}
+
 @end

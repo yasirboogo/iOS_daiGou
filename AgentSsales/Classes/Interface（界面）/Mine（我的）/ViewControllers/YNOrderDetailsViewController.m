@@ -73,7 +73,16 @@
     
     self.btnsView.btnTitles = @[@"确认收货",@"查看物流"];
     
-    self.collectionView.dict = @{@"1":@"1"};
+    self.collectionView.dict = @{@"manMsg":@{@"name":@"李小龙",
+                                             @"phone":@"13631499887",
+                                             @"address":@"广东省广州市天河区五山街华南农业大学华南区12栋312"},
+                                 @"orderMsg":@{@"code":@"1234567890",
+                                               @"buyTime":@"2016年6月21日 14：16",
+                                               @"payTime":@"2016年6月22日 14：16",
+                                               @"address":@"广西桂林",
+                                               @"status":@"代收款",},
+                                 @"goodsMsg":@[],
+                                 };
 }
 -(void)makeNavigationBar{
     [super makeNavigationBar];

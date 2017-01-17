@@ -233,18 +233,8 @@
         [self addSubview:bgView];
         bgView.frame =CGRectMake(W_RATIO(20),W_RATIO(20), WIDTHF(self)-W_RATIO(20)*2, HEIGHTF(self));
         bgView.backgroundColor = COLOR_FFFFFF;
-        UIBezierPath *maskPath = [UIBezierPath bezierPathWithRoundedRect:bgView.bounds byRoundingCorners:UIRectCornerTopLeft | UIRectCornerTopRight cornerRadii:CGSizeMake(W_RATIO(20), W_RATIO(20))];
-        CAShapeLayer *maskLayer = [[CAShapeLayer alloc] init];
-        maskLayer.frame = bgView.bounds;
-        maskLayer.path = maskPath.CGPath;
-        bgView.layer.mask = maskLayer;
-        /**
-         * UIRectCornerTopLeft
-         * UIRectCornerTopRight
-         * UIRectCornerBottomLeft
-         * UIRectCornerBottomRight
-         * UIRectCornerAllCorners
-         */
+        
+        [bgView setViewCornerRadiusWithRectCorner:UIRectCornerTopLeft | UIRectCornerTopRight cornerSize:CGSizeMake(W_RATIO(20), W_RATIO(20))];
     }
     return _bgView;
 }
@@ -408,18 +398,7 @@
         [self addSubview:bgView];
         bgView.frame =CGRectMake(W_RATIO(20),0, WIDTHF(self)-W_RATIO(20)*2, HEIGHTF(self));
         bgView.backgroundColor = COLOR_FFFFFF;
-        UIBezierPath *maskPath = [UIBezierPath bezierPathWithRoundedRect:bgView.bounds byRoundingCorners:UIRectCornerBottomLeft | UIRectCornerBottomRight cornerRadii:CGSizeMake(W_RATIO(20), W_RATIO(20))];
-        CAShapeLayer *maskLayer = [[CAShapeLayer alloc] init];
-        maskLayer.frame = bgView.bounds;
-        maskLayer.path = maskPath.CGPath;
-        bgView.layer.mask = maskLayer;
-        /** 
-         * UIRectCornerTopLeft
-         * UIRectCornerTopRight
-         * UIRectCornerBottomLeft
-         * UIRectCornerBottomRight
-         * UIRectCornerAllCorners
-         */
+        [bgView setViewCornerRadiusWithRectCorner:UIRectCornerBottomLeft | UIRectCornerBottomRight cornerSize:CGSizeMake(W_RATIO(20), W_RATIO(20))];
         
     }
     return _bgView;

@@ -10,4 +10,6 @@
 
 @interface UIView (CornerRadius)
 
+-(UIView*)setViewCornerRadiusWithRectCorner:(UIRectCorner)rectCorner cornerSize:(CGSize)cornerSize;
+
 @end
