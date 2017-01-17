@@ -84,7 +84,6 @@
 }
 - (__kindof UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath{
     YNOrderGoodsCell *goodsCell = [collectionView dequeueReusableCellWithReuseIdentifier:@"goodsCell" forIndexPath:indexPath];
-    goodsCell.backgroundColor = COLOR_FFFFFF;
     goodsCell.dict = @{@"image":@"testGoods",@"title":@"书籍-设计师的自我修养",@"subTitle":@"2016年出版版本",@"price":@"501.21",@"amount":@"2"};
     return goodsCell;
 }
@@ -98,6 +97,8 @@
 
 @end
 @interface YNOrderGoodsCell ()
+/** 背景 */
+@property (nonatomic,weak) UIView * bgView;
 /** 左边图片 */
 @property (nonatomic,weak) UIImageView * leftImgView;
 /** 标题 */
@@ -140,11 +141,23 @@
     self.priceLabel.text = dict[@"price"];
     self.amountLabel.text = [NSString stringWithFormat:@"x%@",dict[@"amount"]];
 }
+
+-(UIView *)bgView{
+    if (!_bgView) {
+        UIView *bgView = [[UIView alloc] init];
+        _bgView = bgView;
+        [self.contentView addSubview:bgView];
+        bgView.backgroundColor = COLOR_FFFFFF;
+        bgView.frame = CGRectMake(0, 0, WIDTHF(self.contentView), HEIGHTF(self.contentView));
+    }
+    return _bgView;
+}
+
 -(UIImageView *)leftImgView{
     if (!_leftImgView) {
         UIImageView * leftImgView = [[UIImageView alloc] init];
         _leftImgView = leftImgView;
-        [self.contentView addSubview:leftImgView];
+        [self.bgView addSubview:leftImgView];
         leftImgView.frame = CGRectMake(W_RATIO(20), W_RATIO(20), W_RATIO(145), W_RATIO(145));
     }
     return _leftImgView;
@@ -153,7 +166,7 @@
     if (!_titleLabel) {
         UILabel * titleLabel = [[UILabel alloc] init];
         _titleLabel = titleLabel;
-        [self.contentView addSubview:titleLabel];
+        [self.bgView addSubview:titleLabel];
         titleLabel.font = FONT(32);
         titleLabel.numberOfLines = 1;
         titleLabel.textColor = COLOR_333333;
@@ -164,7 +177,7 @@
     if (!_subTitleLabel) {
         UILabel * subTitleLabel = [[UILabel alloc] init];
         _subTitleLabel = subTitleLabel;
-        [self.contentView addSubview:subTitleLabel];
+        [self.bgView addSubview:subTitleLabel];
         subTitleLabel.font = FONT(26);
         subTitleLabel.textColor = COLOR_999999;
         subTitleLabel.numberOfLines = 2;
@@ -175,7 +188,7 @@
     if (!_priceLabel) {
         UILabel * priceLabel = [[UILabel alloc] init];
         _priceLabel = priceLabel;
-        [self.contentView addSubview:priceLabel];
+        [self.bgView addSubview:priceLabel];
         priceLabel.font = FONT(38);
         priceLabel.textColor = COLOR_666666;
     }
@@ -185,7 +198,7 @@
     if (!_markLabel) {
         UILabel *markLabel = [[UILabel alloc] init];
         _markLabel = markLabel;
-        [self.contentView addSubview:markLabel];
+        [self.bgView addSubview:markLabel];
         markLabel.font = FONT(26);
         markLabel.textColor = COLOR_666666;
     }
@@ -195,7 +208,7 @@
     if (!_amountLabel) {
         UILabel *amountLabel = [[UILabel alloc] init];
         _amountLabel = amountLabel;
-        [self.contentView addSubview:amountLabel];
+        [self.bgView addSubview:amountLabel];
         amountLabel.font = FONT(38);
         amountLabel.textAlignment = NSTextAlignmentRight;
         amountLabel.textColor = COLOR_666666;

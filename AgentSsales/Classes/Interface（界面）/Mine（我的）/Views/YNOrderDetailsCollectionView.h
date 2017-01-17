@@ -36,17 +36,39 @@
 
 @end
 
-
-@interface YNDetailsOrderMsgCell : UICollectionViewCell
+@interface YNOrderMsgCellFrame : NSObject
 
 @property (nonatomic,strong) NSDictionary *dict;
 
-@property (nonatomic,weak) UILabel *itemLabel;
+@property (nonatomic,assign) CGFloat cellHeight;
 
-@property (nonatomic,weak) UILabel *detailsLabel;
+@property (nonatomic,assign) CGRect codeLF;
+@property (nonatomic,assign) CGRect codeRF;
+@property (nonatomic,assign) CGRect buyTimeLF;
+@property (nonatomic,assign) CGRect buyTimeRF;
+@property (nonatomic,assign) CGRect payTimeLF;
+@property (nonatomic,assign) CGRect payTimeRF;
+@property (nonatomic,assign) CGRect addresssLF;
+@property (nonatomic,assign) CGRect addresssRF;
+@property (nonatomic,assign) CGRect statusLF;
+@property (nonatomic,assign) CGRect statusRF;
+@property (nonatomic,assign) CGRect bgViewF;
+
++(NSMutableArray *)initWithFromDictionaries:(NSArray*)array;
+
+@end
+@interface YNDetailsOrderMsgCell : UICollectionViewCell
+
+@property (nonatomic,strong) YNOrderMsgCellFrame * cellFrame;
 
 @end
 @interface YNOrderDetailsHeaderView : UICollectionReusableView
+
+@property (nonatomic,strong) NSDictionary *dict;
+
+@end
+@interface YNOrderDetailsFooterView : UICollectionReusableView
+
 @property (nonatomic,strong) NSDictionary *dict;
 
 @end
