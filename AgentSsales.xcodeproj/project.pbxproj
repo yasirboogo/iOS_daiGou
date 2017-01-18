@@ -30,6 +30,9 @@
 		55DCAB731E039862003041CF /* UIImage+Extension.m in Sources */ = {isa = PBXBuildFile; fileRef = 55DCAB701E039862003041CF /* UIImage+Extension.m */; };
 		55DCAB741E039862003041CF /* UIView+Extension.m in Sources */ = {isa = PBXBuildFile; fileRef = 55DCAB721E039862003041CF /* UIView+Extension.m */; };
 		BF0E0B891E264DA3007F3907 /* libPods-AgentSsales.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BFA0E75D1E26276A00722C3D /* libPods-AgentSsales.a */; };
+		BF41EE6E1E2F052F00C3FF99 /* YNCouponListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = BF41EE6D1E2F052F00C3FF99 /* YNCouponListViewController.m */; };
+		BF41EE711E2F07F700C3FF99 /* YNCouponTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = BF41EE701E2F07F700C3FF99 /* YNCouponTableView.m */; };
+		BF41EE741E2F717900C3FF99 /* YNGoodsSubmitView.m in Sources */ = {isa = PBXBuildFile; fileRef = BF41EE731E2F717900C3FF99 /* YNGoodsSubmitView.m */; };
 		BF6147A71E2632D8004E990F /* YNShowEmptyView.m in Sources */ = {isa = PBXBuildFile; fileRef = BF6147A61E2632D8004E990F /* YNShowEmptyView.m */; };
 		BF6147AA1E26381F004E990F /* YNMineCouponViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = BF6147A91E26381F004E990F /* YNMineCouponViewController.m */; };
 		BF6147AD1E263886004E990F /* YNMineCodeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = BF6147AC1E263886004E990F /* YNMineCodeViewController.m */; };
@@ -185,6 +188,12 @@
 		AAD7D6F0240328CF544437EF /* Pods-AgentSsales.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AgentSsales.release.xcconfig"; path = "Pods/Target Support Files/Pods-AgentSsales/Pods-AgentSsales.release.xcconfig"; sourceTree = "<group>"; };
 		BDC649B5C616DA909A0ACCF0 /* libPods-AgentSsales.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-AgentSsales.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		BF0E0B871E2645D7007F3907 /* libLGAlertView.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLGAlertView.a; path = "../../Library/Developer/Xcode/DerivedData/AgentSsales-hajwpotfrjkgmncezkophztatikn/Build/Products/Debug-iphonesimulator/LGAlertView/libLGAlertView.a"; sourceTree = "<group>"; };
+		BF41EE6C1E2F052F00C3FF99 /* YNCouponListViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YNCouponListViewController.h; sourceTree = "<group>"; };
+		BF41EE6D1E2F052F00C3FF99 /* YNCouponListViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YNCouponListViewController.m; sourceTree = "<group>"; };
+		BF41EE6F1E2F07F700C3FF99 /* YNCouponTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YNCouponTableView.h; sourceTree = "<group>"; };
+		BF41EE701E2F07F700C3FF99 /* YNCouponTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YNCouponTableView.m; sourceTree = "<group>"; };
+		BF41EE721E2F717900C3FF99 /* YNGoodsSubmitView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YNGoodsSubmitView.h; sourceTree = "<group>"; };
+		BF41EE731E2F717900C3FF99 /* YNGoodsSubmitView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YNGoodsSubmitView.m; sourceTree = "<group>"; };
 		BF6147A51E2632D8004E990F /* YNShowEmptyView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YNShowEmptyView.h; sourceTree = "<group>"; };
 		BF6147A61E2632D8004E990F /* YNShowEmptyView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YNShowEmptyView.m; sourceTree = "<group>"; };
 		BF6147A81E26381F004E990F /* YNMineCouponViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YNMineCouponViewController.h; sourceTree = "<group>"; };
@@ -730,6 +739,8 @@
 			children = (
 				BF9302A51E28BDD000227EF0 /* YNGoodsCartTableView.h */,
 				BF9302A61E28BDD000227EF0 /* YNGoodsCartTableView.m */,
+				BF41EE721E2F717900C3FF99 /* YNGoodsSubmitView.h */,
+				BF41EE731E2F717900C3FF99 /* YNGoodsSubmitView.m */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -958,6 +969,8 @@
 		BFBEE8781E1CA93700FB6E3D /* 我的优惠劵 */ = {
 			isa = PBXGroup;
 			children = (
+				BF41EE6F1E2F07F700C3FF99 /* YNCouponTableView.h */,
+				BF41EE701E2F07F700C3FF99 /* YNCouponTableView.m */,
 			);
 			name = "我的优惠劵";
 			sourceTree = "<group>";
@@ -1034,6 +1047,8 @@
 			children = (
 				BF6147A81E26381F004E990F /* YNMineCouponViewController.h */,
 				BF6147A91E26381F004E990F /* YNMineCouponViewController.m */,
+				BF41EE6C1E2F052F00C3FF99 /* YNCouponListViewController.h */,
+				BF41EE6D1E2F052F00C3FF99 /* YNCouponListViewController.m */,
 			);
 			name = "我的优惠券";
 			sourceTree = "<group>";
@@ -1483,6 +1498,7 @@
 				BFBEE88C1E1DDCFC00FB6E3D /* YNWalletTableView.m in Sources */,
 				BFE240501E14FBD20076CE7A /* YNMineHeaderView.m in Sources */,
 				BF93031C1E2CB7A000227EF0 /* NSString+Size.m in Sources */,
+				BF41EE741E2F717900C3FF99 /* YNGoodsSubmitView.m in Sources */,
 				BFBEE85C1E1A675700FB6E3D /* YNUpdatePhoneTableView.m in Sources */,
 				BF9302B21E2B6EEF00227EF0 /* UIView+CornerRadius.m in Sources */,
 				BF9302AE1E2B6E5100227EF0 /* NSArray+Log.m in Sources */,
@@ -1503,6 +1519,7 @@
 				55DCAAC31E03901E003041CF /* YNBaseNavViewController.m in Sources */,
 				BFFCD3F51E13BFBA0042B8BF /* YNSearchViewController.m in Sources */,
 				BFD8D16C1E0A756E006E6AA8 /* PopoverAction.m in Sources */,
+				BF41EE6E1E2F052F00C3FF99 /* YNCouponListViewController.m in Sources */,
 				BFBEE8A21E1F319500FB6E3D /* YNPaySuccessViewController.m in Sources */,
 				BF652B101E1F8FFA006DA651 /* YNChangeMoneyView.m in Sources */,
 				BFD8D16D1E0A756E006E6AA8 /* PopoverView.m in Sources */,
@@ -1529,6 +1546,7 @@
 				BFBEE89C1E1E247A00FB6E3D /* YNWalletAccountView.m in Sources */,
 				BFD8D1861E0BD2FC006E6AA8 /* YNHomePageCollectionView.m in Sources */,
 				BF93028B1E27883500227EF0 /* TYTabPagerController.m in Sources */,
+				BF41EE711E2F07F700C3FF99 /* YNCouponTableView.m in Sources */,
 				BF9302B51E2C63C100227EF0 /* YNOrderDetailsViewController.m in Sources */,
 				BFBEE8811E1CAA1B00FB6E3D /* YNDistributionTableView.m in Sources */,
 				55DCA9F21E038D07003041CF /* AppDelegate.m in Sources */,

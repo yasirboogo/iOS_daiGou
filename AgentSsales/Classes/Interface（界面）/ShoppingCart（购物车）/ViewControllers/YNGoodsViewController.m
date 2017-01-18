@@ -57,7 +57,43 @@
 
 #pragma mark - 函数、消息
 -(void)makeData{
-    self.tableView.dataArray = @[@"1",@"2"];
+    NSMutableDictionary *dictM1 = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+                                   @"testGoods",@"image",
+                                   @"书籍-设计师的自我修养",@"title",
+                                   @"2016年出版版本",@"subTitle",
+                                   @NO,@"isSelect",
+                                   @"1",@"num",
+                                   @"500.14",@"price", nil];
+    NSMutableDictionary *dictM2 = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+                                   @"testGoods",@"image",
+                                   @"书籍-设计师的自我修养",@"title",
+                                   @"2016年出版版本",@"subTitle",
+                                   @NO,@"isSelect",
+                                   @"1",@"num",
+                                   @"500.14",@"price", nil];
+    NSMutableDictionary *dictM3 = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+                                   @"testGoods",@"image",
+                                   @"书籍-设计师的自我修养",@"title",
+                                   @"2016年出版版本",@"subTitle",
+                                   @NO,@"isSelect",
+                                   @"1",@"num",
+                                   @"500.14",@"price", nil];
+    NSMutableDictionary *dictM4 = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+                                   @"testGoods",@"image",
+                                   @"书籍-设计师的自我修养",@"title",
+                                   @"2016年出版版本",@"subTitle",
+                                   @NO,@"isSelect",
+                                   @"1",@"num",
+                                   @"500.14",@"price", nil];
+    NSMutableDictionary *dictM5 = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+                                   @"testGoods",@"image",
+                                   @"书籍-设计师的自我修养",@"title",
+                                   @"2016年出版版本",@"subTitle",
+                                   @NO,@"isSelect",
+                                   @"1",@"num",
+                                   @"500.14",@"price", nil];
+    
+    self.tableView.dataArrayM = [NSMutableArray arrayWithObjects:dictM1,dictM2,dictM3,dictM4,dictM5, nil];
     
 }
 -(void)makeNavigationBar{

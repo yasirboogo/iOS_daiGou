@@ -76,6 +76,7 @@
         
         [tableView setDidSelectMineTableViewCellClickBlock:^(NSInteger idx) {
             YNBaseViewController *pushVC = [[NSClassFromString(viewControllers[idx]) alloc] init];
+            
             [self.navigationController pushViewController:pushVC animated:NO];
         }];
     }

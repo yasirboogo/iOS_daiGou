@@ -66,7 +66,7 @@
     if (indexPath.section == 0 && indexPath.row == 0) {
         setCell.isOn = [[NSUserDefaults standardUserDefaults] boolForKey:@"ISACCEPT"];;
         [setCell setDidSelectSwitchButtonClick:^(BOOL isOn) {
-            NSLog(@"是否推送:%ld",isOn);
+            NSLog(@"是否推送:%d",isOn);
         }];
     }else if (indexPath.section == 1 && indexPath.row == 0){
         setCell.detailLabel.text = self.cache;

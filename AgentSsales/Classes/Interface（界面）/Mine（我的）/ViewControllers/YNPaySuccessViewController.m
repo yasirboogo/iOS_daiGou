@@ -111,13 +111,12 @@
         self.btnsView.btnTitles = @[@"查看我的钱包"];
     }else if ([self.titleStr isEqualToString:@"确认收货"]){
         //第一部分
-        self.topView.dict = @{@"image":@"chongzhichenggong",@"tips":@"你已确定收货！"};
+        self.topView.dict = @{@"image":@"querenshouhuo",@"tips":@"你已确定收货！"};
         //第二部分
         NSString *tips = @"你的商品已经确认收货，你可以返回首页或者查看订单详情。";
         CGSize msgSize = [tips calculateHightWithWidth:WIDTHF(_topView)-kMidSpace*2 font:FONT(28)];
         
         NSMutableAttributedString *msgAttributedStrM = [[NSMutableAttributedString alloc] initWithString:tips];
-//        [msgAttributedStrM addAttributes:@{NSForegroundColorAttributeName:COLOR_DF463E} range:NSMakeRange(4, 9)];
         
         self.msgView.msgSize = msgSize;
         self.msgView.dict = @{@"title":@"确认收货",@"msg":msgAttributedStrM};

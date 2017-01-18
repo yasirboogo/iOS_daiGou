@@ -8,12 +8,13 @@
 
 #import "YNShoppingCartViewController.h"
 #import "YNGoodsViewController.h"
+#import "YNGoodsSubmitView.h"
 
 @interface YNShoppingCartViewController ()<TYPagerControllerDataSource>
 
 @property (nonatomic, strong) TYTabButtonPagerController *pagerController;
 
-@property (nonatomic, strong) UIView *submitView;
+@property (nonatomic, strong) YNGoodsSubmitView *submitView;
 
 @end
 
@@ -51,6 +52,9 @@
         TYTabButtonPagerController *pagerController = [[TYTabButtonPagerController alloc] init];
         _pagerController = pagerController;
         pagerController.dataSource = self;
+        pagerController.cellSpacing = W_RATIO(100);
+        pagerController.cellWidth = pagerController.cellSpacing*1.5;
+        pagerController.collectionLayoutEdging = (SCREEN_WIDTH-pagerController.cellSpacing-pagerController.cellWidth*2)/2.0;
         pagerController.normalTextColor = COLOR_666666;
         pagerController.selectedTextColor = COLOR_DF463E;
         pagerController.normalTextFont = FONT(30);
@@ -64,13 +68,15 @@
     }
     return _pagerController;
 }
--(UIView *)submitView{
+-(YNGoodsSubmitView *)submitView{
     if (!_submitView) {
         CGRect frame = CGRectMake(0,SCREEN_HEIGHT-kUITabBarH-W_RATIO(90), SCREEN_WIDTH, W_RATIO(90));
-        UIView *submitView = [[UIView alloc] initWithFrame:frame];
+        YNGoodsSubmitView *submitView = [[YNGoodsSubmitView alloc] initWithFrame:frame];
         _submitView = submitView;
         [self.view addSubview:submitView];
-        submitView.backgroundColor = COLOR_DF463E;
+        [submitView setHandleSubmitButtonBlock:^{
+            NSLog(@"结算");
+        }];
     }
     return _submitView;
 }
@@ -98,6 +104,7 @@
 #pragma mark - 函数、消息
 -(void)makeData{
     [super makeData];
+    self.submitView.dict = @{@"allPrice":@"500.32",@"allNum":@"2"};
 }
 -(void)makeNavigationBar{
     [super makeNavigationBar];

@@ -23,6 +23,7 @@
 #define COLOR_CECECE kColorFromRGB(0xCECECE)
 #define COLOR_A4A4A4 kColorFromRGB(0xA4A4A4)
 #define COLOR_BABABA kColorFromRGB(0xBABABA)
+#define COLOR_BFBFBF kColorFromRGB(0xBFBFBF)
 /** 背景色 */
 #define COLOR_EDEDED kColorFromRGB(0xEDEDED)
 /** 阴影 */
