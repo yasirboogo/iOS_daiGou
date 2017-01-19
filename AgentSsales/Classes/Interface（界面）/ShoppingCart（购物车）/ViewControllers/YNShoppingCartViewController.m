@@ -7,14 +7,19 @@
 //
 
 #import "YNShoppingCartViewController.h"
+#import "YNPrefectInforViewController.h"
+#import "YNFirmOrderViewController.h"
 #import "YNGoodsViewController.h"
 #import "YNGoodsSubmitView.h"
+#import "YNTipsPerfectInforView.h"
 
 @interface YNShoppingCartViewController ()<TYPagerControllerDataSource>
 
 @property (nonatomic, strong) TYTabButtonPagerController *pagerController;
 
 @property (nonatomic, strong) YNGoodsSubmitView *submitView;
+
+@property (nonatomic, strong) YNTipsPerfectInforView *inforView;
 
 @end
 
@@ -75,10 +80,30 @@
         _submitView = submitView;
         [self.view addSubview:submitView];
         [submitView setHandleSubmitButtonBlock:^{
-            NSLog(@"结算");
+            BOOL isPrefect = NO;
+            if (!isPrefect) {//已经完善了
+                YNFirmOrderViewController *pushCV = [[YNFirmOrderViewController alloc] init];
+                [self.navigationController pushViewController:pushCV animated:NO];
+            }else{//没有完善
+                [self.inforView showPopView:YES];
+            }
+            
         }];
     }
     return _submitView;
+}
+-(YNTipsPerfectInforView *)inforView{
+    if (!_inforView) {
+        CGRect frame = CGRectMake((SCREEN_WIDTH-W_RATIO(536))/2.0, (SCREEN_HEIGHT-W_RATIO(506))/2.0, W_RATIO(536), W_RATIO(504));
+        YNTipsPerfectInforView *inforView = [[YNTipsPerfectInforView alloc] initWithFrame:frame img:[UIImage imageNamed:@"wanshanziliao_tubiao"] title:@"完善个人资料" tips:@"需要完善个人资料才能购买哦~" btnTitle:@"去完善"];
+        _inforView = inforView;
+//        inforView.isTapGesture = YES;
+        [inforView setDidSelectSubmitButtonBlock:^{
+            YNPrefectInforViewController *pushCV = [[YNPrefectInforViewController alloc] init];
+            [self.navigationController pushViewController:pushCV animated:NO];
+        }];
+    }
+    return _inforView;
 }
 #pragma mark - 代理实现
 #pragma mark - TYPagerControllerDataSource

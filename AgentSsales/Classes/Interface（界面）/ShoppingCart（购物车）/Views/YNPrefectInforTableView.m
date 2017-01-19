@@ -1,20 +1,20 @@
 //
-//  YNNewAddressTableView.m
+//  YNPrefectInforTableView.m
 //  AgentSsales
 //
-//  Created by innofive on 17/1/10.
+//  Created by innofive on 17/1/19.
 //  Copyright © 2017年 英诺. All rights reserved.
 //
 
-#import "YNNewAddressTableView.h"
+#import "YNPrefectInforTableView.h"
 #import "YNUserInforCell.h"
 
-@interface YNNewAddressTableView ()<UITextFieldDelegate,UITableViewDelegate,UITableViewDataSource>
+@interface YNPrefectInforTableView ()<UITextFieldDelegate,UITableViewDelegate,UITableViewDataSource>
 @property (nonatomic,strong) NSArray<NSDictionary*> *inforArray;
 
 @end
 
-@implementation YNNewAddressTableView
+@implementation YNPrefectInforTableView
 
 -(instancetype)init{
     self = [super init];
@@ -65,6 +65,8 @@
             self.locality = str;
         }else if (indexPath.row == 3){
             self.details = str;
+        }else if (indexPath.row == 4){
+            self.numberID = str;
         }
     }];
     
@@ -82,6 +84,7 @@
                         @{@"item":@"手机号码",@"placeholder":@"请输入收货人的手机号码"},
                         @{@"item":@"所在地区",@"placeholder":@"请选择所在地区"},
                         @{@"item":@"详细地址",@"placeholder":@"请输入详细地址"},
+                        @{@"item":@"身份证",@"placeholder":@"请输入身份证号码（选填）"},
                         ];
     }
     return _inforArray;

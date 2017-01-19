@@ -33,6 +33,11 @@
 		BF41EE6E1E2F052F00C3FF99 /* YNCouponListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = BF41EE6D1E2F052F00C3FF99 /* YNCouponListViewController.m */; };
 		BF41EE711E2F07F700C3FF99 /* YNCouponTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = BF41EE701E2F07F700C3FF99 /* YNCouponTableView.m */; };
 		BF41EE741E2F717900C3FF99 /* YNGoodsSubmitView.m in Sources */ = {isa = PBXBuildFile; fileRef = BF41EE731E2F717900C3FF99 /* YNGoodsSubmitView.m */; };
+		BF41EE771E304A0900C3FF99 /* YNTipsPerfectInforView.m in Sources */ = {isa = PBXBuildFile; fileRef = BF41EE761E304A0900C3FF99 /* YNTipsPerfectInforView.m */; };
+		BF41EE7A1E3087E000C3FF99 /* YNPrefectInforViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = BF41EE791E3087E000C3FF99 /* YNPrefectInforViewController.m */; };
+		BF41EE7D1E308A3D00C3FF99 /* YNPrefectInforTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = BF41EE7C1E308A3D00C3FF99 /* YNPrefectInforTableView.m */; };
+		BF41EE801E308F8B00C3FF99 /* YNFirmOrderViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = BF41EE7F1E308F8B00C3FF99 /* YNFirmOrderViewController.m */; };
+		BF41EE861E30A8BE00C3FF99 /* YNFireOrderCollectionView.m in Sources */ = {isa = PBXBuildFile; fileRef = BF41EE851E30A8BE00C3FF99 /* YNFireOrderCollectionView.m */; };
 		BF6147A71E2632D8004E990F /* YNShowEmptyView.m in Sources */ = {isa = PBXBuildFile; fileRef = BF6147A61E2632D8004E990F /* YNShowEmptyView.m */; };
 		BF6147AA1E26381F004E990F /* YNMineCouponViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = BF6147A91E26381F004E990F /* YNMineCouponViewController.m */; };
 		BF6147AD1E263886004E990F /* YNMineCodeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = BF6147AC1E263886004E990F /* YNMineCodeViewController.m */; };
@@ -194,6 +199,16 @@
 		BF41EE701E2F07F700C3FF99 /* YNCouponTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YNCouponTableView.m; sourceTree = "<group>"; };
 		BF41EE721E2F717900C3FF99 /* YNGoodsSubmitView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YNGoodsSubmitView.h; sourceTree = "<group>"; };
 		BF41EE731E2F717900C3FF99 /* YNGoodsSubmitView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YNGoodsSubmitView.m; sourceTree = "<group>"; };
+		BF41EE751E304A0900C3FF99 /* YNTipsPerfectInforView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YNTipsPerfectInforView.h; sourceTree = "<group>"; };
+		BF41EE761E304A0900C3FF99 /* YNTipsPerfectInforView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YNTipsPerfectInforView.m; sourceTree = "<group>"; };
+		BF41EE781E3087E000C3FF99 /* YNPrefectInforViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YNPrefectInforViewController.h; sourceTree = "<group>"; };
+		BF41EE791E3087E000C3FF99 /* YNPrefectInforViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YNPrefectInforViewController.m; sourceTree = "<group>"; };
+		BF41EE7B1E308A3D00C3FF99 /* YNPrefectInforTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YNPrefectInforTableView.h; sourceTree = "<group>"; };
+		BF41EE7C1E308A3D00C3FF99 /* YNPrefectInforTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YNPrefectInforTableView.m; sourceTree = "<group>"; };
+		BF41EE7E1E308F8B00C3FF99 /* YNFirmOrderViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YNFirmOrderViewController.h; sourceTree = "<group>"; };
+		BF41EE7F1E308F8B00C3FF99 /* YNFirmOrderViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YNFirmOrderViewController.m; sourceTree = "<group>"; };
+		BF41EE841E30A8BE00C3FF99 /* YNFireOrderCollectionView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YNFireOrderCollectionView.h; sourceTree = "<group>"; };
+		BF41EE851E30A8BE00C3FF99 /* YNFireOrderCollectionView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YNFireOrderCollectionView.m; sourceTree = "<group>"; };
 		BF6147A51E2632D8004E990F /* YNShowEmptyView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YNShowEmptyView.h; sourceTree = "<group>"; };
 		BF6147A61E2632D8004E990F /* YNShowEmptyView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YNShowEmptyView.m; sourceTree = "<group>"; };
 		BF6147A81E26381F004E990F /* YNMineCouponViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YNMineCouponViewController.h; sourceTree = "<group>"; };
@@ -730,6 +745,10 @@
 				55DCAAB11E03901E003041CF /* YNShoppingCartViewController.m */,
 				BF9302A21E28BA4C00227EF0 /* YNGoodsViewController.h */,
 				BF9302A31E28BA4C00227EF0 /* YNGoodsViewController.m */,
+				BF41EE781E3087E000C3FF99 /* YNPrefectInforViewController.h */,
+				BF41EE791E3087E000C3FF99 /* YNPrefectInforViewController.m */,
+				BF41EE7E1E308F8B00C3FF99 /* YNFirmOrderViewController.h */,
+				BF41EE7F1E308F8B00C3FF99 /* YNFirmOrderViewController.m */,
 			);
 			path = ViewControllers;
 			sourceTree = "<group>";
@@ -741,6 +760,12 @@
 				BF9302A61E28BDD000227EF0 /* YNGoodsCartTableView.m */,
 				BF41EE721E2F717900C3FF99 /* YNGoodsSubmitView.h */,
 				BF41EE731E2F717900C3FF99 /* YNGoodsSubmitView.m */,
+				BF41EE751E304A0900C3FF99 /* YNTipsPerfectInforView.h */,
+				BF41EE761E304A0900C3FF99 /* YNTipsPerfectInforView.m */,
+				BF41EE7B1E308A3D00C3FF99 /* YNPrefectInforTableView.h */,
+				BF41EE7C1E308A3D00C3FF99 /* YNPrefectInforTableView.m */,
+				BF41EE841E30A8BE00C3FF99 /* YNFireOrderCollectionView.h */,
+				BF41EE851E30A8BE00C3FF99 /* YNFireOrderCollectionView.m */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -1519,6 +1544,8 @@
 				55DCAAC31E03901E003041CF /* YNBaseNavViewController.m in Sources */,
 				BFFCD3F51E13BFBA0042B8BF /* YNSearchViewController.m in Sources */,
 				BFD8D16C1E0A756E006E6AA8 /* PopoverAction.m in Sources */,
+				BF41EE861E30A8BE00C3FF99 /* YNFireOrderCollectionView.m in Sources */,
+				BF41EE771E304A0900C3FF99 /* YNTipsPerfectInforView.m in Sources */,
 				BF41EE6E1E2F052F00C3FF99 /* YNCouponListViewController.m in Sources */,
 				BFBEE8A21E1F319500FB6E3D /* YNPaySuccessViewController.m in Sources */,
 				BF652B101E1F8FFA006DA651 /* YNChangeMoneyView.m in Sources */,
@@ -1535,8 +1562,10 @@
 				BFBEE8611E1B3E6B00FB6E3D /* YNMineCollectViewController.m in Sources */,
 				55DCAADB1E0392F3003041CF /* PDBeginView.m in Sources */,
 				BFBEE8991E1E1E9300FB6E3D /* YNWalletExchangeViewController.m in Sources */,
+				BF41EE801E308F8B00C3FF99 /* YNFirmOrderViewController.m in Sources */,
 				BFBEE8881E1DD65F00FB6E3D /* YNMineImgHeaderView.m in Sources */,
 				BF9302951E28773400227EF0 /* YNNewsDetailViewController.m in Sources */,
+				BF41EE7A1E3087E000C3FF99 /* YNPrefectInforViewController.m in Sources */,
 				BF9302921E285EB600227EF0 /* YNNewsListTableView.m in Sources */,
 				BF9303221E2E004F00227EF0 /* YNLogisticalMsgTableView.m in Sources */,
 				55DCAB741E039862003041CF /* UIView+Extension.m in Sources */,
@@ -1548,6 +1577,7 @@
 				BF93028B1E27883500227EF0 /* TYTabPagerController.m in Sources */,
 				BF41EE711E2F07F700C3FF99 /* YNCouponTableView.m in Sources */,
 				BF9302B51E2C63C100227EF0 /* YNOrderDetailsViewController.m in Sources */,
+				BF41EE7D1E308A3D00C3FF99 /* YNPrefectInforTableView.m in Sources */,
 				BFBEE8811E1CAA1B00FB6E3D /* YNDistributionTableView.m in Sources */,
 				55DCA9F21E038D07003041CF /* AppDelegate.m in Sources */,
 				BF93031A1E2CB7A000227EF0 /* NSString+Category.m in Sources */,
