@@ -11,6 +11,10 @@
 #import "YNTipsSuccessMsgView.h"
 #import "YNTipsSuccessBtnsView.h"
 
+#import "YNMineCouponViewController.h"
+#import "YNMineWalletViewController.h"
+#import "YNMineOrderViewController.h"
+
 @interface YNPaySuccessViewController ()
 
 @property (nonatomic,weak) YNTipsSuccessTopView * topView;
@@ -69,8 +73,8 @@
         _btnsView = btnsView;
         [self.view addSubview:btnsView];
         btnsView.btnStyle = UIButtonStyle1;
-        [btnsView setDidSelectBottomButtonClickBlock:^(NSString *str) {
-            NSLog(@"%@",str);
+        [btnsView setDidSelectBottomButtonClickBlock:^(NSString *name) {
+            [self handleBottomButtonClickWithName:name];
         }];
     }
     return _btnsView;
@@ -78,23 +82,39 @@
 #pragma mark - 代理实现
 
 #pragma mark - 函数、消息
+-(void)handleBottomButtonClickWithName:(NSString*)name{
+    if ([name isEqualToString:@"返回首页"]) {
+        [self.navigationController popToRootViewControllerAnimated:NO];
+    }else if ([name isEqualToString:@"查看订单"]){
+        YNMineOrderViewController *pushVC = [[YNMineOrderViewController alloc] init];
+        [self.navigationController pushViewController:pushVC animated:NO];
+    }else if ([name isEqualToString:@"查看我的钱包"]){
+        YNMineWalletViewController *pushVC = [[YNMineWalletViewController alloc] init];
+        [self.navigationController pushViewController:pushVC animated:NO];
+    }else if ([name isEqualToString:@"查看优惠劵"]){
+        YNMineCouponViewController *pushVC = [[YNMineCouponViewController alloc] init];
+        [self.navigationController pushViewController:pushVC animated:NO];
+    }
+}
+
 -(void)makeData{
     [super makeData];
     
-    if ([self.titleStr isEqualToString:@"支付成功"]) {
+    if ([self.titleStr isEqualToString:@"充值成功"]) {
         //第一部分
-        self.topView.dict = @{@"image":@"chongzhichenggong",@"tips":@"恭喜你，支付成功!"};
+        self.topView.dict = @{@"image":@"chongzhichenggong",@"tips":@"恭喜你，充值成功!"};
         //第二部分
         NSString *tips = @"您充值的[200元人民币]已成功存入我的钱包，并赠送了[20元优惠劵]，请前往查看。";
         CGSize msgSize = [tips calculateHightWithWidth:WIDTHF(_topView)-kMidSpace*2 font:FONT(28)];
         
         NSMutableAttributedString *msgAttributedStrM = [[NSMutableAttributedString alloc] initWithString:tips];
         [msgAttributedStrM addAttributes:@{NSForegroundColorAttributeName:COLOR_DF463E} range:NSMakeRange(4, 9)];
+        [msgAttributedStrM addAttributes:@{NSForegroundColorAttributeName:COLOR_649CE0} range:NSMakeRange(28, 7)];
         
         self.msgView.msgSize = msgSize;
-        self.msgView.dict = @{@"title":@"送货成功",@"msg":msgAttributedStrM};
+        self.msgView.dict = @{@"title":@"充值成功",@"msg":msgAttributedStrM};
         //第三部分
-        self.btnsView.btnTitles = @[@"返回首页",@"查看订单"];
+        self.btnsView.btnTitles = @[@"查看我的钱包",@"查看优惠劵"];
     }else if ([self.titleStr isEqualToString:@"兑换成功"]){
         //第一部分
         self.topView.dict = @{@"image":@"duihuanchenggong",@"tips":@"恭喜你，兑换成功!"};
@@ -120,6 +140,32 @@
         
         self.msgView.msgSize = msgSize;
         self.msgView.dict = @{@"title":@"确认收货",@"msg":msgAttributedStrM};
+        //第三部分
+        self.btnsView.btnTitles = @[@"返回首页",@"查看订单"];
+    }else if ([self.titleStr isEqualToString:@"支付成功"]){
+        //第一部分
+        self.topView.dict = @{@"image":@"zhifuchenggong",@"tips":@"恭喜你，支付成功！"};
+        //第二部分
+        NSString *tips = @"我们将尽快安排发货，请买家保持手机通讯通畅，以便快递小哥能第一时间联系到你。";
+        CGSize msgSize = [tips calculateHightWithWidth:WIDTHF(_topView)-kMidSpace*2 font:FONT(28)];
+        
+        NSMutableAttributedString *msgAttributedStrM = [[NSMutableAttributedString alloc] initWithString:tips];
+        
+        self.msgView.msgSize = msgSize;
+        self.msgView.dict = @{@"title":@"送货信息",@"msg":msgAttributedStrM};
+        //第三部分
+        self.btnsView.btnTitles = @[@"返回首页",@"查看订单"];
+    }else if ([self.titleStr isEqualToString:@"订单提交成功"]){
+        //第一部分
+        self.topView.dict = @{@"image":@"dingdantijiaochengong",@"tips":@"恭喜你，订单提交成功！"};
+        //第二部分
+        NSString *tips = @"代购订单需要确认邮费及关税后才能付款，处理需要1到3个工作日";
+        CGSize msgSize = [tips calculateHightWithWidth:WIDTHF(_topView)-kMidSpace*2 font:FONT(28)];
+        
+        NSMutableAttributedString *msgAttributedStrM = [[NSMutableAttributedString alloc] initWithString:tips];
+        
+        self.msgView.msgSize = msgSize;
+        self.msgView.dict = @{@"title":@"代购说明",@"msg":msgAttributedStrM};
         //第三部分
         self.btnsView.btnTitles = @[@"返回首页",@"查看订单"];
     }

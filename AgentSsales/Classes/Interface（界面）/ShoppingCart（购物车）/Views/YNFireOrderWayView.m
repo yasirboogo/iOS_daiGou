@@ -1,22 +1,23 @@
 //
-//  YNChangeMoneyView.m
+//  YNFireOrderWayView.m
 //  AgentSsales
 //
-//  Created by innofive on 17/1/6.
+//  Created by innofive on 17/1/20.
 //  Copyright © 2017年 英诺. All rights reserved.
 //
 
-#import "YNChangeMoneyView.h"
+#import "YNFireOrderWayView.h"
 
-@interface YNChangeMoneyView ()<UITableViewDelegate,UITableViewDataSource>
+@interface YNFireOrderWayView ()<UITableViewDelegate,UITableViewDataSource>
 
 @property (nonatomic, strong) UIView *baseView;
 
-@property (nonatomic, strong) NSIndexPath *indexPath;
+@property (nonatomic,strong) NSIndexPath * indexPath;
 
 @end
 
-@implementation YNChangeMoneyView
+@implementation YNFireOrderWayView
+
 -(instancetype)initWithRowHeight:(CGFloat)rowHeight width:(CGFloat)width showNumber:(NSInteger)showNumber{
     CGRect frame = CGRectMake((SCREEN_WIDTH-width)/2.0,(SCREEN_HEIGHT-(showNumber*rowHeight+kMidSpace*2))/2.0, width, (showNumber*rowHeight+kMidSpace*2));
     self = [super initWithFrame:frame];
@@ -58,9 +59,9 @@
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
-    YNChangeWayCell * wayCell = [tableView dequeueReusableCellWithIdentifier:@"wayCell"];
+    YNOrderWayCell * wayCell = [tableView dequeueReusableCellWithIdentifier:@"wayCell"];
     if (wayCell == nil) {
-        wayCell = [[YNChangeWayCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"wayCell"];
+        wayCell = [[YNOrderWayCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"wayCell"];
         wayCell.selectionStyle = UITableViewCellSelectionStyleNone;
     }
     wayCell.isSelect = (self.indexPath == indexPath) ? YES : NO;
@@ -71,8 +72,8 @@
     [tableView deselectRowAtIndexPath:indexPath animated:NO];
     self.indexPath = indexPath;
     [self reloadData];
-    if (self.didSelectChangeWayCellBlock) {
-        self.didSelectChangeWayCellBlock(_dataArray[indexPath.row][@"title"]);
+    if (self.didSelectOrderWayCellBlock) {
+        self.didSelectOrderWayCellBlock(_dataArray[indexPath.row][@"title"]);
     }
 }
 - (void)showPopView:(BOOL)animated
@@ -135,21 +136,21 @@
     [self dismissPopView:YES];
 }
 @end
-@interface YNChangeWayCell ()
+@interface YNOrderWayCell ()
 
-@property (nonatomic,strong) UIImageView * flagImgView;
+@property (nonatomic,weak) UILabel * titleLabel;
 
-@property (nonatomic,strong) UILabel * titleLabel;
+@property (nonatomic,weak) UILabel * subTitleLabel;
 
-@property (nonatomic,strong) UIButton * selectBtn;
+@property (nonatomic,weak) UIButton * selectBtn;
 
 @end
-@implementation YNChangeWayCell
+@implementation YNOrderWayCell
 
 -(void)setDict:(NSDictionary *)dict{
     _dict = dict;
-    self.flagImgView.image = [UIImage imageNamed:dict[@"image"]];
     self.titleLabel.text = dict[@"title"];
+    self.subTitleLabel.text = dict[@"subTitle"];
 }
 -(void)setIsSelect:(BOOL)isSelect{
     _isSelect = isSelect;
@@ -162,30 +163,32 @@
         [self.contentView addSubview:selectBtn];
         [selectBtn setBackgroundImage:[UIImage imageNamed:@"gou_kui_gouwuche"] forState:UIControlStateNormal];
         [selectBtn setBackgroundImage:[UIImage imageNamed:@"gou_hong_gouwuche"] forState:UIControlStateSelected];
-        //        [selectBtn addTarget:self action:@selector(buttonClick:) forControlEvents:UIControlEventTouchUpInside];
-        selectBtn.frame = CGRectMake(W_RATIO(660)-kMidSpace-kMaxSpace, (W_RATIO(120)-kMidSpace)/2.0, kMidSpace, kMidSpace);
+//        [selectBtn addTarget:self action:@selector(buttonClick:) forControlEvents:UIControlEventTouchUpInside];
+        selectBtn.frame = CGRectMake(W_RATIO(660)-kMidSpace-kMaxSpace, (W_RATIO(150)-kMidSpace)/2.0, kMidSpace, kMidSpace);
     }
     return _selectBtn;
 }
--(UIImageView *)flagImgView{
-    if (!_flagImgView) {
-        UIImageView *flagImgView = [[UIImageView alloc] init];
-        _flagImgView = flagImgView;
-        [self.contentView addSubview:flagImgView];
-        flagImgView.frame = CGRectMake(kMaxSpace,(W_RATIO(120)-W_RATIO(60))/2.0, W_RATIO(60), W_RATIO(60));
-    }
-    return _flagImgView;
-}
+
 -(UILabel *)titleLabel{
     if (!_titleLabel) {
         UILabel *titleLabel = [[UILabel alloc] init];
         _titleLabel = titleLabel;
         [self.contentView addSubview:titleLabel];
-        titleLabel.font = FONT(32);
+        titleLabel.font = FONT(36);
         titleLabel.textColor = COLOR_333333;
-        titleLabel.frame = CGRectMake(MaxXF(_flagImgView)+W_RATIO(20),(W_RATIO(120)-W_RATIO(40))/2.0, XF(_selectBtn)-MaxXF(_flagImgView)-W_RATIO(20)*2, W_RATIO(40));
+        titleLabel.frame = CGRectMake(kMaxSpace, W_RATIO(30), XF(_selectBtn)-kMaxSpace-kMinSpace, W_RATIO(40));
     }
     return _titleLabel;
 }
-
+-(UILabel *)subTitleLabel{
+    if (!_subTitleLabel) {
+        UILabel *subTitleLabel = [[UILabel alloc] init];
+        _subTitleLabel = subTitleLabel;
+        [self.contentView addSubview:subTitleLabel];
+        subTitleLabel.font = FONT(32);
+        subTitleLabel.textColor = COLOR_999999;
+        subTitleLabel.frame = CGRectMake(XF(_titleLabel),MaxYF(_titleLabel)+kMinSpace,MaxXF(_titleLabel), W_RATIO(40));
+    }
+    return _subTitleLabel;
+}
 @end

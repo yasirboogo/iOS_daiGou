@@ -10,7 +10,13 @@
 
 @interface YNFireOrderCollectionView : UICollectionView
 
+@property (nonatomic,copy) NSString * postWay;
+
 @property (nonatomic,strong) NSArray * dataArray;
+
+@property (nonatomic,assign) NSInteger index;
+
+@property (nonatomic,copy) void(^didSelectPostWayBlock)();
 
 @end
 @interface YNFireOrderCell : UICollectionViewCell
@@ -25,6 +31,10 @@
 @end
 @interface YNFireOrderFooterView : UICollectionReusableView
 
+@property (nonatomic,copy) void(^didSelectPostWayBlock)();
+
 @property (nonatomic,strong) NSDictionary * dict;
+
+@property (nonatomic,copy) NSString * postWay;
 
 @end

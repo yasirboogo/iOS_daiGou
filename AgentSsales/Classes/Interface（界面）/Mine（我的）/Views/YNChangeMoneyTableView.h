@@ -9,15 +9,25 @@
 #import <UIKit/UIKit.h>
 
 @interface YNChangeMoneyTableView : UITableView
+@property (nonatomic,copy) void(^didSelectMoneyTypeClickBlock)(NSIndexPath*);
 
+@property (nonatomic,copy) void(^didSelectMoneyNumClickBlock)();
+
+@property (nonatomic,copy) NSString * type1;
+
+@property (nonatomic,copy) NSString * money1;
+
+@property (nonatomic,copy) NSString * type2;
+
+@property (nonatomic,copy) NSString * money2;
 
 @end
 
 @interface YNChangeMoneyCell : UITableViewCell
 
-@property (nonatomic,copy) void(^didSelectMoneyTypeClickBlock)(NSString*);
+@property (nonatomic,copy) void(^didSelectMoneyTypeClickBlock)();
 
-@property (nonatomic,copy) void(^didSelectMoneyNumClickBlock)(NSString*);
+@property (nonatomic,copy) void(^didSelectMoneyNumClickBlock)();
 
 @property (nonatomic,copy) NSString * name;
 

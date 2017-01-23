@@ -111,7 +111,7 @@
 #pragma mark - 函数、消息
 -(void)rechargeButtonClick:(UIButton*)btn{
     YNPaySuccessViewController *pushVC = [[YNPaySuccessViewController alloc] init];
-    pushVC.titleStr = @"支付成功";
+    pushVC.titleStr = @"充值成功";
     [self.navigationController pushViewController:pushVC animated:NO];
 }
 -(void)makeData{

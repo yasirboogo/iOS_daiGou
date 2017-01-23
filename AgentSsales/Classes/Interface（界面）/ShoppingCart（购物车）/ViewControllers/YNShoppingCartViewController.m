@@ -21,6 +21,8 @@
 
 @property (nonatomic, strong) YNTipsPerfectInforView *inforView;
 
+@property (nonatomic, assign) NSInteger index;
+
 @end
 
 
@@ -69,6 +71,9 @@
         pagerController.view.frame = CGRectMake(0, kUINavHeight, SCREEN_WIDTH, SCREEN_HEIGHT-kUINavHeight-HEIGHTF(self.submitView));
         [self addChildViewController:pagerController];
         [self.view addSubview:pagerController.view];
+        [pagerController setDidScrollToTabPageIndexHandle:^(NSInteger index) {
+            self.index = index;
+        }];
         
     }
     return _pagerController;
@@ -80,12 +85,12 @@
         _submitView = submitView;
         [self.view addSubview:submitView];
         [submitView setHandleSubmitButtonBlock:^{
-            BOOL isPrefect = NO;
-            if (!isPrefect) {//已经完善了
-                YNFirmOrderViewController *pushCV = [[YNFirmOrderViewController alloc] init];
-                [self.navigationController pushViewController:pushCV animated:NO];
-            }else{//没有完善
+            if (self.index == 0 && self.isPrefect == NO) {
                 [self.inforView showPopView:YES];
+            }else if (self.isPrefect == YES){
+                YNFirmOrderViewController *pushCV = [[YNFirmOrderViewController alloc] init];
+                pushCV.index = self.index;
+                [self.navigationController pushViewController:pushCV animated:NO];
             }
             
         }];

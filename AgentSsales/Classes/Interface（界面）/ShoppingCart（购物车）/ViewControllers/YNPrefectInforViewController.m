@@ -8,6 +8,7 @@
 
 #import "YNPrefectInforViewController.h"
 #import "YNPrefectInforTableView.h"
+#import "YNShoppingCartViewController.h"
 
 @interface YNPrefectInforViewController ()
 
@@ -70,14 +71,16 @@
 
 #pragma mark - 函数、消息
 -(void)handlePrefectInforSubmitButtonClick:(UIButton*)btn{
-//    NSLog(@"%@",_tableView.textArrayM);
+    YNShoppingCartViewController *lastVc = [self.navigationController.viewControllers objectAtIndex:self.navigationController.viewControllers.count-2];
+    lastVc.isPrefect = YES;
+    [self.navigationController popViewControllerAnimated:NO];
 }
 -(void)makeData{
     [super makeData];
 }
 -(void)makeNavigationBar{
     [super makeNavigationBar];
-    self.titleLabel.text = @"修改手机";
+    self.titleLabel.text = @"完善资料";
 }
 -(void)makeUI{
     [super makeUI];

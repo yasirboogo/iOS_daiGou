@@ -8,12 +8,16 @@
 
 #import "YNFirmOrderViewController.h"
 #import "YNFireOrderCollectionView.h"
-
+#import "YNPayMoneyViewController.h"
+#import "YNPaySuccessViewController.h"
+#import "YNFireOrderWayView.h"
 @interface YNFirmOrderViewController ()
 
 @property (nonatomic,weak) YNFireOrderCollectionView *collectionView;
 
 @property (nonatomic,weak) UIButton *submitBtn;
+
+@property (nonatomic,weak) YNFireOrderWayView *wayView;
 
 @end
 
@@ -50,6 +54,11 @@
         YNFireOrderCollectionView *collectionView = [[YNFireOrderCollectionView alloc] initWithFrame:frame];
         _collectionView = collectionView;
         [self.view addSubview:collectionView];
+        collectionView.index = self.index;
+        collectionView.postWay = self.wayView.dataArray[0][@"title"];
+        [collectionView setDidSelectPostWayBlock:^{
+            [self.wayView showPopView:YES];
+        }];
     }
     return _collectionView;
 }
@@ -68,12 +77,34 @@
     }
     return _submitBtn;
 }
-
+-(YNFireOrderWayView *)wayView{
+    if (!_wayView) {
+        YNFireOrderWayView *wayView = [[YNFireOrderWayView alloc] initWithRowHeight:W_RATIO(150) width:W_RATIO(660) showNumber:3];
+        _wayView = wayView;
+//        wayView.isTapGesture = YES;
+        wayView.dataArray = @[@{@"title":@"空运20元",@"subTitle":@"(预计约6天收货)"},
+                                   @{@"title":@"海运10元",@"subTitle":@"(预计约10天收货)"},
+                                   @{@"title":@"普通快递10元",@"subTitle":@"(预计约15天收货)"}];
+        [wayView setDidSelectOrderWayCellBlock:^(NSString *way) {
+            [_wayView dismissPopView:YES];
+            self.collectionView.postWay = way;
+        }];
+    }
+    return _wayView;
+}
 #pragma mark - 代理实现
 
 #pragma mark - 函数、消息
 -(void)handleFirmOrderSubmitButtonClick:(UIButton*)btn{
-    //    NSLog(@"%@",_tableView.textArrayM);
+    if (self.index == 0) {
+            YNPaySuccessViewController *pushVC = [[YNPaySuccessViewController alloc] init];
+            pushVC.titleStr = @"订单提交成功";
+            [self.navigationController pushViewController:pushVC animated:NO];
+        
+    }else if (self.index == 1){
+        YNPayMoneyViewController *pushVC = [[YNPayMoneyViewController alloc] init];
+        [self.navigationController pushViewController:pushVC animated:NO];
+    }
 }
 -(void)makeData{
     [super makeData];

@@ -40,6 +40,8 @@
         footerView.frame = CGRectMake(0, 0, WIDTHF(self), W_RATIO(150));
         footerView.backgroundColor = COLOR_649CE0;
         
+        YYLabel *changeLabel = [[YYLabel alloc] init];
+        
     }
     return _footerView;
 }
@@ -57,16 +59,50 @@
     }
     if (indexPath.row == 0) {
         moneyCell.name = @"持有货币";
+        moneyCell.type = self.type1;
+        moneyCell.money = self.money1;
+        [moneyCell setDidSelectMoneyNumClickBlock:^{
+            if (self.didSelectMoneyNumClickBlock) {
+                self.didSelectMoneyNumClickBlock();
+            }
+        }];
+
     }else if (indexPath.row == 1){
         moneyCell.name = @"兑换货币";
+        moneyCell.type = self.type2;
+        moneyCell.money = self.money2;
     }
-    moneyCell.type = @"人民币";
-    moneyCell.money = @"1234";
+    [moneyCell setDidSelectMoneyTypeClickBlock:^{
+        if (self.didSelectMoneyTypeClickBlock) {
+            self.didSelectMoneyTypeClickBlock(indexPath);
+        }
+    }];
     
     return moneyCell;
 }
-@end
+-(void)setType1:(NSString *)type1{
+    _type1 = type1;
+    
+    _money2 = [NSString stringWithFormat:@"%f",[_money1 floatValue] * 10];
+    
+    [self reloadData];
+}
+-(void)setType2:(NSString *)type2{
+    _type2 = type2;
+    
+    _money2 = [NSString stringWithFormat:@"%f",[_money1 floatValue] * 10];
+    
+    [self reloadData];
+}
+-(void)setMoney1:(NSString *)money1{
+    _money1 = money1;
+    
+    _money2 = [NSString stringWithFormat:@"%f",[_money1 floatValue] * 10];
+    
+    [self reloadData];
+}
 
+@end
 @interface YNChangeMoneyCell ()
 
 @property (nonatomic,weak) UILabel * nameLabel;
@@ -98,7 +134,6 @@
         [self.arrowBtn setBackgroundImage:[UIImage imageNamed:@"xuanze_bai"] forState:UIControlStateNormal];
         
         self.symbolLabel.textColor = COLOR_FFFFFF;
-        self.symbolLabel.text = @"CN￥";
         
         self.moneyLabel.textColor = COLOR_FFFFFF;
         
@@ -113,7 +148,6 @@
         [self.arrowBtn setBackgroundImage:[UIImage imageNamed:@"xuanze_hong"] forState:UIControlStateNormal];
         
         self.symbolLabel.textColor = COLOR_000000;
-        self.symbolLabel.text = @"$";
         
         self.moneyLabel.textColor = COLOR_000000;
         
@@ -123,11 +157,18 @@
     _type = type;
     
     self.typeLabel.text = type;
+    if ([type isEqualToString:@"人民币"]) {
+        self.symbolLabel.text = @"MCY";
+    }else if ([type isEqualToString:@"马来西亚币"]){
+        self.symbolLabel.text = @"RM";
+    }else if ([type isEqualToString:@"美元"]){
+        self.symbolLabel.text = @"USD";
+    }
 }
 -(void)setMoney:(NSString *)money{
     _money = money;
     
-    self.moneyLabel.text = money;
+    self.moneyLabel.text = [NSString stringWithFormat:@"%0.2f",[money floatValue]];
 }
 
 -(void)layoutSubviews{
@@ -167,9 +208,9 @@
         UILabel *typeLabel = [[UILabel alloc] init];
         _typeLabel = typeLabel;
         [self.contentView addSubview:typeLabel];
-        typeLabel.font = FONT(40);
+        typeLabel.font = FONT(36);
         typeLabel.userInteractionEnabled = YES;
-        UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleArrowButtonSelectClick:)];
+        UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleArrowButtonSelectClick)];
         [typeLabel addGestureRecognizer:tap];
     }
     return _typeLabel;
@@ -179,14 +220,13 @@
         UIButton *arrowBtn =[UIButton buttonWithType:UIButtonTypeCustom];
         _arrowBtn = arrowBtn;
         [self.contentView addSubview:arrowBtn];
-        [arrowBtn addTarget:self action:@selector(handleArrowButtonSelectClick:) forControlEvents:UIControlEventTouchUpInside];
+        [arrowBtn addTarget:self action:@selector(handleArrowButtonSelectClick) forControlEvents:UIControlEventTouchUpInside];
     }
     return _arrowBtn;
 }
--(void)handleArrowButtonSelectClick:(UIButton*)btn{
-    NSLog(@"handleArrowButtonSelectClick");
+-(void)handleArrowButtonSelectClick{
     if (self.didSelectMoneyTypeClickBlock) {
-        self.didSelectMoneyTypeClickBlock(@"1");
+        self.didSelectMoneyTypeClickBlock();
     }
 }
 -(UILabel *)symbolLabel{
@@ -194,7 +234,7 @@
         UILabel *symbolLabel =[[UILabel alloc] init];
         _symbolLabel = symbolLabel;
         [self.contentView addSubview:symbolLabel];
-        symbolLabel.font = FONT(36);
+        symbolLabel.font = FONT(32);
         symbolLabel.textAlignment = NSTextAlignmentRight;
     }
     return _symbolLabel;
@@ -218,15 +258,14 @@
         moneyScrollView.showsVerticalScrollIndicator = NO;
         moneyScrollView.bounces = NO;
         
-        UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handlemoneyScrollViewClick:)];
+        UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handlemoneyScrollViewClick)];
         [moneyScrollView addGestureRecognizer:tap];
     }
     return _moneyScrollView;
 }
--(void)handlemoneyScrollViewClick:(UIButton*)btn{
-    NSLog(@"handlemoneyScrollViewClick");
-    if (self.didSelectMoneyTypeClickBlock) {
-        self.didSelectMoneyTypeClickBlock(@"1024");
+-(void)handlemoneyScrollViewClick{
+    if (self.didSelectMoneyNumClickBlock) {
+        self.didSelectMoneyNumClickBlock();
     }
 }
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch{

@@ -10,4 +10,6 @@
 
 @interface YNShoppingCartViewController : YNBaseViewController
 
+@property (nonatomic,assign) BOOL isPrefect;
+
 @end

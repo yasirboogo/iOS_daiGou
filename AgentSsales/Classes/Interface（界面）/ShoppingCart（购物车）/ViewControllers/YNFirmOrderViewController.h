@@ -10,4 +10,6 @@
 
 @interface YNFirmOrderViewController : YNBaseViewController
 
+@property (nonatomic,assign) NSInteger index;
+
 @end

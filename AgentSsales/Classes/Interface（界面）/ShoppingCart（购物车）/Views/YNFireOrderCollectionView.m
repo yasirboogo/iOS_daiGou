@@ -17,12 +17,14 @@
 -(instancetype)initWithFrame:(CGRect)frame{
     
     UICollectionViewFlowLayout *flowLayout = [[UICollectionViewFlowLayout alloc] init];
-    flowLayout.minimumLineSpacing = 0;
+    flowLayout.minimumLineSpacing = kZero;
     flowLayout.minimumInteritemSpacing = W_RATIO(20);
     flowLayout.itemSize = CGSizeMake(WIDTH(frame)-flowLayout.minimumInteritemSpacing*2, W_RATIO(260));
     self = [super initWithFrame:frame collectionViewLayout:flowLayout];
     if (self) {
         self.backgroundColor = COLOR_EDEDED;
+        self.bounces = NO;
+        self.showsVerticalScrollIndicator = NO;
         self.dataSource = self;
         self.delegate = self;
         
@@ -43,20 +45,40 @@
     return CGSizeMake(SCREEN_WIDTH, W_RATIO(170)+W_RATIO(100));
 }
 -(CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout referenceSizeForFooterInSection:(NSInteger)section{
-    return CGSizeMake(SCREEN_WIDTH, W_RATIO(380));
+    if (self.index == 0) {
+        return CGSizeMake(SCREEN_WIDTH,  W_RATIO(100)+W_RATIO(20)*2);
+    }else if (self.index == 1){
+        return CGSizeMake(SCREEN_WIDTH, W_RATIO(100)+W_RATIO(20)*2+W_RATIO(300));
+    }
+    return CGSizeZero;
 }
 -(UICollectionReusableView *)collectionView:(UICollectionView *)collectionView viewForSupplementaryElementOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath{
     if ([kind isEqualToString:UICollectionElementKindSectionHeader]) {
         YNFireOrderHeaderView *headerView = [collectionView dequeueReusableSupplementaryViewOfKind:kind withReuseIdentifier:@"headerView" forIndexPath:indexPath];
         headerView.dict = @{@"name":@"王大锤",@"phone":@"13631499633",@"address":@"广东省广州市白云区云城西路2208创意园A东1楼整层",@"item":@"平台商品"};
-//        headerView.backgroundColor = COLOR_FFFFFF;
         return headerView;
     }else if ([kind isEqualToString:UICollectionElementKindSectionFooter]){
         YNFireOrderFooterView *footerView = [collectionView dequeueReusableSupplementaryViewOfKind:kind withReuseIdentifier:@"footerView" forIndexPath:indexPath];
-        footerView.backgroundColor = COLOR_FFFFFF;
+        footerView.postWay = self.postWay;
+        [footerView setDidSelectPostWayBlock:^{
+            self.didSelectPostWayBlock();
+        }];
+        if (self.index == 0) {
+            
+        }else if (self.index == 1){
+            footerView.dict = @{@"num":@"2",
+                                @"total":@"502.64",
+                                @"postage":@"10",
+                                @"discount":@"12.54",
+                                @"pay":@"452.02"};
+        }
         return footerView;
     }
     return nil;
+}
+-(void)setPostWay:(NSString *)postWay{
+    _postWay = postWay;
+    [self reloadData];
 }
 - (__kindof UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath{
     YNFireOrderCell *fireCell = [collectionView dequeueReusableCellWithReuseIdentifier:@"fireCell" forIndexPath:indexPath];
@@ -309,20 +331,259 @@
 @interface YNFireOrderFooterView ()
 
 @property (nonatomic,weak) UIView * topView;
+@property (nonatomic,weak) UILabel * wayLabel;
+@property (nonatomic,weak) UILabel * priceLabel;
+@property (nonatomic,weak) UIImageView * arrowImgView;
 
+@property (nonatomic,weak) UILabel * markTotalLabel;
 @property (nonatomic,weak) UILabel * totalLLabel;
 @property (nonatomic,weak) UILabel * totalRLabel;
 
-@property (nonatomic,weak) UILabel * postageLabel;
-@property (nonatomic,weak) UILabel * postageRabel;
+@property (nonatomic,weak) UILabel * markPostageLabel;
+@property (nonatomic,weak) UILabel * postageLLabel;
+@property (nonatomic,weak) UILabel * postageRLabel;
 
-@property (nonatomic,weak) UILabel * discountLabel;
-@property (nonatomic,weak) UILabel * discountRabel;
+@property (nonatomic,weak) UILabel * markDiscountLabel;
+@property (nonatomic,weak) UILabel * discountLLabel;
+@property (nonatomic,weak) UILabel * discountRLabel;
 
+@property (nonatomic,weak) UILabel * markPayLabel;
 @property (nonatomic,weak) UILabel * payLLabel;
-@property (nonatomic,weak) UILabel * payLRabel;
+@property (nonatomic,weak) UILabel * payRLabel;
 @end
 @implementation YNFireOrderFooterView
+
+-(void)setPostWay:(NSString *)postWay{
+    _postWay = postWay;
+    self.wayLabel.text = @"配运方式";
+    self.arrowImgView.image = [UIImage imageNamed:@"mianbaoxie_you_gouwuche"];
+    self.priceLabel.text = postWay;
+}
+
+-(void)setDict:(NSDictionary *)dict{
+    _dict = dict;
+
+    self.totalRLabel.text = dict[@"total"];
+    self.markTotalLabel.text = @"￥";
+    self.totalLLabel.text = [NSString stringWithFormat:@"%@件商品，共计:",dict[@"num"]];
+    
+    self.postageLLabel.text = @"邮费:";
+    self.postageRLabel.text = dict[@"postage"];
+    self.markPostageLabel.text = _markTotalLabel.text;
+    
+    self.discountLLabel.text = @"优惠券抵扣";
+    self.discountRLabel.text = dict[@"discount"];
+    self.markDiscountLabel.text = _markTotalLabel.text;
+    
+    self.payLLabel.text = @"应付金额";
+    self.payRLabel.text = dict[@"pay"];
+    self.markPayLabel.text = _markTotalLabel.text;
+}
+
+-(void)layoutSubviews{
+    [super layoutSubviews];
+    
+    CGSize totalRSize = [_totalRLabel.text calculateHightWithFont:_totalRLabel.font maxWidth:WIDTHF(self)/2.0];
+    self.totalRLabel.frame = CGRectMake(WIDTHF(self)-W_RATIO(30)-totalRSize.width,MaxYF(_topView)+kMidSpace,totalRSize.width, totalRSize.height);
+    CGSize markSize = [_markTotalLabel.text calculateHightWithFont:_markTotalLabel.font maxWidth:0];
+    self.markTotalLabel.frame = CGRectMake(XF(_totalRLabel)-markSize.width, MaxYF(_totalRLabel)-markSize.height, markSize.width, markSize.height);
+    CGSize totalLSize = [_totalLLabel.text calculateHightWithFont:_totalLLabel.font maxWidth:XF(_markTotalLabel)-W_RATIO(30)*2];
+    self.totalLLabel.frame = CGRectMake(W_RATIO(30), MaxYF(_markTotalLabel)-totalLSize.height,XF(_markTotalLabel)-W_RATIO(20)-XF(_totalLLabel), totalLSize.height);
+    
+    CGSize postageRSize = [_postageRLabel.text calculateHightWithFont:_postageRLabel.font maxWidth:WIDTHF(self)/2.0];
+    self.postageRLabel.frame = CGRectMake(MaxXF(_totalRLabel)-postageRSize.width, MaxYF(_totalRLabel)+W_RATIO(20),postageRSize.width,postageRSize.height);
+    self.markPostageLabel.frame = CGRectMake(XF(_postageRLabel)-markSize.width, MaxYF(_postageRLabel)-markSize.height, markSize.width, markSize.height);
+    self.postageLLabel.frame = CGRectMake(XF(_totalLLabel),MaxYF(_markPostageLabel)-totalLSize.height, XF(_markPostageLabel)-W_RATIO(20)-XF(_totalLLabel), totalLSize.height);
+
+    CGSize discountRSize = [_discountRLabel.text calculateHightWithFont:_discountRLabel.font maxWidth:WIDTHF(self)/2.0];
+    self.discountRLabel.frame = CGRectMake(MaxXF(_postageRLabel)-discountRSize.width, MaxYF(_postageRLabel)+W_RATIO(20),discountRSize.width,discountRSize.height);
+    self.markDiscountLabel.frame = CGRectMake(XF(_discountRLabel)-markSize.width, MaxYF(_discountRLabel)-markSize.height, markSize.width, markSize.height);
+    self.discountLLabel.frame = CGRectMake(XF(_totalLLabel),MaxYF(_markDiscountLabel)-totalLSize.height, XF(_markDiscountLabel)-W_RATIO(20)-XF(_totalLLabel), totalLSize.height);
+    
+    CGSize payRSize = [_payRLabel.text calculateHightWithFont:_payRLabel.font maxWidth:WIDTHF(self)/2.0];
+    self.payRLabel.frame = CGRectMake(MaxXF(_discountRLabel)-payRSize.width, MaxYF(_discountRLabel)+W_RATIO(20),payRSize.width,payRSize.height);
+    self.markPayLabel.frame = CGRectMake(XF(_payRLabel)-markSize.width, MaxYF(_payRLabel)-markSize.height, markSize.width, markSize.height);
+    CGSize payLSize = [_payLLabel.text calculateHightWithFont:_discountRLabel.font maxWidth:0];
+    self.payLLabel.frame = CGRectMake(XF(_totalLLabel),MaxYF(_markPayLabel)-payLSize.height, XF(_markDiscountLabel)-W_RATIO(20)-XF(_totalLLabel), payLSize.height);
+    
+}
+
+-(UIView *)topView{
+    if (!_topView) {
+        UIView *topView = [[UIView alloc] init];
+        _topView = topView;
+        [self addSubview:topView];
+        topView.backgroundColor = COLOR_FFFFFF;
+        topView.frame = CGRectMake(W_RATIO(20), W_RATIO(20), WIDTHF(self)-W_RATIO(20)*2, W_RATIO(100));
+        topView.layer.masksToBounds = YES;
+        topView.layer.cornerRadius = W_RATIO(20);
+        
+        UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTapGestureClick)];
+        [topView addGestureRecognizer:tapGesture];
+    }
+    return _topView;
+}
+-(void)handleTapGestureClick{
+    if (self.didSelectPostWayBlock) {
+        self.didSelectPostWayBlock();
+    }
+}
+-(UILabel *)wayLabel{
+    if (!_wayLabel) {
+        UILabel *wayLabel = [[UILabel alloc] init];
+        _wayLabel = wayLabel;
+        [self.topView addSubview:wayLabel];
+        wayLabel.font = FONT(32);
+        wayLabel.textColor = COLOR_999999;
+        wayLabel.frame = CGRectMake(W_RATIO(20), 0, WIDTHF(_topView)/3.0, HEIGHTF(_topView));
+    }
+    return _wayLabel;
+}
+-(UIImageView *)arrowImgView{
+    if (!_arrowImgView) {
+        UIImageView *arrowImgView = [[UIImageView alloc] init];
+        _arrowImgView = arrowImgView;
+        [self.topView addSubview:arrowImgView];
+        arrowImgView.frame = CGRectMake(WIDTHF(_topView)-W_RATIO(20)-W_RATIO(24), (HEIGHTF(_topView)-W_RATIO(24))/2.0, W_RATIO(14), W_RATIO(24));
+    }
+    return _arrowImgView;
+}
+-(UILabel *)priceLabel{
+    if (!_priceLabel) {
+        UILabel *priceLabel = [[UILabel alloc] init];
+        _priceLabel = priceLabel;
+        [self.topView addSubview:priceLabel];
+        priceLabel.font = FONT(32);
+        priceLabel.textAlignment = NSTextAlignmentRight;
+        priceLabel.textColor = COLOR_333333;
+        priceLabel.frame = CGRectMake(MaxXF(_wayLabel),YF(_wayLabel),XF(_arrowImgView)-MaxXF(_wayLabel)-W_RATIO(20)*2, HEIGHTF(_topView));
+    }
+    return _priceLabel;
+}
+-(UILabel *)totalLLabel{
+    if (!_totalLLabel) {
+        UILabel *totalLLabel = [[UILabel alloc] init];
+        _totalLLabel = totalLLabel;
+        [self addSubview:totalLLabel];
+        totalLLabel.font = FONT(28);
+        totalLLabel.textColor = COLOR_666666;
+    }
+    return _totalLLabel;
+}
+-(UILabel *)totalRLabel{
+    if (!_totalRLabel) {
+        UILabel *totalRLabel = [[UILabel alloc] init];
+        _totalRLabel = totalRLabel;
+        [self addSubview:totalRLabel];
+        totalRLabel.textAlignment = NSTextAlignmentRight;
+        totalRLabel.font = FONT(34);
+        totalRLabel.textColor = COLOR_666666;
+    }
+    return _totalRLabel;
+}
+-(UILabel *)markTotalLabel{
+    if (!_markTotalLabel) {
+        UILabel *markTotalLabel = [[UILabel alloc] init];
+        _markTotalLabel = markTotalLabel;
+        [self addSubview:markTotalLabel];
+        markTotalLabel.font = FONT(26);
+        markTotalLabel.textColor = COLOR_666666;
+    }
+    return _markTotalLabel;
+}
+-(UILabel *)postageLLabel{
+    if (!_postageLLabel) {
+        UILabel *postageLLabel = [[UILabel alloc] init];
+        _postageLLabel = postageLLabel;
+        [self addSubview:postageLLabel];
+        postageLLabel.font = FONT(28);
+        postageLLabel.textColor = COLOR_666666;
+    }
+    return _postageLLabel;
+}
+-(UILabel *)postageRLabel{
+    if (!_postageRLabel) {
+        UILabel *postageRLabel = [[UILabel alloc] init];
+        _postageRLabel = postageRLabel;
+        [self addSubview:postageRLabel];
+        postageRLabel.textAlignment = NSTextAlignmentRight;
+        postageRLabel.font = FONT(34);
+        postageRLabel.textColor = COLOR_666666;
+    }
+    return _postageRLabel;
+}
+-(UILabel *)markPostageLabel{
+    if (!_markPostageLabel) {
+        UILabel *markPostageLabel = [[UILabel alloc] init];
+        _markPostageLabel = markPostageLabel;
+        [self addSubview:markPostageLabel];
+        markPostageLabel.font = FONT(26);
+        markPostageLabel.textColor = COLOR_666666;
+    }
+    return _markPostageLabel;
+}
+-(UILabel *)discountLLabel{
+    if (!_discountLLabel) {
+        UILabel *discountLLabel = [[UILabel alloc] init];
+        _discountLLabel = discountLLabel;
+        [self addSubview:discountLLabel];
+        discountLLabel.font = FONT(28);
+        discountLLabel.textColor = COLOR_666666;
+    }
+    return _discountLLabel;
+}
+-(UILabel *)discountRLabel{
+    if (!_discountRLabel) {
+        UILabel *discountRLabel = [[UILabel alloc] init];
+        _discountRLabel = discountRLabel;
+        [self addSubview:discountRLabel];
+        discountRLabel.textAlignment = NSTextAlignmentRight;
+        discountRLabel.font = FONT(34);
+        discountRLabel.textColor = COLOR_666666;
+    }
+    return _discountRLabel;
+}
+-(UILabel *)markDiscountLabel{
+    if (!_markDiscountLabel) {
+        UILabel *markDiscountLabel = [[UILabel alloc] init];
+        _markDiscountLabel = markDiscountLabel;
+        [self addSubview:markDiscountLabel];
+        markDiscountLabel.font = FONT(26);
+        markDiscountLabel.textColor = COLOR_666666;
+    }
+    return _markDiscountLabel;
+}
+-(UILabel *)payLLabel{
+    if (!_payLLabel) {
+        UILabel *payLLabel = [[UILabel alloc] init];
+        _payLLabel = payLLabel;
+        [self addSubview:payLLabel];
+        payLLabel.font = FONT(32);
+        payLLabel.textColor = COLOR_333333;
+    }
+    return _payLLabel;
+}
+-(UILabel *)payRLabel{
+    if (!_payRLabel) {
+        UILabel *payRLabel = [[UILabel alloc] init];
+        _payRLabel = payRLabel;
+        [self addSubview:payRLabel];
+        payRLabel.textAlignment = NSTextAlignmentRight;
+        payRLabel.font = FONT(38);
+        payRLabel.textColor = COLOR_DF463E;
+    }
+    return _payRLabel;
+}
+-(UILabel *)markPayLabel{
+    if (!_markPayLabel) {
+        UILabel *markPayLabel = [[UILabel alloc] init];
+        _markPayLabel = markPayLabel;
+        [self addSubview:markPayLabel];
+        markPayLabel.font = FONT(26);
+        markPayLabel.textColor = COLOR_DF463E;
+    }
+    return _markPayLabel;
+}
 
 
 @end
