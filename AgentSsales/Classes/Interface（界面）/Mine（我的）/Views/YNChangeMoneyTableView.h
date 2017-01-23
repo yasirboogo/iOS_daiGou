@@ -21,6 +21,8 @@
 
 @property (nonatomic,copy) NSString * money2;
 
+@property (nonatomic,copy) NSString * lastMoney;
+
 @end
 
 @interface YNChangeMoneyCell : UITableViewCell

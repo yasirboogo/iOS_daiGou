@@ -49,7 +49,7 @@
 /* -------------------第三方类文件------------------- */
 #import "UIImageView+WebCache.h"
 #import "TYTabButtonPagerController.h"
-#import "YYLabel.h"
+#import "YYKit.h"
 
 #endif /* PrefixHeader_pch */
 

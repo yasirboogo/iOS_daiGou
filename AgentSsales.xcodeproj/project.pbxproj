@@ -41,6 +41,8 @@
 		BF41EE891E31C04800C3FF99 /* YNFireOrderWayView.m in Sources */ = {isa = PBXBuildFile; fileRef = BF41EE881E31C04800C3FF99 /* YNFireOrderWayView.m */; };
 		BF41EE8C1E31DC7900C3FF99 /* YNPayMoneyViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = BF41EE8B1E31DC7900C3FF99 /* YNPayMoneyViewController.m */; };
 		BF41EE921E31E70B00C3FF99 /* YNPayMoneyCollectionView.m in Sources */ = {isa = PBXBuildFile; fileRef = BF41EE911E31E70B00C3FF99 /* YNPayMoneyCollectionView.m */; };
+		BF41EE951E35ACBB00C3FF99 /* YNNewsCommentTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = BF41EE941E35ACBB00C3FF99 /* YNNewsCommentTableView.m */; };
+		BF41EE981E35D15D00C3FF99 /* YNNewsDetailHeaderView.m in Sources */ = {isa = PBXBuildFile; fileRef = BF41EE971E35D15D00C3FF99 /* YNNewsDetailHeaderView.m */; };
 		BF6147A71E2632D8004E990F /* YNShowEmptyView.m in Sources */ = {isa = PBXBuildFile; fileRef = BF6147A61E2632D8004E990F /* YNShowEmptyView.m */; };
 		BF6147AA1E26381F004E990F /* YNMineCouponViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = BF6147A91E26381F004E990F /* YNMineCouponViewController.m */; };
 		BF6147AD1E263886004E990F /* YNMineCodeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = BF6147AC1E263886004E990F /* YNMineCodeViewController.m */; };
@@ -218,6 +220,10 @@
 		BF41EE8B1E31DC7900C3FF99 /* YNPayMoneyViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YNPayMoneyViewController.m; sourceTree = "<group>"; };
 		BF41EE901E31E70B00C3FF99 /* YNPayMoneyCollectionView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YNPayMoneyCollectionView.h; sourceTree = "<group>"; };
 		BF41EE911E31E70B00C3FF99 /* YNPayMoneyCollectionView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YNPayMoneyCollectionView.m; sourceTree = "<group>"; };
+		BF41EE931E35ACBB00C3FF99 /* YNNewsCommentTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YNNewsCommentTableView.h; sourceTree = "<group>"; };
+		BF41EE941E35ACBB00C3FF99 /* YNNewsCommentTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YNNewsCommentTableView.m; sourceTree = "<group>"; };
+		BF41EE961E35D15D00C3FF99 /* YNNewsDetailHeaderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YNNewsDetailHeaderView.h; sourceTree = "<group>"; };
+		BF41EE971E35D15D00C3FF99 /* YNNewsDetailHeaderView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YNNewsDetailHeaderView.m; sourceTree = "<group>"; };
 		BF6147A51E2632D8004E990F /* YNShowEmptyView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YNShowEmptyView.h; sourceTree = "<group>"; };
 		BF6147A61E2632D8004E990F /* YNShowEmptyView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YNShowEmptyView.m; sourceTree = "<group>"; };
 		BF6147A81E26381F004E990F /* YNMineCouponViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YNMineCouponViewController.h; sourceTree = "<group>"; };
@@ -726,6 +732,10 @@
 			children = (
 				BF9302901E285EB600227EF0 /* YNNewsListTableView.h */,
 				BF9302911E285EB600227EF0 /* YNNewsListTableView.m */,
+				BF41EE961E35D15D00C3FF99 /* YNNewsDetailHeaderView.h */,
+				BF41EE971E35D15D00C3FF99 /* YNNewsDetailHeaderView.m */,
+				BF41EE931E35ACBB00C3FF99 /* YNNewsCommentTableView.h */,
+				BF41EE941E35ACBB00C3FF99 /* YNNewsCommentTableView.m */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -1580,6 +1590,7 @@
 				BFBEE8991E1E1E9300FB6E3D /* YNWalletExchangeViewController.m in Sources */,
 				BF41EE801E308F8B00C3FF99 /* YNFirmOrderViewController.m in Sources */,
 				BFBEE8881E1DD65F00FB6E3D /* YNMineImgHeaderView.m in Sources */,
+				BF41EE951E35ACBB00C3FF99 /* YNNewsCommentTableView.m in Sources */,
 				BF9302951E28773400227EF0 /* YNNewsDetailViewController.m in Sources */,
 				BF41EE7A1E3087E000C3FF99 /* YNPrefectInforViewController.m in Sources */,
 				BF9302921E285EB600227EF0 /* YNNewsListTableView.m in Sources */,
@@ -1591,6 +1602,7 @@
 				BFBEE89C1E1E247A00FB6E3D /* YNWalletAccountView.m in Sources */,
 				BFD8D1861E0BD2FC006E6AA8 /* YNHomePageCollectionView.m in Sources */,
 				BF93028B1E27883500227EF0 /* TYTabPagerController.m in Sources */,
+				BF41EE981E35D15D00C3FF99 /* YNNewsDetailHeaderView.m in Sources */,
 				BF41EE711E2F07F700C3FF99 /* YNCouponTableView.m in Sources */,
 				BF9302B51E2C63C100227EF0 /* YNOrderDetailsViewController.m in Sources */,
 				BF41EE7D1E308A3D00C3FF99 /* YNPrefectInforTableView.m in Sources */,

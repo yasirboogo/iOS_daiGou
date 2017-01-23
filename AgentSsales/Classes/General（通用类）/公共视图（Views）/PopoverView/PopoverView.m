@@ -14,7 +14,7 @@ static float const kPopoverViewCellHeight = 40.f; ///< cell指定高度
 static float const kPopoverViewArrowHeight = 13.f; ///< 箭头高度
 
 // convert degrees to radians
-float DegreesToRadians(float angle) {
+float DegreesToRadian(float angle) {
     return angle*M_PI/180;
 }
 

@@ -38,12 +38,37 @@
         UIView *footerView = [[UIView alloc] init];
         _footerView = footerView;
         footerView.frame = CGRectMake(0, 0, WIDTHF(self), W_RATIO(150));
-        footerView.backgroundColor = COLOR_649CE0;
+
+        NSMutableAttributedString *attachText = [NSMutableAttributedString new];
+        UIFont *font = FONT(26);
+        UIImage *image = [UIImage imageNamed:@"tanhao_kui"];
+        image = [UIImage imageWithCGImage:image.CGImage scale:2 orientation:UIImageOrientationUp];
         
+        attachText = [NSMutableAttributedString attachmentStringWithContent:image contentMode:UIViewContentModeCenter attachmentSize:image.size alignToFont:font alignment:YYTextVerticalAlignmentCenter];
+        
+        NSMutableAttributedString *str1 = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@" 当前人民币余额为%@元，",self.lastMoney] attributes:@{NSForegroundColorAttributeName:COLOR_999999,NSFontAttributeName:font}];
+        [attachText appendAttributedString:str1];
+        
+        NSMutableAttributedString *str2 = [[NSMutableAttributedString alloc] initWithString:@"全部兑换" attributes:@{NSForegroundColorAttributeName:COLOR_DF463E,NSFontAttributeName:font}];
+        YYTextHighlight *highlight = [YYTextHighlight new];
+        [str2 setTextHighlight:highlight range:str2.rangeOfAll];
+        [attachText appendAttributedString:str2];
+        highlight.tapAction = ^(UIView *containerView, NSAttributedString *text, NSRange range, CGRect rect) {
+            NSLog(@"全部兑换");
+        };
         YYLabel *changeLabel = [[YYLabel alloc] init];
-        
+        [footerView addSubview:changeLabel];
+        changeLabel.frame = CGRectMake(W_RATIO(20), W_RATIO(20), WIDTHF(footerView)-W_RATIO(20)*2, HEIGHTF(footerView)-W_RATIO(20)*2);
+        changeLabel.textVerticalAlignment = YYTextVerticalAlignmentTop;
+        changeLabel.userInteractionEnabled = YES;
+        changeLabel.numberOfLines = 0;
+        changeLabel.attributedText = attachText;
     }
     return _footerView;
+}
+-(void)setLastMoney:(NSString *)lastMoney{
+    _lastMoney = lastMoney;
+    [self reloadData];
 }
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
     return 2;
