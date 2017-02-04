@@ -9,6 +9,7 @@
 #import "YNNewsDetailViewController.h"
 #import "YNNewsDetailHeaderView.h"
 #import "YNNewsCommentTableView.h"
+#import "YNNewsCommentSendView.h"
 
 @interface YNNewsDetailViewController ()
 
@@ -16,7 +17,7 @@
 
 @property (nonatomic,weak) YNNewsCommentTableView * tableView;
 
-@property (nonatomic,weak) UITextField * textField;
+@property (nonatomic,weak) YNNewsCommentSendView * sendView;
 
 @end
 
@@ -60,13 +61,25 @@
 }
 -(YNNewsCommentTableView *)tableView{
     if (!_tableView) {
-        CGRect frame = CGRectMake(0, kUINavHeight, SCREEN_WIDTH, SCREEN_HEIGHT-kUINavHeight);
+        CGRect frame = CGRectMake(0, kUINavHeight, SCREEN_WIDTH, SCREEN_HEIGHT-kUINavHeight-HEIGHTF(self.sendView));
         YNNewsCommentTableView *tableView = [[YNNewsCommentTableView alloc] initWithFrame:frame];
         _tableView = tableView;
         [self.view addSubview:tableView];
         tableView.tableHeaderView = self.headerView;
     }
     return _tableView;
+}
+-(YNNewsCommentSendView *)sendView{
+    if (!_sendView) {
+        CGRect frame = CGRectMake(0, SCREEN_HEIGHT-W_RATIO(90), SCREEN_WIDTH, W_RATIO(90));
+        YNNewsCommentSendView *sendView = [[YNNewsCommentSendView alloc] initWithFrame:frame];
+        _sendView = sendView;
+        [self.view addSubview:sendView];
+        [sendView setDidSelectSendButtonClickBlock:^(NSString *str) {
+            NSLog(@"%@",str);
+        }];
+    }
+    return _sendView;
 }
 #pragma mark - 代理实现
 

@@ -17,7 +17,7 @@
 /** 点击轮播广告回调 */
 @property (nonatomic,copy)void(^didSelectPlayerImgClickBlock)(NSString*);
 /** 点击代购平台回调 */
-@property (nonatomic,copy)void(^didSelectPlatImgClickBlock)(NSString*);
+@property (nonatomic,copy)void(^didSelectPlatImgClickBlock)(NSInteger);
 /** 点击热门分类回调 */
 @property (nonatomic,copy)void(^didSelectHotClassImgClickBlock)(NSString*);
 /** 点击更多按钮回调 */
@@ -40,7 +40,7 @@
 /** 代购平台图片 */
 @property (nonatomic,strong) NSArray<NSString*> * platImgs;
 /** 点击代购平台回调 */
-@property (nonatomic,copy)void(^didSelectPlatImgClickBlock)(NSString*);
+@property (nonatomic,copy)void(^didSelectPlatImgClickBlock)(NSInteger);
 
 @end
 

@@ -33,6 +33,7 @@
 #import "SystemMacro.h"
 
 /* -------------------公用类头文件------------------- */
+#import <WebKit/WebKit.h>
 #import "UIImage+Extension.h"
 #import "UIView+Extension.h"
 #import "UIButton+Position.h"

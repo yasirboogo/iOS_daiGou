@@ -12,7 +12,7 @@
 #import "YNYNCameraScanCodeViewController.h"
 #import "YNShowMoreGoodsViewController.h"
 #import "YNShowMoreClassViewController.h"
-
+#import "YNAgentGoodsViewController.h"
 @interface YNHomePageViewController ()
 
 @property (nonatomic,weak) YNHomePageCollectionView* collectionView;
@@ -53,9 +53,14 @@
     if (!_collectionView) {
         YNHomePageCollectionView *collectionView =[[YNHomePageCollectionView alloc] init];
         _collectionView = collectionView;
-
-        [collectionView setDidSelectPlatImgClickBlock:^(NSString *str) {
-            NSLog(@"%@",str);
+        
+        [collectionView setDidSelectPlatImgClickBlock:^(NSInteger index) {
+            YNAgentGoodsViewController *pushVC = [[YNAgentGoodsViewController alloc] init];
+            NSArray *urlStrArr = @[@"https://www.taobao.com/",
+                                   @"http://www.vip.com/",
+                                   @"https://www.jd.com/"];
+            pushVC.urlStr = urlStrArr[index];
+            [self.navigationController pushViewController:pushVC animated:NO];
         }];
         [collectionView setDidSelectPlayerImgClickBlock:^(NSString *str) {
             NSLog(@"%@",str);

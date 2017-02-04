@@ -89,8 +89,8 @@
         selectCell.platImgs = @[@"taobao_shouye",
                                 @"weipinhui_shouye",
                                 @"jingdong_shouye"];
-        [selectCell setDidSelectPlatImgClickBlock:^(NSString *str) {
-            self.didSelectPlatImgClickBlock(str);
+        [selectCell setDidSelectPlatImgClickBlock:^(NSInteger index) {
+            self.didSelectPlatImgClickBlock(index);
         }];
         return selectCell;
         
@@ -358,7 +358,7 @@
 }
 -(void)handlePlatImgTapClick:(UITapGestureRecognizer*)tap{
     if (self.didSelectPlatImgClickBlock) {
-        self.didSelectPlatImgClickBlock([NSString stringWithFormat:@"你点击了代购平台第%ld图片",tap.view.tag]);
+        self.didSelectPlatImgClickBlock(tap.view.tag);
     }
 }
 @end

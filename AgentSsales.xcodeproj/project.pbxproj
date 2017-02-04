@@ -80,6 +80,9 @@
 		BFA0D9111E251687006897DB /* YNSettingTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = BFA0D9101E251687006897DB /* YNSettingTableView.m */; };
 		BFA0E75A1E26276100722C3D /* libMasonry.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BFA0E7591E26276100722C3D /* libMasonry.a */; };
 		BFA0E75C1E26276600722C3D /* libSDWebImage.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BFA0E75B1E26276600722C3D /* libSDWebImage.a */; };
+		BFB037BF1E4454CD0069A826 /* YNNewsCommentSendView.m in Sources */ = {isa = PBXBuildFile; fileRef = BFB037BE1E4454CD0069A826 /* YNNewsCommentSendView.m */; };
+		BFB037C21E4470160069A826 /* YNMoreClassViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = BFB037C11E4470160069A826 /* YNMoreClassViewController.m */; };
+		BFB037C71E4477820069A826 /* YNAgentGoodsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = BFB037C61E4477820069A826 /* YNAgentGoodsViewController.m */; };
 		BFBEE84A1E19EB9600FB6E3D /* YNUpdatePswordViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = BFBEE8491E19EB9600FB6E3D /* YNUpdatePswordViewController.m */; };
 		BFBEE8521E19F56400FB6E3D /* YNUpdatePhoneViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = BFBEE8511E19F56400FB6E3D /* YNUpdatePhoneViewController.m */; };
 		BFBEE8551E19FA6F00FB6E3D /* YNUpdatePswordTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = BFBEE8541E19FA6F00FB6E3D /* YNUpdatePswordTableView.m */; };
@@ -296,6 +299,12 @@
 		BFA0E7591E26276100722C3D /* libMasonry.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libMasonry.a; path = "../../Library/Developer/Xcode/DerivedData/AgentSsales-hajwpotfrjkgmncezkophztatikn/Build/Products/Debug-iphonesimulator/Masonry/libMasonry.a"; sourceTree = "<group>"; };
 		BFA0E75B1E26276600722C3D /* libSDWebImage.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libSDWebImage.a; path = "../../Library/Developer/Xcode/DerivedData/AgentSsales-hajwpotfrjkgmncezkophztatikn/Build/Products/Debug-iphonesimulator/SDWebImage/libSDWebImage.a"; sourceTree = "<group>"; };
 		BFA0E75D1E26276A00722C3D /* libPods-AgentSsales.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libPods-AgentSsales.a"; path = "../../Library/Developer/Xcode/DerivedData/AgentSsales-hajwpotfrjkgmncezkophztatikn/Build/Products/Debug-iphonesimulator/libPods-AgentSsales.a"; sourceTree = "<group>"; };
+		BFB037BD1E4454CD0069A826 /* YNNewsCommentSendView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YNNewsCommentSendView.h; sourceTree = "<group>"; };
+		BFB037BE1E4454CD0069A826 /* YNNewsCommentSendView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YNNewsCommentSendView.m; sourceTree = "<group>"; };
+		BFB037C01E4470160069A826 /* YNMoreClassViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YNMoreClassViewController.h; sourceTree = "<group>"; };
+		BFB037C11E4470160069A826 /* YNMoreClassViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YNMoreClassViewController.m; sourceTree = "<group>"; };
+		BFB037C51E4477820069A826 /* YNAgentGoodsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YNAgentGoodsViewController.h; sourceTree = "<group>"; };
+		BFB037C61E4477820069A826 /* YNAgentGoodsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YNAgentGoodsViewController.m; sourceTree = "<group>"; };
 		BFBEE8481E19EB9600FB6E3D /* YNUpdatePswordViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YNUpdatePswordViewController.h; sourceTree = "<group>"; };
 		BFBEE8491E19EB9600FB6E3D /* YNUpdatePswordViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YNUpdatePswordViewController.m; sourceTree = "<group>"; };
 		BFBEE8501E19F56400FB6E3D /* YNUpdatePhoneViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YNUpdatePhoneViewController.h; sourceTree = "<group>"; };
@@ -636,6 +645,8 @@
 		55DCAA9B1E03901E003041CF /* ViewControllers */ = {
 			isa = PBXGroup;
 			children = (
+				BFB037C41E4477100069A826 /* 平台商品 */,
+				BFB037C31E4476FA0069A826 /* 代购商品 */,
 				BFFCD3FB1E13C41F0042B8BF /* 导航栏 */,
 				BFFCD3F61E13BFD20042B8BF /* 搜索页 */,
 				BFFCD3EB1E1362E00042B8BF /* 主页 */,
@@ -736,6 +747,8 @@
 				BF41EE971E35D15D00C3FF99 /* YNNewsDetailHeaderView.m */,
 				BF41EE931E35ACBB00C3FF99 /* YNNewsCommentTableView.h */,
 				BF41EE941E35ACBB00C3FF99 /* YNNewsCommentTableView.m */,
+				BFB037BD1E4454CD0069A826 /* YNNewsCommentSendView.h */,
+				BFB037BE1E4454CD0069A826 /* YNNewsCommentSendView.m */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -909,6 +922,22 @@
 				BF9303191E2CB7A000227EF0 /* NSString+Size.m */,
 			);
 			path = NSStringCategory;
+			sourceTree = "<group>";
+		};
+		BFB037C31E4476FA0069A826 /* 代购商品 */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = "代购商品";
+			sourceTree = "<group>";
+		};
+		BFB037C41E4477100069A826 /* 平台商品 */ = {
+			isa = PBXGroup;
+			children = (
+				BFB037C51E4477820069A826 /* YNAgentGoodsViewController.h */,
+				BFB037C61E4477820069A826 /* YNAgentGoodsViewController.m */,
+			);
+			name = "平台商品";
 			sourceTree = "<group>";
 		};
 		BFBEE8451E19EAAE00FB6E3D /* 修改手机号 */ = {
@@ -1301,6 +1330,8 @@
 			children = (
 				BFFCD3F71E13C38E0042B8BF /* YNShowMoreClassViewController.h */,
 				BFFCD3F81E13C38E0042B8BF /* YNShowMoreClassViewController.m */,
+				BFB037C01E4470160069A826 /* YNMoreClassViewController.h */,
+				BFB037C11E4470160069A826 /* YNMoreClassViewController.m */,
 			);
 			name = "更多热门分类";
 			sourceTree = "<group>";
@@ -1551,6 +1582,7 @@
 				BF41EE741E2F717900C3FF99 /* YNGoodsSubmitView.m in Sources */,
 				BFBEE85C1E1A675700FB6E3D /* YNUpdatePhoneTableView.m in Sources */,
 				BF9302B21E2B6EEF00227EF0 /* UIView+CornerRadius.m in Sources */,
+				BFB037C21E4470160069A826 /* YNMoreClassViewController.m in Sources */,
 				BF9302AE1E2B6E5100227EF0 /* NSArray+Log.m in Sources */,
 				BFD8D16E1E0A756E006E6AA8 /* PopoverViewCell.m in Sources */,
 				BFBEE8591E19FE7600FB6E3D /* YNUserInforCell.m in Sources */,
@@ -1605,6 +1637,7 @@
 				BF41EE981E35D15D00C3FF99 /* YNNewsDetailHeaderView.m in Sources */,
 				BF41EE711E2F07F700C3FF99 /* YNCouponTableView.m in Sources */,
 				BF9302B51E2C63C100227EF0 /* YNOrderDetailsViewController.m in Sources */,
+				BFB037BF1E4454CD0069A826 /* YNNewsCommentSendView.m in Sources */,
 				BF41EE7D1E308A3D00C3FF99 /* YNPrefectInforTableView.m in Sources */,
 				BFBEE8811E1CAA1B00FB6E3D /* YNDistributionTableView.m in Sources */,
 				55DCA9F21E038D07003041CF /* AppDelegate.m in Sources */,
@@ -1617,6 +1650,7 @@
 				BF9302891E27883500227EF0 /* TYPagerController.m in Sources */,
 				55DCAACB1E03901E003041CF /* YNShoppingCartViewController.m in Sources */,
 				BFBEE8AC1E1F409E00FB6E3D /* YNTipsSuccessMsgView.m in Sources */,
+				BFB037C71E4477820069A826 /* YNAgentGoodsViewController.m in Sources */,
 				BFBEE8A61E1F341F00FB6E3D /* YNTipsSuccessTopView.m in Sources */,
 				BF6147AD1E263886004E990F /* YNMineCodeViewController.m in Sources */,
 				BFA0D9021E248262006897DB /* YNAddressViewController.m in Sources */,

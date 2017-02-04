@@ -15,3 +15,11 @@
 @property (nonatomic,copy) void(^htmlDidLoadFinish)();
 
 @end
+
+@interface YNWebHeaderView : UIView
+@property (nonatomic,strong) NSDictionary *dict;
+@end
+
+@interface YNWebFooterView : UIView
+@property (nonatomic,strong) NSDictionary *dict;
+@end

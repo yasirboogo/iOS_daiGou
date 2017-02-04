@@ -22,7 +22,7 @@
         self.separatorStyle = UITableViewCellSeparatorStyleNone;
         self.delegate = self;
         self.dataSource = self;
-        
+
         UIView *footerView = [[UIView alloc] init];
         footerView.backgroundColor = COLOR_EDEDED;
         footerView.frame = CGRectMake(0, 0, WIDTHF(self), kMinSpace);
@@ -50,6 +50,11 @@
     if (commentCell == nil) {
         commentCell = [[YNNewsCommentCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"commentCell"];
         commentCell.selectionStyle = UITableViewCellSelectionStyleNone;
+        
+        UIView *lineView = [[UIView alloc] init];
+        lineView.backgroundColor = COLOR_EDEDED;
+        lineView.frame = CGRectMake(0, 0, SCREEN_WIDTH, W_RATIO(2));
+        [commentCell.contentView addSubview:lineView];
     }
     commentCell.cellFrame = _dataArray[indexPath.row];
     return commentCell;
