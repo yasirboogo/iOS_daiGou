@@ -13,6 +13,7 @@
 #import "YNShowMoreGoodsViewController.h"
 #import "YNShowMoreClassViewController.h"
 #import "YNAgentGoodsViewController.h"
+#import "YNTerraceGoodsViewController.h"
 @interface YNHomePageViewController ()
 
 @property (nonatomic,weak) YNHomePageCollectionView* collectionView;
@@ -69,7 +70,8 @@
             NSLog(@"%@",str);
         }];
         [collectionView setDidSelectGoodImgClickBlock:^(NSString *str) {
-            NSLog(@"%@",str);
+            YNTerraceGoodsViewController *pushVC = [[YNTerraceGoodsViewController alloc] init];
+            [self.navigationController pushViewController:pushVC animated:NO];
         }];
         [collectionView setDidSelectMoreBtnClickBlock:^(NSString *str) {
             if ([str isEqualToString:@"特色惠购"]) {

@@ -50,6 +50,8 @@
 		BF652B101E1F8FFA006DA651 /* YNChangeMoneyView.m in Sources */ = {isa = PBXBuildFile; fileRef = BF652B0F1E1F8FFA006DA651 /* YNChangeMoneyView.m */; };
 		BF652B131E21D817006DA651 /* YNChangeMoneyTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = BF652B121E21D817006DA651 /* YNChangeMoneyTableView.m */; };
 		BF69E3B71E25D1B90096B2D9 /* YNClearCache.m in Sources */ = {isa = PBXBuildFile; fileRef = BF69E3B61E25D1B90096B2D9 /* YNClearCache.m */; };
+		BF80B97C1E4565F600AA2C54 /* libMasonry.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BF80B97B1E4565F600AA2C54 /* libMasonry.a */; };
+		BF80B97F1E45DF4400AA2C54 /* YNTerraceGoodsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = BF80B97E1E45DF4400AA2C54 /* YNTerraceGoodsViewController.m */; };
 		BF9302891E27883500227EF0 /* TYPagerController.m in Sources */ = {isa = PBXBuildFile; fileRef = BF9302811E27883500227EF0 /* TYPagerController.m */; };
 		BF93028A1E27883500227EF0 /* TYTabButtonPagerController.m in Sources */ = {isa = PBXBuildFile; fileRef = BF9302831E27883500227EF0 /* TYTabButtonPagerController.m */; };
 		BF93028B1E27883500227EF0 /* TYTabPagerController.m in Sources */ = {isa = PBXBuildFile; fileRef = BF9302851E27883500227EF0 /* TYTabPagerController.m */; };
@@ -78,7 +80,6 @@
 		BFA0D90B1E24EAA3006897DB /* YNNewAddressTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = BFA0D90A1E24EAA3006897DB /* YNNewAddressTableView.m */; };
 		BFA0D90E1E251527006897DB /* YNSettingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = BFA0D90D1E251527006897DB /* YNSettingViewController.m */; };
 		BFA0D9111E251687006897DB /* YNSettingTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = BFA0D9101E251687006897DB /* YNSettingTableView.m */; };
-		BFA0E75A1E26276100722C3D /* libMasonry.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BFA0E7591E26276100722C3D /* libMasonry.a */; };
 		BFA0E75C1E26276600722C3D /* libSDWebImage.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BFA0E75B1E26276600722C3D /* libSDWebImage.a */; };
 		BFB037BF1E4454CD0069A826 /* YNNewsCommentSendView.m in Sources */ = {isa = PBXBuildFile; fileRef = BFB037BE1E4454CD0069A826 /* YNNewsCommentSendView.m */; };
 		BFB037C21E4470160069A826 /* YNMoreClassViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = BFB037C11E4470160069A826 /* YNMoreClassViewController.m */; };
@@ -241,6 +242,9 @@
 		BF652B121E21D817006DA651 /* YNChangeMoneyTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YNChangeMoneyTableView.m; sourceTree = "<group>"; };
 		BF69E3B51E25D1B90096B2D9 /* YNClearCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YNClearCache.h; sourceTree = "<group>"; };
 		BF69E3B61E25D1B90096B2D9 /* YNClearCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YNClearCache.m; sourceTree = "<group>"; };
+		BF80B97B1E4565F600AA2C54 /* libMasonry.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libMasonry.a; path = "Pods/../build/Release-iphoneos/Masonry/libMasonry.a"; sourceTree = "<group>"; };
+		BF80B97D1E45DF4400AA2C54 /* YNTerraceGoodsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YNTerraceGoodsViewController.h; sourceTree = "<group>"; };
+		BF80B97E1E45DF4400AA2C54 /* YNTerraceGoodsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YNTerraceGoodsViewController.m; sourceTree = "<group>"; };
 		BF9302801E27883500227EF0 /* TYPagerController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TYPagerController.h; sourceTree = "<group>"; };
 		BF9302811E27883500227EF0 /* TYPagerController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TYPagerController.m; sourceTree = "<group>"; };
 		BF9302821E27883500227EF0 /* TYTabButtonPagerController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TYTabButtonPagerController.h; sourceTree = "<group>"; };
@@ -390,9 +394,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BF80B97C1E4565F600AA2C54 /* libMasonry.a in Frameworks */,
 				BF0E0B891E264DA3007F3907 /* libPods-AgentSsales.a in Frameworks */,
 				BFA0E75C1E26276600722C3D /* libSDWebImage.a in Frameworks */,
-				BFA0E75A1E26276100722C3D /* libMasonry.a in Frameworks */,
 				BFC471061E26239C0011D1A7 /* libYYKit.a in Frameworks */,
 				BFC471041E2623980011D1A7 /* libIQKeyboardManager.a in Frameworks */,
 				BFC471021E2623940011D1A7 /* libTPKeyboardAvoiding.a in Frameworks */,
@@ -927,6 +931,8 @@
 		BFB037C31E4476FA0069A826 /* 代购商品 */ = {
 			isa = PBXGroup;
 			children = (
+				BFB037C51E4477820069A826 /* YNAgentGoodsViewController.h */,
+				BFB037C61E4477820069A826 /* YNAgentGoodsViewController.m */,
 			);
 			name = "代购商品";
 			sourceTree = "<group>";
@@ -934,8 +940,8 @@
 		BFB037C41E4477100069A826 /* 平台商品 */ = {
 			isa = PBXGroup;
 			children = (
-				BFB037C51E4477820069A826 /* YNAgentGoodsViewController.h */,
-				BFB037C61E4477820069A826 /* YNAgentGoodsViewController.m */,
+				BF80B97D1E45DF4400AA2C54 /* YNTerraceGoodsViewController.h */,
+				BF80B97E1E45DF4400AA2C54 /* YNTerraceGoodsViewController.m */,
 			);
 			name = "平台商品";
 			sourceTree = "<group>";
@@ -1364,6 +1370,7 @@
 		F1CEC59E8E326C508983AAB1 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				BF80B97B1E4565F600AA2C54 /* libMasonry.a */,
 				BF0E0B871E2645D7007F3907 /* libLGAlertView.a */,
 				BFA0E75D1E26276A00722C3D /* libPods-AgentSsales.a */,
 				BFA0E75B1E26276600722C3D /* libSDWebImage.a */,
@@ -1578,6 +1585,7 @@
 				BF652B131E21D817006DA651 /* YNChangeMoneyTableView.m in Sources */,
 				BFBEE88C1E1DDCFC00FB6E3D /* YNWalletTableView.m in Sources */,
 				BFE240501E14FBD20076CE7A /* YNMineHeaderView.m in Sources */,
+				BF80B97F1E45DF4400AA2C54 /* YNTerraceGoodsViewController.m in Sources */,
 				BF93031C1E2CB7A000227EF0 /* NSString+Size.m in Sources */,
 				BF41EE741E2F717900C3FF99 /* YNGoodsSubmitView.m in Sources */,
 				BFBEE85C1E1A675700FB6E3D /* YNUpdatePhoneTableView.m in Sources */,
@@ -1846,6 +1854,7 @@
 					"$(PROJECT_DIR)/build/Debug-iphoneos/AFNetworking",
 					"$(PROJECT_DIR)",
 					"$(PROJECT_DIR)/Pods/AFNetworking/AFNetworking",
+					"$(PROJECT_DIR)/build/Release-iphoneos/Masonry",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.AgentSsales;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1871,6 +1880,7 @@
 					"$(PROJECT_DIR)/build/Debug-iphoneos/AFNetworking",
 					"$(PROJECT_DIR)",
 					"$(PROJECT_DIR)/Pods/AFNetworking/AFNetworking",
+					"$(PROJECT_DIR)/build/Release-iphoneos/Masonry",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.AgentSsales;
 				PRODUCT_NAME = "$(TARGET_NAME)";

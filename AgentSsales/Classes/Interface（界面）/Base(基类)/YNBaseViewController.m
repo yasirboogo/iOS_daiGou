@@ -64,6 +64,13 @@
     [super preferredStatusBarStyle];
     return UIStatusBarStyleLightContent;
 }
+/** 调用，状态栏背景颜色 */
+- (void)setStatusBarBackgroundColor:(UIColor *)color {
+    UIView *statusBar = [[[UIApplication sharedApplication] valueForKey:@"statusBarWindow"] valueForKey:@"statusBar"];
+    if ([statusBar respondsToSelector:@selector(setBackgroundColor:)]) {
+        statusBar.backgroundColor = color;
+    }
+}
 #pragma mark -- 视图加载
 -(UIView *)navView{
     if (!_navView) {
