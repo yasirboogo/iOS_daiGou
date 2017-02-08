@@ -7,31 +7,68 @@
 //
 
 #import "YNMoreClassViewController.h"
+#import "YNHotGoodsClassesView.h"
 
-@interface YNMoreClassViewController ()
+@interface YNMoreClassViewController ()<UICollectionViewDelegate,UICollectionViewDataSource,UICollectionViewDelegateFlowLayout>
+
+@property (nonatomic,weak) YNHotGoodsClassesView * collectionView;
 
 @end
 
 @implementation YNMoreClassViewController
 
+#pragma mark - 视图生命周期
+
+- (void)viewWillAppear:(BOOL)animated{
+    [super viewWillAppear:animated];
+}
+
+- (void)viewDidAppear:(BOOL)animated{
+    [super viewDidAppear:animated];
+}
 - (void)viewDidLoad {
     [super viewDidLoad];
-    // Do any additional setup after loading the view.
+    [self makeData];
+    [self makeUI];
 }
 
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
+- (void)viewWillDisappear:(BOOL)animated{
+    [super viewWillDisappear:animated];
 }
 
-/*
-#pragma mark - Navigation
-
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
+- (void)viewDidDisappear:(BOOL)animated{
+    [super viewDidDisappear:animated];
 }
-*/
+
+#pragma mark - 网路请求
+
+#pragma mark - 视图加载
+-(YNHotGoodsClassesView *)collectionView{
+    if (!_collectionView) {
+        CGRect frame = CGRectMake(0,0 ,SCREEN_WIDTH,SCREEN_HEIGHT-W_RATIO(90));
+        YNHotGoodsClassesView *collectionView = [[YNHotGoodsClassesView alloc] initWithFrame:frame];
+        _collectionView = collectionView;
+        [self.view addSubview:collectionView];
+    }
+    return _collectionView;
+}
+#pragma mark - 代理实现
+
+#pragma mark - 函数、消息
+-(void)makeData{
+    self.collectionView.dataArray = @[
+                                      @{@"image":@"testGoods",@"name":@"休闲鞋"},
+                                      @{@"image":@"testGoods",@"name":@"休闲鞋"},
+                                      @{@"image":@"testGoods",@"name":@"休闲鞋"},
+                                      @{@"image":@"testGoods",@"name":@"休闲鞋"},
+                                      @{@"image":@"testGoods",@"name":@"休闲鞋"},
+                                      @{@"image":@"testGoods",@"name":@"休闲鞋"}];
+}
+-(void)makeUI{
+    
+}
+#pragma mark - 数据懒加载
+
+#pragma mark - 其他
 
 @end

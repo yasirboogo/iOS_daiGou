@@ -9,6 +9,6 @@
 #ifndef APIMacro_h
 #define APIMacro_h
 
-#define ImageUrl @"http://192.168.1.170:8080/images"
-#define BaseUrl @"http://192.168.1.170:8080/innoo"
+#define kBaseUrl @"http://192.168.1.138/daigou/app/appUserController/"
+
 #endif /* APIMacro_h */

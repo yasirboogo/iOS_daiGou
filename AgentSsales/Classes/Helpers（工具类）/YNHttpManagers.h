@@ -1,0 +1,13 @@
+//
+//  YNHttpManagers.h
+//  AgentSsales
+//
+//  Created by innofive on 17/2/8.
+//  Copyright © 2017年 英诺. All rights reserved.
+//
+
+#import <Foundation/Foundation.h>
+
+@interface YNHttpManagers : NSObject
+
+@end

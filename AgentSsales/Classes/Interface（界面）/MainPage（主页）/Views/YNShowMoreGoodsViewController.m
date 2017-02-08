@@ -76,7 +76,6 @@
 -(void)makeUI{
     [super makeUI];
 }
-
 #pragma mark - 数据懒加载
 
 #pragma mark - 其他

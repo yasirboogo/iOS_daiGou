@@ -34,6 +34,10 @@
     }
     return self;
 }
+-(void)setDataArray:(NSArray *)dataArray{
+    _dataArray = dataArray;
+    [self reloadData];
+}
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section{
     return self.dataArray.count;
 }

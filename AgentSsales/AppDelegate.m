@@ -7,8 +7,13 @@
 //
 
 #import "AppDelegate.h"
+#import "AppDelegate+ThirdShare.h"
+
 #import "PDNewFeatureViewController.h"
 #import "YNTabBarController.h"
+
+#import "YNLoginViewController.h"
+
 @interface AppDelegate ()
 
 @end
@@ -18,15 +23,24 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     UIWindow *window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
-
+    
+    [self ThirdShareApplication:application didFinishLaunchingWithOptions:launchOptions];
+    
     self.window = window;
 //    if ([PDVersionTool needShowNewFeature]) {
 //        self.window.rootViewController = [[PDNewFeatureViewController alloc]init];
 //    }else{
         // 设置根控制器
+    BOOL isLogin = YES;
+    if (isLogin) {
+        UINavigationController *nVc = [[UINavigationController alloc] initWithRootViewController:[[YNLoginViewController alloc] init]];
+        self.window.rootViewController = nVc;
+    }else{
+    
         YNTabBarController *tab = [[YNTabBarController alloc]init];
         //        UINavigationController *meNav = [[UINavigationController alloc]initWithRootViewController:vc];
         self.window.rootViewController = tab;
+    }
 //    }
     //
     //    // 设置窗口为主窗口并可见

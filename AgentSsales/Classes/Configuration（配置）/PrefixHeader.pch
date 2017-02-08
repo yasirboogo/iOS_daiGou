@@ -51,6 +51,7 @@
 #import "UIImageView+WebCache.h"
 #import "TYTabButtonPagerController.h"
 #import "YYKit.h"
+#import "JKDBModel.h"
 
 #endif /* PrefixHeader_pch */
 

@@ -99,7 +99,7 @@
     [super viewWillLayoutSubviews];
     _pagerBarView.frame = CGRectMake(0, 0, CGRectGetWidth(self.view.frame), self.contentTopEdging+[self statusBarHeight]);
     _pagerBarImageView.frame = _pagerBarView.bounds;
-    _collectionViewBar.frame = CGRectMake(0, [self statusBarHeight], CGRectGetWidth(self.view.frame), self.contentTopEdging);
+    _collectionViewBar.frame = CGRectMake(0, [self statusBarHeight], CGRectGetWidth(self.view.frame)-self.contentRightEdging, self.contentTopEdging);
                                      
 }
 

@@ -214,7 +214,7 @@
     CGSize titleSize = [title sizeWithAttributes:@{NSFontAttributeName:font}];
     CGSize selectTitleSize = [selectTitle sizeWithAttributes:@{NSFontAttributeName:font}];
     
-    CGFloat btnWidth = titleSize.width > selectTitleSize.width ? titleSize.width :selectTitleSize.width;
+    CGFloat btnWidth = (titleSize.width > selectTitleSize.width ? titleSize.width :selectTitleSize.width)+kUINavBtnHorSpace*2;
     
     if (isOnRight == YES) {
         self.rightBtnFrame += btnWidth+kUINavBtnHorSpace;

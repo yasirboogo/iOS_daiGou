@@ -19,7 +19,6 @@
 @property (nonatomic,assign) BOOL isShowCodeBtn;
 /** 是否显示右箭头 */
 @property (nonatomic,assign) BOOL isShowArrowImg;
-/** 是否显示右箭头 */
 @property (nonatomic,assign) BOOL isForbidClick;
 /** 键盘类型 */
 @property (nonatomic,assign) UIKeyboardType keyboardType;

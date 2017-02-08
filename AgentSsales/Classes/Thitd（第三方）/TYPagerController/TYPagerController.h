@@ -53,6 +53,9 @@
 
 @property (nonatomic, assign) CGFloat contentTopEdging; // contentView top edge
 
+@property (nonatomic, assign) CGFloat contentRightEdging; // contentView top edge
+
+
 @property (nonatomic, assign) BOOL adjustStatusBarHeight; // defaut NO,if YES and navBar is hide,statusBarHeight have value to adjust status
 
 @property (nonatomic, assign) CGFloat changeIndexWhenScrollProgress; // default 1.0,when scroll progress percent will change index
