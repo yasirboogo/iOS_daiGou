@@ -7,17 +7,22 @@
 //
 
 #import "YNHomePageViewController.h"
-#import "PopoverView.h"
+#import "YNSelectLanguageView.h"
 #import "YNHomePageCollectionView.h"
 #import "YNYNCameraScanCodeViewController.h"
 #import "YNShowMoreGoodsViewController.h"
 #import "YNShowMoreClassViewController.h"
 #import "YNAgentGoodsViewController.h"
 #import "YNTerraceGoodsViewController.h"
-@interface YNHomePageViewController ()
+#import "YNSearchViewController.h"
+#import "YNWebViewController.h"
 
+@interface YNHomePageViewController ()<UITextFieldDelegate>{
+    NSInteger _type;
+}
 @property (nonatomic,weak) YNHomePageCollectionView* collectionView;
 
+@property (nonatomic,weak) YNSelectLanguageView* selectLanguageView;
 @end
 
 @implementation YNHomePageViewController
@@ -35,8 +40,11 @@
 }
 - (void)viewDidLoad {
     [super viewDidLoad];
-    [self makeNavigationBar];
-    [self makeUI];
+    [self startNetWorkingRequestWithGetAdvertise];
+    [self startNetWorkingRequestWithGetHotClass];
+    [self startNetWorkingRequestWithGetSpecialPurchase];
+    
+    [self.view bringSubviewToFront:self.selectLanguageView];
 }
 
 - (void)viewWillDisappear:(BOOL)animated{
@@ -48,13 +56,48 @@
 }
 
 #pragma mark - 网路请求
-
+-(void)startNetWorkingRequestWithGetAdvertise{
+    NSDictionary *params = @{@"status":@1};
+    [YNHttpManagers getAdvertiseWithParams:params success:^(id response) {
+        self.collectionView.adArray = response[@"adArray"];
+    } failure:^(NSError *error) {
+    }];
+}
+-(void)startNetWorkingRequestWithGetHotClass{
+    NSDictionary *params = @{@"type":[NSNumber numberWithInteger:_type],
+                             @"status":@1};
+    [YNHttpManagers getHotClassWithParams:params success:^(id response) {
+        self.collectionView.hotArray = response;
+    } failure:^(NSError *error) {
+    }];
+}
+-(void)startNetWorkingRequestWithGetSpecialPurchase{
+    NSDictionary *params = @{@"type":[NSNumber numberWithInteger:_type],
+                             @"pageIndex":[NSNumber numberWithInteger:self.pageIndex],
+                             @"pageSize":[NSNumber numberWithInteger:self.pageSize]};
+    [YNHttpManagers getSpecialPurchaseWithParams:params success:^(id response) {
+        self.collectionView.featureArray = response;
+    } failure:^(NSError *error) {
+    }];
+}
 #pragma mark - 视图加载
+-(YNSelectLanguageView *)selectLanguageView{
+    if (!_selectLanguageView) {
+        CGRect frame = CGRectMake(kMinSpace, kUINavHeight,W_RATIO(220),W_RATIO(270));
+        YNSelectLanguageView *selectLanguageView = [[YNSelectLanguageView alloc] initWithFrame:frame];
+        _selectLanguageView = selectLanguageView;
+        selectLanguageView.hidden = YES;
+        selectLanguageView.index = [LanguageManager currentLanguageIndex];
+        [selectLanguageView setDidSelectLanguageCellBlock:^(NSInteger index) {
+            [kLanguageManager setUserlanguage:index type:0];
+        }];
+    }
+    return _selectLanguageView;
+}
 -(YNHomePageCollectionView *)collectionView{
     if (!_collectionView) {
         YNHomePageCollectionView *collectionView =[[YNHomePageCollectionView alloc] init];
         _collectionView = collectionView;
-        
         [collectionView setDidSelectPlatImgClickBlock:^(NSInteger index) {
             YNAgentGoodsViewController *pushVC = [[YNAgentGoodsViewController alloc] init];
             NSArray *urlStrArr = @[@"https://www.taobao.com/",
@@ -63,123 +106,96 @@
             pushVC.urlStr = urlStrArr[index];
             [self.navigationController pushViewController:pushVC animated:NO];
         }];
-        [collectionView setDidSelectPlayerImgClickBlock:^(NSString *str) {
-            NSLog(@"%@",str);
-        }];
-        [collectionView setDidSelectHotClassImgClickBlock:^(NSString *str) {
-            NSLog(@"%@",str);
-        }];
-        [collectionView setDidSelectGoodImgClickBlock:^(NSString *str) {
-            YNTerraceGoodsViewController *pushVC = [[YNTerraceGoodsViewController alloc] init];
-            [self.navigationController pushViewController:pushVC animated:NO];
-        }];
-        [collectionView setDidSelectMoreBtnClickBlock:^(NSString *str) {
-            if ([str isEqualToString:@"特色惠购"]) {
-                YNBaseViewController *pushVC = [[YNShowMoreGoodsViewController alloc] init];
+        [collectionView setDidSelectPlayerImgClickBlock:^(NSString *url,NSString *type) {
+            if ([type integerValue] == 1) {
+                YNTerraceGoodsViewController *pushVC = [[YNTerraceGoodsViewController alloc] init];
+                pushVC.goodsId = url;
                 [self.navigationController pushViewController:pushVC animated:NO];
-            }else if ([str isEqualToString:@"热门分类"]){
-                YNBaseViewController *pushVC = [[YNShowMoreClassViewController alloc] init];
+            }else if ([type integerValue] == 2){
+                YNWebViewController *pushVC = [[YNWebViewController alloc] init];
+                pushVC.url = url;
                 [self.navigationController pushViewController:pushVC animated:NO];
             }
         }];
-        [self.view addSubview:collectionView];
+        [collectionView setDidSelectHotClassImgClickBlock:^(NSString *classId,NSInteger index) {
+            YNShowMoreClassViewController *pushVC = [[YNShowMoreClassViewController alloc] init];
+            pushVC.classId = classId;
+            [self.navigationController pushViewController:pushVC animated:NO];
+        }];
+        [collectionView setDidSelectGoodImgClickBlock:^(NSString *goodsId) {
+            YNTerraceGoodsViewController *pushVC = [[YNTerraceGoodsViewController alloc] init];
+            pushVC.goodsId = goodsId;
+            [self.navigationController pushViewController:pushVC animated:NO];
+        }];
+        [collectionView setDidSelectMoreBtnClickBlock:^(NSInteger index) {
+            if (index == 3) {
+                YNShowMoreClassViewController *pushVC = [[YNShowMoreClassViewController alloc] init];
+                [self.navigationController pushViewController:pushVC animated:NO];
+            }else if (index == 4){
+                YNShowMoreGoodsViewController *pushVC = [[YNShowMoreGoodsViewController alloc] init];
+                [self.navigationController pushViewController:pushVC animated:NO];
+            }
+        }];
     }
     return _collectionView;
 }
 #pragma mark - 代理实现
-
+- (BOOL)textFieldShouldBeginEditing:(UITextField *)textField{
+    YNSearchViewController *pushVC = [[YNSearchViewController alloc] init];
+    [self.navigationController pushViewController:pushVC animated:NO];
+    return NO;
+}
 #pragma mark - 函数、消息
+-(void)makeData{
+    [super makeData];
+    _type = [LanguageManager currentLanguageIndex];
+
+    self.selectLanguageView.dataArray = @[@"中文",@"马来语",@"英语"];
+}
 -(void)makeNavigationBar{
     [super makeNavigationBar];
-    //左边选择语种按钮
-    UIButton *leftLanguageBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    leftLanguageBtn.frame = CGRectMake(kUINavBtnHorSpace,
-                                       kUIStatusBar+kUINavBtnVerSpace,
-                                       kUINavBtnWidth*2,
-                                       kUINavBtnWidth);
-    [leftLanguageBtn setTitle:@"语言" forState:UIControlStateNormal];
-    leftLanguageBtn.titleLabel.font = FONT_14;
-    [leftLanguageBtn setTitleColor:COLOR_FFFFFF
-                          forState:UIControlStateNormal];
-    [leftLanguageBtn setImage:[UIImage imageNamed:@"xiala_shouye"]
-                     forState:UIControlStateNormal];
-    leftLanguageBtn.tag = 0;
-    [leftLanguageBtn addTarget:self
-                        action:@selector(handleNavigationBarButtonsClick:)
-              forControlEvents:UIControlEventTouchUpInside];
-    [self.navView addSubview:leftLanguageBtn];
-    
+    __weak typeof(self) weakSelf = self;
+    UIButton *leftLanguageBtn = [self addNavigationBarBtnWithTitle:kLocalizedString(@"language", @"语言") selectTitle:kLocalizedString(@"language", @"语言") font:FONT_15 img:[UIImage imageNamed:@"xiala_shouye"] selectImg:[UIImage imageNamed:@"xiala_shouye"] imgWidth:W_RATIO(20) isOnRight:NO btnClickBlock:^(BOOL isShow) {
+        weakSelf.selectLanguageView.hidden = !isShow;
+        
+    }];
     // 右边扫一扫按钮
-    UIButton *rightScanBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    rightScanBtn.frame = CGRectMake(SCREEN_WIDTH-kUINavBtnHorSpace-kUINavBtnWidth,
-                                    kUIStatusBar+kUINavBtnVerSpace,
-                                    kUINavBtnWidth,
-                                    kUINavBtnWidth);
-    [rightScanBtn setImage:[UIImage imageNamed:@"saoyisao_shouye"]
-                  forState:UIControlStateNormal];
-    rightScanBtn.tag = 1;
-    [rightScanBtn addTarget:self
-                     action:@selector(handleNavigationBarButtonsClick:)
-           forControlEvents:UIControlEventTouchUpInside];
-    [self.navView addSubview:rightScanBtn];
-    
-    //搜索条
+    UIButton *rightScanBtn = [self addNavigationBarBtnWithImg:[UIImage imageNamed:@"saoyisao_shouye"] selectImg:[UIImage imageNamed:@"saoyisao_shouye"] isOnRight:YES btnClickBlock:^(BOOL isShow) {
+        YNYNCameraScanCodeViewController *scanVC = [[YNYNCameraScanCodeViewController alloc] init];
+        [weakSelf presentViewController:scanVC animated:NO completion:nil];
+
+    }];
+     //搜索条
     UITextField *searchBar = [[UITextField alloc] init];
+    [self.navView addSubview:searchBar];
     searchBar.frame = CGRectMake(MaxXF(leftLanguageBtn)+kUINavBtnHorSpace,
                                  MinYF(leftLanguageBtn),
                                  MinXF(rightScanBtn)- MaxXF(leftLanguageBtn)-kUINavBtnHorSpace*2,
                                  kUINavBtnWidth);
-    searchBar.attributedPlaceholder = [[NSAttributedString alloc] initWithString:NSLS(@"searchContent",@"请输入搜索内容")
+    searchBar.attributedPlaceholder = [[NSAttributedString alloc] initWithString:kLocalizedString(@"searchContent",@"请输入搜索内容")
         attributes:@{NSFontAttributeName:FONT_11,
                      NSForegroundColorAttributeName:COLOR_999999}];
     searchBar.font = FONT_11;
+    searchBar.delegate = self;
     searchBar.returnKeyType = UIReturnKeySearch;
     searchBar.layer.backgroundColor = COLOR_FFFFFF.CGColor;
     searchBar.layer.cornerRadius = kViewRadius;
-    
-    // 搜索按钮按钮
-    UIButton *searchBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    searchBtn.frame = CGRectMake(0, 0, kUINavBtnWidth, kUINavBtnWidth);
-    [searchBtn setImage:[UIImage imageNamed:@"sousuo_shouye"]
-               forState:UIControlStateNormal];
-    searchBar.leftView = searchBtn;
-    searchBar.leftViewMode = UITextFieldViewModeAlways;
-
     searchBar.layer.masksToBounds = YES;
-    [self.navView addSubview:searchBar];
-    
-}
--(void)handleNavigationBarButtonsClick:(UIButton*)btn{
-    if (btn.tag == 0) {
-        NSLog(@"切换语言");
-        // 不带图片
-        PopoverAction *action1 = [PopoverAction actionWithTitle:@"中文" handler:^(PopoverAction *action) {
-        }];
-        PopoverAction *action2 = [PopoverAction actionWithTitle:@"英语" handler:^(PopoverAction *action) {
-        }];
-        PopoverAction *action3 = [PopoverAction actionWithTitle:@"马来语" handler:^(PopoverAction *action) {
-        }];
-        
-        PopoverView *popoverView = [PopoverView popoverView];
-        popoverView.style = PopoverViewStyleDark;
-        popoverView.hideAfterTouchOutside = YES; // 点击外部时不允许隐藏
-        [popoverView showToView:btn withActions:@[action1, action2, action3]];
-        
-        
-    }else if (btn.tag == 1){
-        NSLog(@"扫一扫");
-        YNYNCameraScanCodeViewController *scanVC = [[YNYNCameraScanCodeViewController alloc] init];
-        [self presentViewController:scanVC animated:NO completion:nil];
-        
+    {
+        // 搜索按钮按钮
+        UIButton *searchBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+        searchBtn.frame = CGRectMake(0, 0, kUINavBtnWidth, kUINavBtnWidth);
+        [searchBtn setImage:[UIImage imageNamed:@"sousuo_shouye"]
+                   forState:UIControlStateNormal];
+        searchBar.leftView = searchBtn;
+        searchBar.leftViewMode = UITextFieldViewModeAlways;
     }
+
 }
 -(void)makeUI{
     [super makeUI];
-    NSArray *dataArray = @[
-  @{@"image":@"testGoods",@"name":@"米勒洗衣机",@"version":@"产品型号J-GRY4",@"price":@"500.14",@"mark":@"￥"},
-  @{@"image":@"testGoods",@"name":@"米勒洗衣机",@"version":@"产品型号J-GRY4",@"price":@"500.14",@"mark":@"￥"}];
-
-    self.collectionView.dataArray = dataArray;
+    [self.view addSubview:self.collectionView];
+    [self.view addSubview:self.selectLanguageView];
 }
 #pragma mark - 数据懒加载
 

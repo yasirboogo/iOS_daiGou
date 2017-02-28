@@ -11,7 +11,6 @@
 #import "YNAddressTableView.h"
 
 @interface YNAddressViewController ()
-
 @property (nonatomic,weak) YNAddressTableView * tableView;
 
 @property (nonatomic,weak) YNShowEmptyView * emptyView;
@@ -27,6 +26,7 @@
 
 - (void)viewDidAppear:(BOOL)animated{
     [super viewDidAppear:animated];
+    [self startNetWorkingRequestWithUserAddressList];
 }
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -41,11 +41,34 @@
 }
 
 #pragma mark - 网路请求
-
-#pragma mark - 视图加载
--(void)viewDidLayoutSubviews{
-    [super viewDidLayoutSubviews];
+-(void)startNetWorkingRequestWithUserAddressList{
+    NSDictionary *params = @{@"userId":[DEFAULTS valueForKey:kUserLoginInfors][@"userId"],
+                             @"pageIndex":[NSNumber numberWithInteger:self.pageIndex],
+                             @"pageSize":[NSNumber numberWithInteger:self.pageSize],
+                             };
+    [YNHttpManagers getUserAddressListWithParams:params success:^(id response) {
+        self.tableView.dataArrayM = response;
+        self.emptyView.hidden = self.tableView.dataArrayM.count;
+    } failure:^(NSError *error) {
+    }];
 }
+-(void)startNetWorkingRequestWithSetDefaultAddressWithAddressId:(NSInteger)addressId{
+    NSDictionary *params = @{@"addressId":[NSNumber numberWithInteger:addressId],
+                             };
+    [YNHttpManagers setDefaultAddressWithParams:params success:^(id response) {
+        [self startNetWorkingRequestWithUserAddressList];
+    } failure:^(NSError *error) {
+    }];
+}
+-(void)startNetWorkingRequestWithDelectUserAddressWithAddressId:(NSInteger)addressId{
+    NSDictionary *params = @{@"addressId":[NSNumber numberWithInteger:addressId],
+                             };
+    [YNHttpManagers delectUserAddressWithParams:params success:^(id response) {
+        [self startNetWorkingRequestWithUserAddressList];
+    } failure:^(NSError *error) {
+    }];
+}
+#pragma mark - 视图加载
 -(YNAddressTableView *)tableView{
     if (!_tableView) {
         YNAddressTableView *tableView = [[YNAddressTableView alloc] init];
@@ -53,8 +76,16 @@
         [self.view addSubview:tableView];
         [tableView setDidSelectAddressCellBlock:^(NSIndexPath *indexPath) {
             YNNewAddressViewController *pushVC = [[YNNewAddressViewController alloc] init];
-            pushVC.titleStr = @"修改收货地址";
+            pushVC.type = 0;
+            YNAddressCellFrame *cellFrame = _tableView.dataArrayM[indexPath.row];
+            pushVC.address = cellFrame.dict;
             [self.navigationController pushViewController:pushVC animated:NO];
+        }];
+        [tableView setDidSelectSetDefaultAddressBlock:^(NSInteger index) {
+            [self startNetWorkingRequestWithSetDefaultAddressWithAddressId:index];
+        }];
+        [tableView setDidSelectSetDelectAddressBlock:^(NSInteger index) {
+            [self startNetWorkingRequestWithDelectUserAddressWithAddressId:index];
         }];
     }
     return _tableView;
@@ -76,26 +107,20 @@
 -(void)makeData{
     [super makeData];
     
-    self.tableView.dataArrayM = [NSMutableArray arrayWithArray:@[
-    @{@"name":@"李小龙",@"phone":@"13631499999",@"address":@"广东省广州市天河区五山街华南农业大学花山区12栋312"},
-    @{@"name":@"李小龙",@"phone":@"13631499999",@"address":@"广东省广州市天河区五山街华南农业大学花山区12栋312"}
-    ]];
-    
 }
 -(void)makeNavigationBar{
     [super makeNavigationBar];
     __weak typeof(self) weakSelf = self;
     [self addNavigationBarBtnWithTitle:@"新建" selectTitle:@"新建" font:FONT_15 img:[UIImage imageNamed:@"xinjian"] selectImg:[UIImage imageNamed:@"xinjian"] imgWidth:W_RATIO(30) isOnRight:YES btnClickBlock:^(BOOL isSelect) {
         YNNewAddressViewController *pushVC = [[YNNewAddressViewController alloc] init];
-        pushVC.titleStr = @"新增收货地址";
+        pushVC.type = 1;
         [weakSelf.navigationController pushViewController:pushVC animated:NO];
     }];
-    self.titleLabel.text = @"收货地址管理";
+    self.titleLabel.text = kLocalizedString(@"addressManagement",@"收货地址管理");
 }
 -(void)makeUI{
     [super makeUI];
 
-    self.emptyView.hidden = _tableView.dataArrayM.count;
 }
 #pragma mark - 数据懒加载
 

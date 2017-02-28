@@ -48,12 +48,6 @@
     _dataArray = dataArray;
     [self reloadData];
 }
--(NSIndexPath *)indexPath{
-    if (!_indexPath) {
-        _indexPath = [NSIndexPath indexPathForRow:0 inSection:0];
-    }
-    return _indexPath;
-}
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
     return _dataArray.count;
 }
@@ -73,7 +67,7 @@
     self.indexPath = indexPath;
     [self reloadData];
     if (self.didSelectOrderWayCellBlock) {
-        self.didSelectOrderWayCellBlock(_dataArray[indexPath.row][@"title"]);
+        self.didSelectOrderWayCellBlock([NSString stringWithFormat:@"%@",_dataArray[indexPath.row][@"name"]],[NSString stringWithFormat:@"%@",_dataArray[indexPath.row][@"money"]]);
     }
 }
 - (void)showPopView:(BOOL)animated
@@ -147,10 +141,15 @@
 @end
 @implementation YNOrderWayCell
 
+
 -(void)setDict:(NSDictionary *)dict{
     _dict = dict;
-    self.titleLabel.text = dict[@"title"];
-    self.subTitleLabel.text = dict[@"subTitle"];
+    if (dict[@"money"] == NULL) {
+        self.titleLabel.text = [NSString stringWithFormat:@"%@",dict[@"name"]];
+    }else{
+        self.titleLabel.text = [NSString stringWithFormat:@"%@%@元",dict[@"name"],dict[@"money"]];
+    }
+    self.subTitleLabel.text = dict[@"code"];
 }
 -(void)setIsSelect:(BOOL)isSelect{
     _isSelect = isSelect;
@@ -163,7 +162,6 @@
         [self.contentView addSubview:selectBtn];
         [selectBtn setBackgroundImage:[UIImage imageNamed:@"gou_kui_gouwuche"] forState:UIControlStateNormal];
         [selectBtn setBackgroundImage:[UIImage imageNamed:@"gou_hong_gouwuche"] forState:UIControlStateSelected];
-//        [selectBtn addTarget:self action:@selector(buttonClick:) forControlEvents:UIControlEventTouchUpInside];
         selectBtn.frame = CGRectMake(W_RATIO(660)-kMidSpace-kMaxSpace, (W_RATIO(150)-kMidSpace)/2.0, kMidSpace, kMidSpace);
     }
     return _selectBtn;

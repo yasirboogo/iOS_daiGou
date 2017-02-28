@@ -10,16 +10,14 @@
 
 @interface YNNewsListTableView ()<UITableViewDelegate,UITableViewDataSource>
 
-@property (nonatomic,weak) YNNewsHeaderView * headerView;
 
 @end
 
 @implementation YNNewsListTableView
 
 -(instancetype)initWithFrame:(CGRect)frame{
-    self = [super initWithFrame:frame];
+    self = [super initWithFrame:frame style:UITableViewStyleGrouped];
     if (self) {
-        self.rowHeight = W_RATIO(220);
         self.showsVerticalScrollIndicator = NO;
         self.backgroundColor = COLOR_EDEDED;
         self.separatorStyle = UITableViewCellSeparatorStyleNone;
@@ -28,84 +26,67 @@
     }
     return self;
 }
--(YNNewsHeaderView *)headerView{
-    if (!_headerView) {
-        YNNewsHeaderView *headerView = [[YNNewsHeaderView alloc] init];
-        _headerView = headerView;
-        headerView.frame = CGRectMake(0, 0, WIDTHF(self), W_RATIO(318));
-        self.tableHeaderView = headerView;
-    }
-    return _headerView;
-}
--(void)setDataArray:(NSArray *)dataArray{
-    _dataArray = dataArray;
-    
-    self.headerView.dict = dataArray[0];
-    
-    [self reloadData];
-}
-
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
-    return _dataArray.count-1;
+    return _adArrayM.count+_dataArrayM.count;
+}
+-(CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section{
+    if (section == 0) {
+        return W_RATIO(318);
+    }
+    return kZero;
+}
+-(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
+    if ((indexPath.row+1)%4 == 0 || indexPath.row == _adArrayM.count+_dataArrayM.count-1) {
+        return W_RATIO(150);
+    }
+    return W_RATIO(220);
+}
+-(UIView*)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section{
+    if (section == 0) {
+        UIImageView *headImgView = [[UIImageView alloc] init];
+        [headImgView sd_setImageWithURL:[NSURL URLWithString:_imgInfor[@"img"]] placeholderImage:[UIImage imageNamed:@"zhanwei2"]];
+        return headImgView;
+    }
+    return nil;
 }
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
-    YNNewsListCell * listCell = [tableView dequeueReusableCellWithIdentifier:@"listCell"];
-    if (listCell == nil) {
-        listCell = [[YNNewsListCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"listCell"];
-        listCell.selectionStyle = UITableViewCellSelectionStyleNone;
+    if ((indexPath.row+1)%4 == 0 || indexPath.row == _adArrayM.count+_dataArrayM.count-1) {
+        YNNewsAdCell * adCell = [tableView dequeueReusableCellWithIdentifier:@"adCell"];
+        if (adCell == nil) {
+            adCell = [[YNNewsAdCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"adCell"];
+            adCell.selectionStyle = UITableViewCellSelectionStyleNone;
+        }
+        if ((indexPath.row+1)%4 == 0) {
+            adCell.imageUrl = _adArrayM[(indexPath.row+1)/4-1][@"img"];
+        }else{
+            adCell.imageUrl = [_adArrayM lastObject][@"img"];
+        }
+        return adCell;
+    }else{
+        YNNewsListCell * listCell = [tableView dequeueReusableCellWithIdentifier:@"listCell"];
+        if (listCell == nil) {
+            listCell = [[YNNewsListCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"listCell"];
+            listCell.selectionStyle = UITableViewCellSelectionStyleNone;
+        }
+        listCell.dict = _dataArrayM[indexPath.row-((indexPath.row+1)/4)];
+        return listCell;
     }
-    listCell.dict = _dataArray[indexPath.row+1];
-    return listCell;
 }
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
     [tableView deselectRowAtIndexPath:indexPath animated:NO];
-    if (self.didSelectNewsListCellBlock) {
-        self.didSelectNewsListCellBlock(_dataArray[indexPath.row+1][@"title"]);
+    if ((indexPath.row+1)%4 == 0 || indexPath.row == _adArrayM.count+_dataArrayM.count-1) {
+        if (self.didSelectAdCellBlock) {
+            if ((indexPath.row+1)%4 == 0) {
+                self.didSelectAdCellBlock([NSString stringWithFormat:@"%@",_adArrayM[(indexPath.row+1)/4-1][@"type"]],_adArrayM[(indexPath.row+1)/4-1][@"url"]);
+            }else{
+                self.didSelectAdCellBlock([NSString stringWithFormat:@"%@",[_adArrayM lastObject][@"type"]],[_adArrayM lastObject][@"url"]);
+            }
+        }
+    }else{
+        if (self.didSelectNewsListCellBlock) {
+            self.didSelectNewsListCellBlock([NSString stringWithFormat:@"%@",_dataArrayM[indexPath.row-((indexPath.row+1)/4)][@"messageId"]]);
+        }
     }
-}
-@end
-@interface YNNewsHeaderView ()
-/** 图片 */
-@property (nonatomic,weak) UIImageView * bigImgView;
-/** 标题 */
-@property (nonatomic,weak) UILabel * nameLabel;
-@end
-
-@implementation YNNewsHeaderView
-
--(void)setDict:(NSDictionary *)dict{
-    _dict = dict;
-    self.bigImgView.image = [UIImage imageNamed:dict[@"bigImg"]];
-    self.nameLabel.text = dict[@"name"];
-}
-
--(void)layoutSubviews{
-    [super layoutSubviews];
-        CGSize nameSize = [_nameLabel.text calculateHightWithWidth:MaxXF(_bigImgView)-kMidSpace*2 font:_nameLabel.font line:_nameLabel.numberOfLines];
-    self.nameLabel.frame = CGRectMake(kMidSpace, HEIGHTF(_bigImgView)-nameSize.height-W_RATIO(20), nameSize.width, nameSize.height);
-}
--(UIImageView *)bigImgView{
-    if (!_bigImgView) {
-        UIImageView *bigImgView = [[UIImageView alloc] init];
-        _bigImgView = bigImgView;
-        [self addSubview:bigImgView];
-        bigImgView.frame = self.bounds;
-    }
-    return _bigImgView;
-}
--(UILabel *)nameLabel{
-    if (!_nameLabel) {
-        UILabel *nameLabel = [[UILabel alloc] init];
-        _nameLabel = nameLabel;
-        [self.bigImgView addSubview:nameLabel];
-        nameLabel.font = FONT(36);
-        nameLabel.textAlignment = NSTextAlignmentCenter;
-        nameLabel.numberOfLines = 2;
-        nameLabel.textColor = COLOR_FFFFFF;
-        nameLabel.shadowColor = COLOR_000000;
-        nameLabel.shadowOffset = CGSizeMake(W_RATIO(3), W_RATIO(0));
-    }
-    return _nameLabel;
 }
 @end
 @interface YNNewsListCell ()
@@ -127,10 +108,10 @@
 -(void)setDict:(NSDictionary *)dict{
     _dict = dict;
 
-    self.rightImgView.image = [UIImage imageNamed:dict[@"image"]];
-    self.nameLabel.text = dict[@"name"];
-    self.timeLabel.text = dict[@"time"];
-    self.commentLabel.text = dict[@"comment"];
+    [self.rightImgView sd_setImageWithURL:[NSURL URLWithString:dict[@"img"]] placeholderImage:[UIImage imageNamed:@"zhanwei2"]];
+    self.nameLabel.text = dict[@"title"];
+    self.timeLabel.text = dict[@"createtime"];
+    self.commentLabel.text = [NSString stringWithFormat:@"%@",dict[@"review"]];
 }
 -(void)layoutSubviews{
     [super layoutSubviews];
@@ -186,13 +167,28 @@
         UIImageView *rightImgView = [[UIImageView alloc] init];
         _rightImgView = rightImgView;
         [self.contentView addSubview:rightImgView];
-        rightImgView.frame = CGRectMake(WIDTH(self.contentView)-W_RATIO(14)-W_RATIO(278), W_RATIO(14), W_RATIO(278), W_RATIO(206));
+        rightImgView.frame = CGRectMake(WIDTH(self.contentView)-W_RATIO(14)-W_RATIO(278), W_RATIO(14), W_RATIO(278), W_RATIO(192));
     }
     return _rightImgView;
 }
+@end
+@interface YNNewsAdCell ()
 
+@property (nonatomic,weak) UIImageView * adImgView;
 
+@end
+@implementation YNNewsAdCell
 
-
-
+-(void)setImageUrl:(NSString *)imageUrl{
+    [self.adImgView sd_setImageWithURL:[NSURL URLWithString:imageUrl] placeholderImage:[UIImage imageNamed:@"zhanwei2"]];
+}
+-(UIImageView *)adImgView{
+    if (!_adImgView) {
+        UIImageView *adImgView = [[UIImageView alloc] init];
+        _adImgView = adImgView;
+        [self.contentView addSubview:adImgView];
+        adImgView.frame = CGRectMake(0, 0, SCREEN_WIDTH, W_RATIO(150));
+    }
+    return _adImgView;
+}
 @end

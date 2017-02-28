@@ -12,4 +12,8 @@
 
 @property (nonatomic,assign) BOOL isInvalid;
 
+@property (nonatomic,assign) NSInteger index;
+
+@property (nonatomic,copy) NSString *allPrice;
+
 @end

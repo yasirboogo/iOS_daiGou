@@ -12,7 +12,7 @@
 
 @property (nonatomic, strong) NSArray *dataArray;
 
-@property (nonatomic, copy) void(^didSelectSubmitButtonBlock)();
+@property (nonatomic, copy) void(^didSelectGoodsClassCellButtonBlock)(NSInteger);
 
 @end
 @interface YNShowAllGoodsClassCell : UICollectionViewCell

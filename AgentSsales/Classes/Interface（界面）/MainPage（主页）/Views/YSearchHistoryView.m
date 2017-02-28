@@ -140,6 +140,7 @@
         history.sordId = [NSString stringWithFormat:@"%ld",(unsigned long)historyArray.count];
         [history save];
     }
+    [self.collectionView reloadData];
 }
 -(void)delectUpdateHistoryRecord{
     [YNHistoryModel deleteObjectsWithFormat:@"Where userId = %d",USERID];

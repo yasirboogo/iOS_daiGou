@@ -68,7 +68,7 @@
     
     self.icoF = CGRectMake(W_RATIO(30), W_RATIO(20), W_RATIO(64), W_RATIO(64));
     
-    CGSize timeSize = [dict[@"time"] calculateHightWithFont:FONT(22) maxWidth:SCREEN_WIDTH/3.0];
+    CGSize timeSize = [dict[@"createtime"] calculateHightWithFont:FONT(22) maxWidth:SCREEN_WIDTH/3.0];
     self.timeF = CGRectMake(SCREEN_WIDTH-timeSize.width-kMidSpace, Y(_icoF), timeSize.width, timeSize.height);
     self.nameF = CGRectMake(MaxX(_icoF)+W_RATIO(30), Y(_icoF),X(_timeF)-MaxX(_icoF)-W_RATIO(30)*2 , HEIGHT(_icoF)/2.0);
     
@@ -123,9 +123,9 @@
 }
 -(void)setupCellContent:(YNNewsCommentCellFrame*)cellFrame{
     
-    self.icoImgView.image = [UIImage imageNamed:cellFrame.dict[@"ico"]];
-    self.timeLabel.text = cellFrame.dict[@"time"];
-    self.nameLabel.text = cellFrame.dict[@"name"];
+    [self.icoImgView sd_setImageWithURL:[NSURL URLWithString:cellFrame.dict[@"headimg"]] placeholderImage:[UIImage imageNamed:@"zhanwei1"]];
+    self.timeLabel.text = cellFrame.dict[@"createtime"];
+    self.nameLabel.text = cellFrame.dict[@"nickname"];
     self.contentLabel.text = cellFrame.dict[@"content"];
 }
 

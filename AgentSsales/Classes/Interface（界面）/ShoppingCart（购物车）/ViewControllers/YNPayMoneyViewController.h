@@ -10,4 +10,6 @@
 
 @interface YNPayMoneyViewController : YNBaseViewController
 
+@property (nonatomic,strong) NSDictionary * orderDict;
+
 @end

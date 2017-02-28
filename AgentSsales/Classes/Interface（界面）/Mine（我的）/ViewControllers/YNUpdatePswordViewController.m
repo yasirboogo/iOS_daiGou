@@ -41,7 +41,15 @@
 }
 
 #pragma mark - 网路请求
-
+-(void)startNetWorkingRequestWithUpdateUserPwd{
+    NSDictionary *params = @{@"userId":[DEFAULTS valueForKey:kUserLoginInfors][@"userId"],
+                             @"oldPassword":_tableView.textArrayM[0],
+                             @"newPassword":_tableView.textArrayM[1]};
+    [YNHttpManagers updateUserPwdWithParams:params success:^(id response) {
+        [self.navigationController popViewControllerAnimated:NO];
+    } failure:^(NSError *error) {
+    }];
+}
 #pragma mark - 视图加载
 -(YNUpdatePswordTableView *)tableView{
     if (!_tableView) {
@@ -69,7 +77,15 @@
 
 #pragma mark - 函数、消息
 -(void)handleUpdatePswordSubmitButtonClick:(UIButton*)btn{
-    NSLog(@"%@",_tableView.textArrayM);
+    BOOL isPwdEqual = [_tableView.textArrayM[1] isEqualToString:_tableView.textArrayM[2]];
+    BOOL isPwdRight = YES;
+    if (!isPwdRight) {
+        NSLog(@"密码不正确");
+    }else if(!isPwdEqual) {
+        NSLog(@"两次密码不一样");
+    }else{
+        [self startNetWorkingRequestWithUpdateUserPwd];
+    }
 }
 -(void)makeData{
     [super makeData];

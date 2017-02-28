@@ -42,7 +42,6 @@
 }
 
 #pragma mark - 网路请求
-
 #pragma mark - 视图加载
 -(TYTabButtonPagerController *)pagerController{
     if (!_pagerController) {
@@ -86,9 +85,11 @@
     YNCouponListViewController *couponVC = [[YNCouponListViewController alloc] init];
     if (index == 0) {
         couponVC.isInvalid = NO;
+        couponVC.allPrice = self.allPrice;
     }else if (index == 1){
         couponVC.isInvalid = YES;
     }
+    couponVC.index = index;
     return couponVC;
 }
 
@@ -99,7 +100,7 @@
 -(void)makeNavigationBar{
     [super makeNavigationBar];
 
-    self.titleLabel.text = @"我的优惠券";
+    self.titleLabel.text = kLocalizedString(@"myCoupon",@"我的优惠券");
 }
 -(void)makeUI{
     [super makeUI];

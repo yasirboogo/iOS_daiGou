@@ -30,6 +30,7 @@
 }
 - (void)viewDidLoad {
     [super viewDidLoad];
+    [self startNetWorkingRequestWithViewLogistics];
 }
 
 - (void)viewWillDisappear:(BOOL)animated{
@@ -41,7 +42,14 @@
 }
 
 #pragma mark - 网路请求
-
+-(void)startNetWorkingRequestWithViewLogistics{
+    NSDictionary *params = @{@"orderId":[NSNumber numberWithInteger:_orderId]};
+    [YNHttpManagers viewLogisticsWithParams:params success:^(id response) {
+        self.tableView.dataArray = response;
+        self.emptyView.hidden = self.tableView.dataArray.count;
+    } failure:^(NSError *error) {
+    }];
+}
 #pragma mark - 视图加载
 -(YNLogisticalMsgTableView *)tableView{
     if (!_tableView) {
@@ -68,12 +76,14 @@
 #pragma mark - 函数、消息
 -(void)makeData{
     [super makeData];
+    /*
     self.tableView.dataArray = @[
                                  @{@"msg":@"卖家已签收，感谢使用EMS快递",@"time":@"2016-11-12 09:48"},
                                  @{@"msg":@"广州市集散中心 已发出",@"time":@"2016-11-12 09:48"},
                                  @{@"msg":@"顺丰快递 佛山市长城区新明二路营业点收件员 已揽件",@"time":@"2016-11-12 09:48"},
                                  @{@"msg":@"你的快递由佛山门店安排发货",@"time":@"2016-11-12 09:48"}
                                  ];
+     */
 }
 -(void)makeNavigationBar{
     [super makeNavigationBar];
@@ -81,7 +91,6 @@
 }
 -(void)makeUI{
     [super makeUI];
-    self.emptyView.hidden = _tableView.dataArray.count;
 }
 #pragma mark - 数据懒加载
 

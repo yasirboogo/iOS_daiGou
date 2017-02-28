@@ -5,3 +5,41 @@
   Created by innofive on 16/12/15.
   Copyright © 2016年 inno. All rights reserved.
 */
+
+/** --------------------------home-------------------------- */
+"home" = "Laman";
+"language" = "Bahasa";
+"searchContent" = "Sila masukkan carian anda";
+"purchasePlatform" = "Platform pembelian";
+"exchangeRate" = "Kadar pertukaran";
+"specialPurchase" = "Ciri-ciri untuk pembelian";
+"hotClasses" = "Kategori terbaik";
+"more" = "Lebih";
+"hot" = "haba";
+"moneySymbol" = "$";
+/** --------------------------news-------------------------- */
+"news" = "Maklumat";
+"newsCenter" = "Pusat Maklumat";
+
+
+
+
+/** --------------------------shop-------------------------- */
+"shopCart" = "BakulBelian";
+/** --------------------------mine-------------------------- */
+"mine" = "Saya";
+"accountBalances" = "Baki akaun";
+"yuan" = "Yuan";
+"allOrder" = "Semua";
+"waitHandle" = "Memproses";
+"waitPay" = "Pembayaran";
+"waitSend" = "menghantar";
+"waitReceive" = "Resit";
+"completed" = "Bidang";
+"myCollection" = "Pilihan Saya";
+"myDistribution" = "Pengedar saya";
+"myWallet" = "Dompet saya";
+"myCoupon" = "Kupon Saya";
+"addressManagement" = "Penghantaran Management Alamat";
+"myTwoCode" = "Kod dua dimensi saya";
+"settings" = "Sediakan";

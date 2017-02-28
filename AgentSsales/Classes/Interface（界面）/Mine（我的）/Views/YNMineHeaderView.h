@@ -12,7 +12,7 @@
 
 @property (nonatomic,copy)void(^didSelectScrollViewButtonClickBlock)(NSInteger);
 
-@property (nonatomic,strong)UIImage *headImg;
+@property (nonatomic,strong)NSString *headImg;
 
 @property (nonatomic,copy)NSString *nickName;
 

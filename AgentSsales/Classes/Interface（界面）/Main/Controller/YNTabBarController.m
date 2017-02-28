@@ -25,7 +25,7 @@
                      @"YNMineViewController"];
     NSArray *titles = @[@"home",
                         @"news",
-                        @"shop",
+                        @"shopCart",
                         @"mine"];
     NSArray *images = @[@"shouye_kui",
                         @"zixun_kui",
@@ -39,7 +39,7 @@
     for (NSInteger i =0; i < controllers.count; i++) {
         YNBaseViewController *baseVC = [[NSClassFromString(controllers[i]) alloc] init];
         baseVC.backButton.hidden = YES;
-        [self addChildViewController:baseVC withTitle:NSLS(titles[i],@"标题")
+        [self addChildViewController:baseVC withTitle:kLocalizedString(titles[i],@"标题")
                                image:[UIImage imageNamed:images[i]]
                        selectedImage:[UIImage imageNamed:selectedImages[i]]];
         

@@ -43,6 +43,10 @@
     _isForbidClick = isForbidClick;
     self.inforTField.enabled = !isForbidClick;
 }
+-(void)setTextFieldText:(NSString *)textFieldText{
+    _textFieldText = textFieldText;
+    self.inforTField.text = textFieldText;
+}
 -(void)layoutSubviews{
     [super layoutSubviews];
     self.itemLabel.frame = CGRectMake(kMidSpace, 0, W_RATIO(180), HEIGHTF(self.contentView));
@@ -71,7 +75,7 @@
         inforTField.autocorrectionType = NO;
         inforTField.autocapitalizationType = UITextAutocapitalizationTypeNone;
         inforTField.autocorrectionType = UITextAutocorrectionTypeNo;
-        inforTField.secureTextEntry=YES;
+        inforTField.secureTextEntry = self.isShowText;
         inforTField.font = FONT(32);
         inforTField.textColor = COLOR_999999;
         inforTField.delegate = self;
@@ -121,9 +125,11 @@
 }
 
 -(void)handleSendButtonCodeClick:(UIButton*)btn{
-    
-    // 启动定时器
-    dispatch_resume(self.timer);
+    if (self.didSendPhoneCodeButtonBlock) {
+        self.didSendPhoneCodeButtonBlock();
+        // 启动定时器
+        dispatch_resume(self.timer);
+    }
     
 }
 -(dispatch_source_t)timer{
@@ -131,12 +137,13 @@
         __block long lastTime = 30;
         // 创建定时器
         dispatch_queue_t queue = dispatch_get_main_queue();
-        _timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, queue);
+        dispatch_source_t timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, queue);
+         _timer = timer;
         dispatch_time_t start = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.0 * NSEC_PER_SEC));
         uint64_t interval = (uint64_t)(1.0 * NSEC_PER_SEC);
-        dispatch_source_set_timer(_timer, start, interval, 0);
+        dispatch_source_set_timer(timer, start, interval, 0);
         // 设置回调
-        dispatch_source_set_event_handler(_timer, ^{
+        dispatch_source_set_event_handler(timer, ^{
             if (lastTime+1) {
                 _sendCodeBtn.enabled = NO;
                 _sendCodeBtn.backgroundColor = COLOR_EDEDED;
@@ -146,7 +153,7 @@
                 _sendCodeBtn.backgroundColor = COLOR_DF463E;
                 [_sendCodeBtn setTitle:@"发送验证码" forState:UIControlStateNormal];
                 // 取消定时器
-                dispatch_cancel(_timer);
+                dispatch_cancel(self.timer);
                 _timer = nil;
                 /*
                  // 启动定时器

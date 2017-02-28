@@ -44,6 +44,7 @@
 -(void)setRightNumber:(NSString *)rightNumber{
     _rightNumber = rightNumber;
     self.rightLabel.text = rightNumber;
+    [self layoutSubviews];
 }
 -(void)layoutSubviews{
     [super layoutSubviews];

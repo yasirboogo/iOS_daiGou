@@ -14,6 +14,10 @@
 
 @property (nonatomic,assign) BOOL isInvalid;
 
+@property (nonatomic,copy) NSString *allPrice;
+
+@property (nonatomic,copy) void(^didSelectUseButtonBlock)(NSString*,NSString*);
+
 @end
 typedef NS_ENUM(NSInteger, YNCouponCellType) {
     RedType,
@@ -26,5 +30,9 @@ typedef NS_ENUM(NSInteger, YNCouponCellType) {
 @property (nonatomic,strong) NSDictionary *dict;
 
 @property (nonatomic,assign) YNCouponCellType cellType;
+
+@property (nonatomic,assign) BOOL isShowUse;
+
+@property (nonatomic,copy) void(^didSelectUseButtonBlock)();
 
 @end

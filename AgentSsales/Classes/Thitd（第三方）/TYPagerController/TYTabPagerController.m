@@ -194,9 +194,8 @@
 
 - (void)reloadData
 {
-    [_collectionViewBar reloadData];
-    
     [super reloadData];
+    [_collectionViewBar reloadData];
 }
 
 // update tab subviews frame
@@ -240,7 +239,6 @@
     if (_tabDelegateFlags.didScrollToTabPageIndex) {
         [self.delegate pagerController:self didScrollToTabPageIndex:index];
     }
-    
     if (index < self.countOfControllers) {
         [_collectionViewBar scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:index inSection:0] atScrollPosition:UICollectionViewScrollPositionCenteredHorizontally animated:animated];
     }

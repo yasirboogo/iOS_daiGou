@@ -8,8 +8,15 @@
 
 #import "YNRegisterViewController.h"
 #import "YNRegisterTableView.h"
+#import "YNPhoneAreaCodeView.h"
 
 @interface YNRegisterViewController ()
+{
+    NSString *_checkCode;
+}
+@property (nonatomic,strong) YNPhoneAreaCodeView *areaCodeView;
+
+@property (nonatomic,assign) NSInteger index;
 
 @property (nonatomic,weak) YNRegisterTableView * tableView ;
 
@@ -18,6 +25,7 @@
 @property (nonatomic,weak) UIButton *checkBtn;
 
 @property (nonatomic,strong) YYLabel *procotolLabel;
+
 
 @end
 
@@ -46,13 +54,54 @@
 }
 
 #pragma mark - 网路请求
-
+-(void)startNetWorkingRequestWithPhoneCode{
+    NSDictionary *params = @{
+                             @"loginphone":[NSString stringWithFormat:@"%@%@",_areaCodeView.dataArray[_index][@"code"],_tableView.textArrayM[1]]
+                             };
+    [YNHttpManagers getMsgCodeWithParams:params success:^(id response) {
+        _checkCode = response;
+    } failure:^(NSError *error) {
+        NSLog(@"%@",error);
+    }];
+}
+-(void)startNetWorkingRequestWithSubmitButtonClick{
+    NSDictionary *params = @{
+                             @"loginphone":_tableView.textArrayM[1],
+                             @"password":_tableView.textArrayM[3],
+                             @"country":_areaCodeView.dataArray[_index][@"title"]
+                             };
+    
+    [YNHttpManagers userRegisterInforWithParams:params success:^(id response) {
+        [self.navigationController popViewControllerAnimated:YES];
+    } failure:^(NSError *error) {
+        NSLog(@"%@",error);
+    }];
+}
 #pragma mark - 视图加载
+-(YNPhoneAreaCodeView *)areaCodeView{
+    if (!_areaCodeView) {
+        CGRect frame = CGRectMake(kMidSpace, (SCREEN_HEIGHT-(W_RATIO(120)*3))/2.0, SCREEN_WIDTH-kMidSpace*2, W_RATIO(120)*3);
+        YNPhoneAreaCodeView *areaCodeView = [[YNPhoneAreaCodeView alloc] initWithFrame:frame];
+        _areaCodeView = areaCodeView;
+        [areaCodeView setDidSelectCodeCellBlock:^(NSInteger index) {
+            self.index = index;
+            self.tableView.code = self.areaCodeView.dataArray[_index][@"code"];
+        }];
+    }
+    return _areaCodeView;
+}
 -(YNRegisterTableView *)tableView{
     if (!_tableView) {
         YNRegisterTableView *tableView = [[YNRegisterTableView alloc] init];
         _tableView  = tableView;
         [self.view addSubview:tableView];
+        [tableView setDidSelectAreaCellBlock:^{
+            [self.areaCodeView showPopView:YES];
+        }];
+        [tableView setDidSelectSendPhoneCodeBlock:^{
+            
+            [self startNetWorkingRequestWithPhoneCode];
+        }];
     }
     return _tableView;
 }
@@ -67,7 +116,7 @@
         submitBtn.titleLabel.font = FONT(36);
         [submitBtn setTitle:@"注册" forState:UIControlStateNormal];
         [submitBtn setTitleColor:COLOR_FFFFFF forState:UIControlStateNormal];
-        [submitBtn addTarget:self action:@selector(handleLoginSubmitButtonClick:) forControlEvents:UIControlEventTouchUpInside];
+        [submitBtn addTarget:self action:@selector(handleRegisterSubmitButtonClick:) forControlEvents:UIControlEventTouchUpInside];
         [self.view addSubview:submitBtn];
     }
     return _submitBtn;
@@ -79,6 +128,7 @@
         [self.view addSubview:checkBtn];
         [checkBtn setBackgroundImage:[UIImage imageNamed:@"gou_kui_gouwuche"] forState:UIControlStateNormal];
         [checkBtn setBackgroundImage:[UIImage imageNamed:@"gou_hong_gouwuche"] forState:UIControlStateSelected];
+        checkBtn.selected = YES;
         [checkBtn addTarget:self action:@selector(handleCheckButtonClick:) forControlEvents:UIControlEventTouchUpInside];
         checkBtn.frame = CGRectMake(W_RATIO(30),MaxYF(_submitBtn)+W_RATIO(20), kMidSpace, kMidSpace);
     }
@@ -123,11 +173,16 @@
 #pragma mark - 函数、消息
 -(void)makeData{
     [super makeData];
+    self.areaCodeView.dataArray =@[
+  @{@"image":@"zhongguo_yuan",@"title":@"中国",@"code":@"86"},
+  @{@"image":@"malaixiya_yuan",@"title":@"马来西亚",@"code":@"60"}
+                                   ];
 }
 -(void)makeNavigationBar{
     [super makeNavigationBar];
-    [self addNavigationBarBtnWithTitle:@"登录" selectTitle:@"登录" font:FONT(30) isOnRight:YES btnClickBlock:^(BOOL isShow) {
-        
+    __weak typeof(self) weakSelf = self;
+    [self addNavigationBarBtnWithTitle:@"登录" selectTitle:@"登录" font:FONT_15 isOnRight:YES btnClickBlock:^(BOOL isShow) {
+        [weakSelf.navigationController popViewControllerAnimated:NO];
     }];
     self.backButton.hidden = YES;
     self.titleLabel.text = @"注册";
@@ -142,11 +197,26 @@
 -(void)handleForgetPwdButtonClick:(UIButton*)btn{
     
 }
--(void)handleLoginSubmitButtonClick:(UIButton*)btn{
-    
+-(void)handleRegisterSubmitButtonClick:(UIButton*)btn{
+    BOOL isEmpty = [_tableView.textArrayM[0] isEqualToString:kZeroStr]||[_tableView.textArrayM[1] isEqualToString:kZeroStr]||[_tableView.textArrayM[2]isEqualToString:kZeroStr]||[_tableView.textArrayM[3] isEqualToString:kZeroStr];
+    BOOL isCode = [_tableView.textArrayM[2] isEqualToString:_checkCode];
+    if (isEmpty) {
+        NSLog(@"输入为空");
+    }
+    if (isCode) {
+        NSLog(@"输入正确的验证码");
+    }
+    [self startNetWorkingRequestWithSubmitButtonClick];
 }
 -(void)handleCheckButtonClick:(UIButton*)btn{
     btn.selected = !btn.selected;
+    if (btn.selected) {
+        _submitBtn.enabled = YES;
+        _submitBtn.backgroundColor = COLOR_DF463E;
+    }else{
+        _submitBtn.enabled = NO;
+        _submitBtn.backgroundColor = COLOR_999999;
+    }
 }
 #pragma mark - 数据懒加载
 

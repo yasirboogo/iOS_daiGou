@@ -12,6 +12,8 @@
 
 @property (nonatomic,strong) NSArray * dataArray;
 
+@property (nonatomic,copy) void(^didSelectHotGoodsClassesCellBlock)(NSInteger);
+
 @end
 @interface YNHotGoodsClassesCell : UICollectionViewCell
 

@@ -66,7 +66,7 @@
     if (indexPath.section == 0 && indexPath.row == 0) {
         setCell.isOn = [[NSUserDefaults standardUserDefaults] boolForKey:@"ISACCEPT"];;
         [setCell setDidSelectSwitchButtonClick:^(BOOL isOn) {
-            NSLog(@"是否推送:%d",isOn);
+            self.didSelectIsPushOnBlock(isOn);
         }];
     }else if (indexPath.section == 1 && indexPath.row == 0){
         setCell.detailLabel.text = self.cache;
@@ -76,15 +76,12 @@
 }
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
     [tableView deselectRowAtIndexPath:indexPath animated:NO];
-    NSString *itemName = _items[indexPath.section][indexPath.row];
-    if ([itemName isEqualToString:@"推送开关"]) {
-    }else if ([itemName isEqualToString:@"清除缓存"]){
+    if (indexPath.section == 0 && indexPath.row == 0) {
+    }else if (indexPath.section == 1 && indexPath.row == 0){
         [YNClearCache clearCacheFile];
         [self reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationBottom];
-    }else if ([itemName isEqualToString:@"意见反馈"]){
-        
-    }else if ([itemName isEqualToString:@"常见问题"]){
-        
+    }else{
+        self.didSelectSettingCellBlock(indexPath.row);
     }
 }
 -(NSArray<NSArray *> *)items{

@@ -49,28 +49,81 @@
         cartCell.selectionStyle = UITableViewCellSelectionStyleNone;
         cartCell.backgroundColor = COLOR_EDEDED;
     }
-    cartCell.dict = _dataArrayM[indexPath.row];
+    cartCell.count = self.numArrayM[indexPath.row];
+    cartCell.isSelected = [self.selectArrayM[indexPath.row] boolValue];
+    cartCell.dict = self.dataArrayM[indexPath.row];
     [cartCell setDidSelectedButtonClickBlock:^(BOOL isSelect) {
-        [_dataArrayM[indexPath.row] setValue:[NSNumber numberWithBool:isSelect] forKey:@"isSelect"];
-        [self reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:NO];
-    }];
-    
-    cartCell.isEnabled = [_dataArrayM[indexPath.row][@"num"] integerValue] > 1 ? YES:NO;
-    
-    [cartCell setHandleCellAddButtonBlock:^(NSInteger idx) {
-        NSInteger num = [_dataArrayM[indexPath.row][@"num"] integerValue];
-        if (idx == 0) {
-            num -= 1;
-        }else if (idx == 1){
-            num += 1;
+        [_selectArrayM replaceObjectAtIndex:indexPath.row withObject:[NSNumber numberWithBool:isSelect]];
+        if (isSelect) {
+            self.allCount += [self.numArrayM[indexPath.row] integerValue];
+            self.allPrice += [self.numArrayM[indexPath.row] integerValue]*[self.dataArrayM[indexPath.row][@"salesprice"] floatValue];
+            [self.goodsIdsArrayM replaceObjectAtIndex:indexPath.row withObject:[NSString stringWithFormat:@"%@",self.dataArrayM[indexPath.row][@"shoppingId"]]];
+        }else{
+            self.allCount -= [self.numArrayM[indexPath.row] integerValue];
+            self.allPrice -= [self.numArrayM[indexPath.row] integerValue]*[self.dataArrayM[indexPath.row][@"salesprice"] floatValue];
+            [self.goodsIdsArrayM replaceObjectAtIndex:indexPath.row withObject:@"-99"];
         }
-        [_dataArrayM[indexPath.row] setObject:[NSString stringWithFormat:@"%ld",(long)num] forKey:@"num"];
-        [self reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:NO];
+        [self reloadData];
     }];
+    cartCell.isEnabled = [self.numArrayM[indexPath.row] integerValue] > 1 ? YES:NO;
+    [cartCell setHandleCellAddButtonBlock:^(BOOL isSelect,NSInteger lastNum,NSInteger newNum) {
+        [self.numArrayM replaceObjectAtIndex:indexPath.row withObject:[NSString stringWithFormat:@"%ld",newNum]];
+        if (isSelect) {
+            self.allCount += newNum-lastNum;
+            self.allPrice += (newNum-lastNum)*[self.dataArrayM[indexPath.row][@"salesprice"] floatValue];
+        }
+        [self reloadData];
+    }];
+    [cartCell setHandleCellEditButtonBlock:^(BOOL isEdit) {
+        if (isEdit) {
+            self.allSaveCount +=1;
+        }else{
+            self.allSaveCount -=1;
+        }
+        self.handleCellEditButtonBlock(isEdit,indexPath.row);
+        [self sendNSNotificationCenterToBalance];
+    }];
+    [self sendNSNotificationCenterToBalance];
     return cartCell;
 }
+
+-(void)sendNSNotificationCenterToBalance{
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"priceBalance" object:nil userInfo:
+     @{@"allPrice":[NSString stringWithFormat:@"%f",self.allPrice],
+       @"allCount":[NSString stringWithFormat:@"%ld",self.allCount],
+       @"allSaveCount":[NSString stringWithFormat:@"%ld",self.allSaveCount],
+       @"goodsIdsArrayM":self.goodsIdsArrayM}];
+}
+
+-(NSMutableArray<NSNumber *> *)selectArrayM{
+    if (!_selectArrayM) {
+        _selectArrayM = [NSMutableArray array];
+        for (NSInteger i = 0; i<_dataArrayM.count; i++) {
+            [_selectArrayM addObject:@NO];
+        }
+    }
+    return _selectArrayM;
+}
+-(NSMutableArray<NSString *> *)numArrayM{
+    if (!_numArrayM) {
+        _numArrayM = [NSMutableArray array];
+        for (NSInteger i = 0; i<_dataArrayM.count; i++) {
+            [_numArrayM addObject:[NSString stringWithFormat:@"%@",_dataArrayM[i][@"count"]]];
+        }
+    }
+    return _numArrayM;
+}
+-(NSMutableArray<NSString *> *)goodsIdsArrayM{
+    if (!_goodsIdsArrayM) {
+        _goodsIdsArrayM = [NSMutableArray array];
+        for (NSInteger i = 0; i<_dataArrayM.count; i++) {
+            [_goodsIdsArrayM addObject:@"-99"];
+        }
+    }
+    return _goodsIdsArrayM;
+}
 @end
-@interface YNGoodsCartCell ()
+@interface YNGoodsCartCell ()<UITextFieldDelegate>
 /** 勾选按钮 */
 @property (nonatomic,weak) UIButton * selectBtn;
 /** 背景 */
@@ -86,43 +139,48 @@
 /** 价钱 */
 @property (nonatomic,weak) UILabel * priceLabel;
 /** 数量 */
-@property (nonatomic,weak) UILabel * amountLabel;
+@property (nonatomic,weak) UITextField * amountTField;
 /** 减按钮 */
 @property (nonatomic,weak) UIButton * subBtn;
 /** 加按钮 */
 @property (nonatomic,weak) UIButton * addBtn;
+/** 编辑按钮 */
+@property (nonatomic,weak) UIButton * editBtn;
 @end
 @implementation YNGoodsCartCell
 
 -(void)setDict:(NSDictionary *)dict{
     _dict = dict;
     
-    self.leftImgView.image = [UIImage imageNamed:dict[@"image"]];
+    [self.leftImgView sd_setImageWithURL:[NSURL URLWithString:dict[@"img"]] placeholderImage:[UIImage imageNamed:@"zhanwei1"]];
     
-    self.titleLabel.text = dict[@"title"];
+    self.titleLabel.text = dict[@"name"];
     
-    self.subTitleLabel.text = dict[@"subTitle"];
+    self.subTitleLabel.text = dict[@"note"];
     
-    self.markLabel.text = NSLS(@"moneySymbol", @"货币符号");
+    self.markLabel.text = @"$";
     
-    self.priceLabel.text = dict[@"price"];
+    self.priceLabel.text = [NSString stringWithFormat:@"%@",dict[@"salesprice"]];
+
     
-    self.amountLabel.text = dict[@"num"];
-    
-    self.isSelected = [dict[@"isSelect"] boolValue];
 }
+-(void)setCount:(NSString *)count{
+    _count = count;
+    self.amountTField.text = count;
+}
+
 -(void)setIsSelected:(BOOL)isSelected{
     _isSelected = isSelected;
     self.selectBtn.selected = isSelected;
 }
 -(void)setIsEnabled:(BOOL)isEnabled{
     _isEnabled = isEnabled;
-    self.subBtn.enabled = isEnabled;
+    self.subBtn.enabled = isEnabled && self.addBtn.enabled;
 }
 -(void)layoutSubviews{
     [super layoutSubviews];
 //    不同模式控件布局
-    CGSize titleSize = [_titleLabel.text calculateHightWithWidth:WIDTHF(_bgView)-MaxXF(_leftImgView)-W_RATIO(20)*2 font:_titleLabel.font line:_titleLabel.numberOfLines];
+    CGSize titleSize = [_titleLabel.text calculateHightWithWidth:XF(self.editBtn)-MaxXF(_leftImgView)-W_RATIO(20)*2 font:_titleLabel.font line:_titleLabel.numberOfLines];
     self.titleLabel.frame = CGRectMake(MaxXF(_leftImgView)+W_RATIO(20), W_RATIO(20)*2, titleSize.width,titleSize.height);
 
     CGSize subTitleSize = [_subTitleLabel.text calculateHightWithWidth:WIDTHF(_titleLabel) font:_subTitleLabel.font line:_subTitleLabel.numberOfLines];
@@ -132,13 +190,13 @@
     self.markLabel.frame = CGRectMake(XF(_subTitleLabel),MaxYF(_leftImgView)-markSize.height-W_RATIO(20), markSize.width,markSize.height);
     
     CGSize priceSize = [_priceLabel.text calculateHightWithFont:_priceLabel.font maxWidth:0];
-    self.priceLabel.frame = CGRectMake(MaxXF(_markLabel),MaxYF(_markLabel)-priceSize.height,WIDTHF(_subTitleLabel)*2/5.0,priceSize.height);
+    self.priceLabel.frame = CGRectMake(MaxXF(_markLabel),MaxYF(_markLabel)-priceSize.height,WIDTHF(_subTitleLabel)*3/5.0,priceSize.height);
     
     self.subBtn.frame = CGRectMake(MaxXF(_priceLabel)+kMinSpace,YF(_priceLabel), HEIGHTF(_priceLabel),  HEIGHTF(_priceLabel));
     
     self.addBtn.frame = CGRectMake(WIDTHF(_bgView)-W_RATIO(20)-HEIGHTF(_subBtn),YF(_subBtn),HEIGHTF(_subBtn),HEIGHTF(_subBtn));
     
-    self.amountLabel.frame = CGRectMake(MaxXF(_subBtn)+kMinSpace, YF(_subBtn), XF(_addBtn)-MaxXF(_subBtn)-kMinSpace*2, HEIGHTF(_subBtn));
+    self.amountTField.frame = CGRectMake(MaxXF(_subBtn)+kMinSpace, YF(_subBtn), XF(_addBtn)-MaxXF(_subBtn)-kMinSpace*2, HEIGHTF(_subBtn));
     
 }
 -(UIButton *)selectBtn{
@@ -192,6 +250,30 @@
     }
     return _titleLabel;
 }
+-(UIButton *)editBtn{
+    if (!_editBtn) {
+        UIButton *editBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+        _editBtn = editBtn;
+        [self.bgView addSubview:editBtn];
+        [editBtn setTitle:@"编辑" forState:UIControlStateNormal];
+        [editBtn setTitleColor:COLOR_666666 forState:UIControlStateNormal];
+        [editBtn setTitle:@"保存" forState:UIControlStateSelected];
+        [editBtn setTitleColor:COLOR_666666 forState:UIControlStateSelected];
+        editBtn.titleLabel.font = FONT(30);
+        [editBtn addTarget:self action:@selector(handleCellEditButtonClick:) forControlEvents:UIControlEventTouchUpInside];
+        editBtn.frame = CGRectMake(WIDTHF(_bgView)-W_RATIO(100), W_RATIO(20)*2, W_RATIO(100) ,W_RATIO(40));
+    }
+    return _editBtn;
+}
+-(void)handleCellEditButtonClick:(UIButton*)btn{
+    btn.selected = !btn.selected;
+    if (self.handleCellEditButtonBlock) {
+        self.handleCellEditButtonBlock(!btn.selected);
+    }
+    self.addBtn.enabled = btn.selected;
+    self.subBtn.enabled = (btn.selected) &&self.isEnabled;
+    self.amountTField.enabled = btn.selected;
+}
 -(UILabel *)subTitleLabel{
     if (!_subTitleLabel) {
         UILabel * subTitleLabel = [[UILabel alloc] init];
@@ -224,24 +306,40 @@
     }
     return _markLabel;
 }
--(UILabel *)amountLabel{
-    if (!_amountLabel) {
-        UILabel *amountLabel = [[UILabel alloc] init];
-        _amountLabel = amountLabel;
-        [self.bgView addSubview:amountLabel];
-        amountLabel.text = @"1";
-        amountLabel.textAlignment = NSTextAlignmentCenter;
-        amountLabel.adjustsFontSizeToFitWidth = YES;
-        amountLabel.font = FONT(40);
-        amountLabel.textColor = COLOR_666666;
+-(UITextField *)amountTField{
+    if (!_amountTField) {
+        UITextField *amountTField = [[UITextField alloc] init];
+        _amountTField = amountTField;
+        [self.bgView addSubview:amountTField];
+        amountTField.text = @"1";
+        amountTField.enabled = NO;
+        amountTField.textAlignment = NSTextAlignmentCenter;
+        amountTField.keyboardType = UIKeyboardTypeNumberPad;
+        amountTField.delegate = self;
+        amountTField.adjustsFontSizeToFitWidth = YES;
+        amountTField.font = FONT(40);
+        amountTField.textColor = COLOR_666666;
     }
-    return _amountLabel;
+    return _amountTField;
+}
+- (void)textFieldDidEndEditing:(UITextField *)textField{
+    if ([textField.text integerValue]<=1) {
+        textField.text = [NSString stringWithFormat:@"1"];
+        self.subBtn.enabled = NO;
+    }else if ([textField.text integerValue]>1){
+        textField.text = [NSString stringWithFormat:@"%ld",[textField.text integerValue]];
+        self.subBtn.enabled = YES;
+    }
+    if (self.handleCellAddButtonBlock) {
+        self.handleCellAddButtonBlock(self.selected,[self.count integerValue],[textField.text integerValue]);
+    }
 }
 -(UIButton *)subBtn{
     if (!_subBtn) {
         UIButton *subBtn = [UIButton buttonWithType:UIButtonTypeCustom];
         _subBtn = subBtn;
         [self.bgView addSubview:subBtn];
+        subBtn.enabled = NO;
         [subBtn setBackgroundImage:[UIImage imageNamed:@"jian_shenkui_gouwuche"] forState:UIControlStateNormal];
         [subBtn setBackgroundImage:[UIImage imageNamed:@"jian_qiankui_gouwuche"] forState:UIControlStateDisabled];
         subBtn.tag = 0;
@@ -254,15 +352,23 @@
         UIButton *addBtn = [UIButton buttonWithType:UIButtonTypeCustom];
         _addBtn = addBtn;
         [self.bgView addSubview:addBtn];
+        addBtn.enabled = NO;
         [addBtn setBackgroundImage:[UIImage imageNamed:@"jia_shenkui_gouwuche"] forState:UIControlStateNormal];
+        [addBtn setBackgroundImage:[UIImage imageNamed:@"jian_qiankui_gouwuche"] forState:UIControlStateDisabled];
         addBtn.tag = 1;
         [addBtn addTarget:self action:@selector(handleCellAmountButtonClick:) forControlEvents:UIControlEventTouchUpInside];
     }
     return _addBtn;
 }
 -(void)handleCellAmountButtonClick:(UIButton*)btn{
+    NSInteger num = [self.count integerValue];
+    if (btn.tag == 0) {
+        num -= 1;
+    }else if (btn.tag == 1){
+        num += 1;
+    }
     if (self.handleCellAddButtonBlock) {
-        self.handleCellAddButtonBlock(btn.tag);
+        self.handleCellAddButtonBlock(self.selected,[self.count integerValue],num);
     }
 }
 @end

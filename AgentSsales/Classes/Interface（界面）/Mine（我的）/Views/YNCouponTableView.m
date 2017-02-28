@@ -38,7 +38,7 @@
     [self reloadData];
 }
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
-    return 10;
+    return _dataArray.count;
 }
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
     YNCouponCell * couponCell = [tableView dequeueReusableCellWithIdentifier:@"couponCell"];
@@ -47,6 +47,16 @@
         couponCell.selectionStyle = UITableViewCellSelectionStyleNone;
         couponCell.backgroundColor = COLOR_EDEDED;
     }
+    if ([self.allPrice floatValue] >= [_dataArray[indexPath.row][@"manzu"] floatValue]) {
+        couponCell.isShowUse = YES;
+    }else{
+        couponCell.isShowUse = NO;
+    }
+    [couponCell setDidSelectUseButtonBlock:^{
+        if (self.didSelectUseButtonBlock) {
+            self.didSelectUseButtonBlock(_dataArray[indexPath.row][@"money"],_dataArray[indexPath.row][@"id"]);
+        }
+    }];
     if (self.isInvalid == NO) {
         if (indexPath.row % 2) {
             couponCell.cellType = RedType;
@@ -56,7 +66,7 @@
     }else{
         couponCell.cellType = GrayType;
     }
-    couponCell.dict = @{@"price":@"30",@"tips":@"300",@"time":@"2016-12-22",@"status":@"已过期"};
+    couponCell.dict = _dataArray[indexPath.row];
     return couponCell;
 }
 @end
@@ -74,18 +84,25 @@
 
 @property (nonatomic,weak) UILabel * timeLabel;
 
+@property (nonatomic,weak) UIButton * useBtn;
+
 @end
 @implementation YNCouponCell
 
-
+-(void)setIsShowUse:(BOOL)isShowUse{
+    _isShowUse = isShowUse;
+    self.useBtn.hidden = !isShowUse;
+}
 -(void)setCellType:(YNCouponCellType)cellType{
     _cellType = cellType;
     if (cellType == RedType) {
         self.bgImgView.image = [UIImage imageNamed:@"youhuiquan_hong"];
         self.markLabel.textColor = COLOR_DF463E;
+        [self.useBtn setTitleColor:COLOR_69B6FF forState:UIControlStateNormal];
     }else if (cellType == BlueType){
         self.bgImgView.image = [UIImage imageNamed:@"youhuiquan_lan"];
         self.markLabel.textColor = COLOR_69B6FF;
+        [self.useBtn setTitleColor:COLOR_DF463E forState:UIControlStateNormal];
     }else if (cellType == GrayType){
         self.bgImgView.image = [UIImage imageNamed:@"youhuiquan_kui"];
         self.markLabel.textColor = COLOR_BFBFBF;
@@ -96,24 +113,23 @@
 -(void)setDict:(NSDictionary *)dict{
     _dict = dict;
     self.markLabel.text = @"￥";
-    self.priceLabel.text = dict[@"price"];
-    self.tipsLabel.text = [NSString stringWithFormat:@"满%@元使用",dict[@"tips"]];
-    self.timeLabel.text = [NSString stringWithFormat:@"有效期至%@",dict[@"time"]];
+    self.priceLabel.text = [NSString stringWithFormat:@"%@",dict[@"money"]];
+    self.tipsLabel.text = [NSString stringWithFormat:@"满%@元使用",dict[@"manzu"]];
+    self.timeLabel.text = [NSString stringWithFormat:@"有效期至%@",dict[@"createtime"]];
     if (self.cellType == GrayType) {
-        if ([dict[@"status"] isEqualToString:@"已过期"]) {
+        if ([dict[@"status"] integerValue] == 2) {
             self.invalidImgView.image = [UIImage imageNamed:@"yiguoqi_quan"];
-        }else if ([dict[@"status"] isEqualToString:@"已使用"]){
+        }else if ([dict[@"status"] integerValue] == 3){
             self.invalidImgView.image = [UIImage imageNamed:@"yishiyong_quan"];
         }
     }
     
 }
-
 -(void)layoutSubviews{
     [super layoutSubviews];
     
     CGSize markSize = [_markLabel.text calculateHightWithFont:_markLabel.font maxWidth:0];
-    self.markLabel.frame = CGRectMake(kMidSpace, kMaxSpace, markSize.width, markSize.height);
+    self.markLabel.frame = CGRectMake(kMidSpace, kMidSpace, markSize.width, markSize.height);
     
     CGSize priceSize = [_priceLabel.text calculateHightWithFont:_priceLabel.font maxWidth:WIDTHF(_bgImgView)/3.0];
     self.priceLabel.frame = CGRectMake(MaxXF(_markLabel), YF(_markLabel), priceSize.width, priceSize.height);
@@ -123,12 +139,15 @@
     
     CGSize timeSize = [_timeLabel.text calculateHightWithFont:_timeLabel.font maxWidth:WIDTHF(_bgImgView)-MaxXF(_priceLabel)-W_RATIO(20)*2];
     self.timeLabel.frame = CGRectMake(WIDTHF(_bgImgView)-timeSize.width-W_RATIO(20),MaxYF(_tipsLabel)+W_RATIO(20), timeSize.width, timeSize.height);
+    CGSize useSize = [_useBtn.titleLabel.text calculateHightWithFont:_useBtn.titleLabel.font maxWidth:0];
+    self.useBtn.frame = CGRectMake(MaxXF(_timeLabel)-useSize.width, MaxYF(_timeLabel)+W_RATIO(30), useSize.width, useSize.height);
 }
 
 -(UIImageView *)bgImgView{
     if (!_bgImgView) {
         UIImageView *bgImgView = [[UIImageView alloc] init];
         _bgImgView = bgImgView;
+        bgImgView.userInteractionEnabled = YES;
         [self.contentView addSubview:bgImgView];
         bgImgView.frame = CGRectMake(W_RATIO(20), W_RATIO(20), WIDTHF(self.contentView)-W_RATIO(20)*2, W_RATIO(240)-W_RATIO(20));
     }
@@ -186,6 +205,22 @@
         timeLabel.adjustsFontSizeToFitWidth = YES;
     }
     return _timeLabel;
+}
+-(UIButton *)useBtn{
+    if (!_useBtn) {
+        UIButton *useBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+        _useBtn = useBtn;
+        [self.bgImgView addSubview:useBtn];
+        [useBtn setTitle:@"立即使用" forState:UIControlStateNormal];
+        useBtn.titleLabel.font = FONT(30);
+        [useBtn addTarget:self action:@selector(handleUseButtonClick:) forControlEvents:UIControlEventTouchUpInside];
+    }
+    return _useBtn;
+}
+-(void)handleUseButtonClick:(UIButton*)btn{
+    if (self.didSelectUseButtonBlock) {
+        self.didSelectUseButtonBlock();
+    }
 }
 @end
 

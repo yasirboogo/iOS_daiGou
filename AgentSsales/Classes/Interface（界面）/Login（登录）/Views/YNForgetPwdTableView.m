@@ -47,6 +47,11 @@
     if (indexPath.row == 0) {
         inforCell.keyboardType = UIKeyboardTypeNumberPad;
         inforCell.isShowCodeBtn = YES;
+        [inforCell setDidSendPhoneCodeButtonBlock:^{
+            if (self.didSelectSendPhoneCodeBlock) {
+                self.didSelectSendPhoneCodeBlock();
+            }
+        }];
     }else if (indexPath.row == 1){
         inforCell.keyboardType = UIKeyboardTypeASCIICapable;
     }else if (indexPath.row == 2){

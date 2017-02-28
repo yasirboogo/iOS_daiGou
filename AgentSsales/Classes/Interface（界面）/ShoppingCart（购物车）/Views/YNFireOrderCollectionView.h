@@ -12,11 +12,21 @@
 
 @property (nonatomic,copy) NSString * postWay;
 
+@property (nonatomic,copy) NSString * postMoney;
+
+@property (nonatomic,copy) NSString * subMoney;
+
+@property (nonatomic,strong) NSDictionary * dataDict;
+
 @property (nonatomic,strong) NSArray * dataArray;
 
-@property (nonatomic,assign) NSInteger index;
+@property (nonatomic,assign) NSInteger status;
 
 @property (nonatomic,copy) void(^didSelectPostWayBlock)();
+
+@property (nonatomic,copy) void(^didSelectAddressBlock)();
+
+@property (nonatomic,copy) void(^didSelectDiscountBlock)(NSString*);
 
 @end
 @interface YNFireOrderCell : UICollectionViewCell
@@ -26,6 +36,8 @@
 @end
 @interface YNFireOrderHeaderView : UICollectionReusableView
 
+@property (nonatomic,copy) void(^didSelectAddressBlock)();
+
 @property (nonatomic,strong) NSDictionary * dict;
 
 @end
@@ -33,8 +45,16 @@
 
 @property (nonatomic,copy) void(^didSelectPostWayBlock)();
 
-@property (nonatomic,strong) NSDictionary * dict;
+@property (nonatomic,copy) void(^didSelectDiscountBlock)();
 
 @property (nonatomic,copy) NSString * postWay;
+
+@property (nonatomic,assign) NSInteger allCount;
+
+@property (nonatomic,copy) NSString * allPrice;
+
+@property (nonatomic,copy) NSString * postMoney;
+
+@property (nonatomic,copy) NSString * subMoney;
 
 @end

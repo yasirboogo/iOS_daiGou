@@ -12,7 +12,9 @@
 #import "YNNewsCommentSendView.h"
 
 @interface YNNewsDetailViewController ()
-
+{
+    NSInteger _type;
+}
 @property (nonatomic,weak) YNNewsDetailHeaderView * headerView;
 
 @property (nonatomic,weak) YNNewsCommentTableView * tableView;
@@ -34,6 +36,7 @@
 }
 - (void)viewDidLoad {
     [super viewDidLoad];
+    [self startNetWorkingRequestWithGetCommentNewsList];
 }
 
 - (void)viewWillDisappear:(BOOL)animated{
@@ -45,16 +48,63 @@
 }
 
 #pragma mark - 网路请求
-
+-(void)startNetWorkingRequestWithOneNewsDetail{
+    NSDictionary *params = @{@"userId":[DEFAULTS valueForKey:kUserLoginInfors][@"userId"],
+                             @"messageId":_messageId,
+                             @"type":[NSNumber numberWithInteger:_type]
+                             };
+    [YNHttpManagers getOneNewsDetailWithParams:params success:^(id response) {
+        self.headerView.dict = response;
+    } failure:^(NSError *error) {
+    }];
+}
+-(void)startNetWorkingRequestWithStartLikeNews{
+    NSDictionary *params = @{@"userId":[DEFAULTS valueForKey:kUserLoginInfors][@"userId"],
+                             @"messageId":_messageId,
+                             @"type":[NSNumber numberWithInteger:_type]
+                             };
+    [YNHttpManagers startLikeNewsWithParams:params success:^(id response) {
+        [self startNetWorkingRequestWithGetCommentNewsList];
+    } failure:^(NSError *error) {
+    }];
+}
+-(void)startNetWorkingRequestWithGetCommentNewsList{
+    NSDictionary *params = @{@"messageId":_messageId,
+                             @"pageIndex":[NSNumber numberWithInteger:self.pageIndex],
+                             @"pageSize":[NSNumber numberWithInteger:self.pageSize]
+                             };
+    [YNHttpManagers getCommentNewsListWithParams:params success:^(id response) {
+        self.tableView.dataArray = response;
+        [self startNetWorkingRequestWithOneNewsDetail];
+    } failure:^(NSError *error) {
+    }];
+}
+-(void)startNetWorkingRequestWithSaveUserCommentWithContent:(NSString*)content{
+    NSDictionary *params = @{@"userId":[DEFAULTS valueForKey:kUserLoginInfors][@"userId"],
+                             @"infoId":_messageId,
+                             @"content":content
+                             };
+    [YNHttpManagers saveUserCommentWithParams:params success:^(id response) {
+        [self startNetWorkingRequestWithGetCommentNewsList];
+    } failure:^(NSError *error) {
+    }];
+}
 #pragma mark - 视图加载
 -(YNNewsDetailHeaderView *)headerView{
     if (!_headerView) {
         YNNewsDetailHeaderView *headerView = [[YNNewsDetailHeaderView alloc] init];
         _headerView = headerView;
         _tableView.tableHeaderView = headerView;
-        headerView.dict = @{@"title":@"未来这一新光源系统装置建成后，将满足我国重大战略需求",@"type":@"新闻",@"time":@"2016-12-12 16:05:54"};
+        headerView.commentNum = [NSString stringWithFormat:@"%ld",self.tableView.dataArray.count];
         [headerView setHtmlDidLoadFinish:^{
             _tableView.tableHeaderView = _headerView;
+        }];
+        [headerView setDidSelectLikeButtonBlock:^(BOOL isLike) {
+            if (!isLike) {
+                [self startNetWorkingRequestWithStartLikeNews];
+            }else{
+                NSLog(@"已经点过了，不能再点了");
+            }
         }];
     }
     return _headerView;
@@ -65,7 +115,6 @@
         YNNewsCommentTableView *tableView = [[YNNewsCommentTableView alloc] initWithFrame:frame];
         _tableView = tableView;
         [self.view addSubview:tableView];
-        tableView.tableHeaderView = self.headerView;
     }
     return _tableView;
 }
@@ -76,7 +125,7 @@
         _sendView = sendView;
         [self.view addSubview:sendView];
         [sendView setDidSelectSendButtonClickBlock:^(NSString *str) {
-            NSLog(@"%@",str);
+            [self startNetWorkingRequestWithSaveUserCommentWithContent:str];
         }];
     }
     return _sendView;
@@ -86,7 +135,7 @@
 #pragma mark - 函数、消息
 -(void)makeData{
     [super makeData];
-    self.tableView.dataArray = @[@{@"ico":@"testGoods",@"name":@"在“十三五”期间",@"time":@"3分钟前",@"content":@"中国科学院消息，在“十三五”期间，我国将在北京建设一台高性能的高能同步辐射光源，也称为“北京光源”，其设计亮度及相干度均高于世界现有、在建或计划中的光源。未来这一新光源系统装置建成后，将满足我国重大战略需求，并对众多基础科学的研究发挥关键支撑作用。"}];
+    _type = [LanguageManager currentLanguageIndex];
 
 }
 -(void)makeNavigationBar{

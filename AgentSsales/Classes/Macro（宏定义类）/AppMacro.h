@@ -75,4 +75,7 @@
 #define kMinSpace W_RATIO(10)
 /** 0边距 */
 #define kZero W_RATIO(0.001)
+
+#define kZeroStr @"0"
+
 #endif /* AppMacro_h */

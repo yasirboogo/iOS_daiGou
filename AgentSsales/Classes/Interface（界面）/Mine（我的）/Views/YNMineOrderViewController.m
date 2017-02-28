@@ -13,7 +13,7 @@
 
 @property (nonatomic, strong) NSArray *btnTitles;
 
-@property (nonatomic, strong) TYTabButtonPagerController *pagerController;
+@property (nonatomic, weak) TYTabButtonPagerController *pagerController;
 
 @end
 
@@ -30,8 +30,8 @@
 }
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
     [self.pagerController reloadData];
+    [self.pagerController moveToControllerAtIndex:self.index animated:NO];
 }
 
 - (void)viewWillDisappear:(BOOL)animated{
@@ -41,9 +41,7 @@
 - (void)viewDidDisappear:(BOOL)animated{
     [super viewDidDisappear:animated];
 }
-
 #pragma mark - 网路请求
-
 #pragma mark - 视图加载
 -(TYTabButtonPagerController *)pagerController{
     if (!_pagerController) {
@@ -59,19 +57,15 @@
         pagerController.view.frame = CGRectMake(0, kUINavHeight, SCREEN_WIDTH, SCREEN_HEIGHT-kUINavHeight);
         [self addChildViewController:pagerController];
         [self.view addSubview:pagerController.view];
-        
     }
     return _pagerController;
 }
 #pragma mark - 代理实现
 #pragma mark - TYPagerControllerDataSource
-
 - (NSInteger)numberOfControllersInPagerController
 {
     return self.btnTitles.count;
 }
-
-
 - (NSString *)pagerController:(TYPagerController *)pagerController titleForIndex:(NSInteger)index
 {
     return _btnTitles[index];
@@ -80,10 +74,9 @@
 - (UIViewController *)pagerController:(TYPagerController *)pagerController controllerForIndex:(NSInteger)index
 {
     YNOrderViewController *orderVC = [[YNOrderViewController alloc] init];
-    
+    orderVC.index = index;
     return orderVC;
 }
-
 #pragma mark - 函数、消息
 -(void)makeData{
     [super makeData];
@@ -97,7 +90,7 @@
 #pragma mark - 数据懒加载
 -(NSArray *)btnTitles{
     if (!_btnTitles) {
-        _btnTitles = @[@"全部",@"待处理",@"待付款",@"待发货",@"待收货",@"待评价"];
+        _btnTitles = @[kLocalizedString(@"allOrder",@"全部订单"),kLocalizedString(@"waitHandle",@"待处理"),kLocalizedString(@"waitPay",@"待付款"),kLocalizedString(@"waitSend",@"待发货"),kLocalizedString(@"waitReceive",@"待收货"),kLocalizedString(@"completed",@"已完成")];
     }
     return _btnTitles;
 }

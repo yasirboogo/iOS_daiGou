@@ -12,16 +12,20 @@
 
 @interface YNHomePageCollectionView : UICollectionView
 
+@property (nonatomic,strong) NSArray *adArray;
 
-@property (nonatomic,strong) NSArray *dataArray;
+@property (nonatomic,strong) NSArray *hotArray;
+
+@property (nonatomic,strong) NSArray *featureArray;
+
 /** 点击轮播广告回调 */
-@property (nonatomic,copy)void(^didSelectPlayerImgClickBlock)(NSString*);
+@property (nonatomic,copy)void(^didSelectPlayerImgClickBlock)(NSString*,NSString*);
 /** 点击代购平台回调 */
 @property (nonatomic,copy)void(^didSelectPlatImgClickBlock)(NSInteger);
 /** 点击热门分类回调 */
-@property (nonatomic,copy)void(^didSelectHotClassImgClickBlock)(NSString*);
+@property (nonatomic,copy)void(^didSelectHotClassImgClickBlock)(NSString*,NSInteger);
 /** 点击更多按钮回调 */
-@property (nonatomic,copy)void(^didSelectMoreBtnClickBlock)(NSString*);
+@property (nonatomic,copy)void(^didSelectMoreBtnClickBlock)(NSInteger);
 /** 点击特色惠购回调 */
 @property (nonatomic,copy)void(^didSelectGoodImgClickBlock)(NSString*);
 
@@ -32,7 +36,7 @@
 /** 滚动视图URLString */
 @property (nonatomic,strong) NSArray<NSString*> * imageURLs;
 /** 点击代购平台回调 */
-@property (nonatomic,copy)void(^didSelectPlayerImgClickBlock)(NSString*);
+@property (nonatomic,copy)void(^didSelectPlayerImgClickBlock)(NSInteger);
 
 @end
 
@@ -48,7 +52,7 @@
 /** 热门分类图片URLString */
 @property (nonatomic,strong) NSArray<NSString*> * imageURLs;
 /** 点击热门分类回调 */
-@property (nonatomic,copy)void(^didSelectHotClassImgClickBlock)(NSString*);
+@property (nonatomic,copy)void(^didSelectHotClassImgClickBlock)(NSInteger);
 
 @end
 @interface YNRateTypesCell : UICollectionViewCell
@@ -73,20 +77,12 @@
 @end
 
 @interface YNShowGoodsCell : UICollectionViewCell
-/** 大图 */
-@property (nonatomic,weak) UIImageView *bigImageView;
-/** 名称 */
-@property (nonatomic,weak) UILabel *nameLabel;
-/** 型号 */
-@property (nonatomic,weak) UILabel *versionLabel;
-/** ￥符号 */
-@property (nonatomic,weak) UILabel *markLabel;
-/** 价格 */
-@property (nonatomic,weak) UILabel *priceLabel;
+
+@property (nonatomic,strong) NSDictionary * dict;
 
 @end
 
-typedef void(^moreButtonClickBlock)(NSString*);
+typedef void(^moreButtonClickBlock)();
 @interface YNHeaderBarView : UICollectionReusableView
 
 @property (nonatomic,copy)moreButtonClickBlock moreButtonClickBlock;

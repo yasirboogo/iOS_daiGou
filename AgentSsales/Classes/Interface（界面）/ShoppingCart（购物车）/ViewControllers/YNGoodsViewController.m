@@ -8,10 +8,12 @@
 
 #import "YNGoodsViewController.h"
 #import "YNGoodsCartTableView.h"
+#import "YNShoppingCartViewController.h"
 
 @interface YNGoodsViewController ()
-
-@property (nonatomic,weak) YNGoodsCartTableView * tableView;
+{
+    NSInteger _type;
+}
 
 @end
 
@@ -19,16 +21,20 @@
 #pragma mark - 视图生命周期
 - (void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:animated];
+    //注册通知
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleNotificationSelectButton:) name:@"allSelect" object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleNotificationDelectGoodsButton:) name:@"delectGoods" object:nil];
 }
 
 - (void)viewDidAppear:(BOOL)animated{
     [super viewDidAppear:animated];
+    [self startNetWorkingRequestWithGetShoppingCartList];
 }
 - (void)viewDidLoad {
     [super viewDidLoad];
     
     [self makeData];
-    
     [self makeUI];
 }
 
@@ -41,7 +47,42 @@
 }
 
 #pragma mark - 网路请求
-
+-(void)startNetWorkingRequestWithGetShoppingCartList{
+    NSDictionary *params = @{@"userId":[DEFAULTS valueForKey:kUserLoginInfors][@"userId"],
+                             @"type":[NSNumber numberWithInteger:_type],
+                             @"status":[NSNumber numberWithInteger:_index+1]};
+    [YNHttpManagers getShoppingCartListWithParams:params success:^(id response) {
+        self.tableView.dataArrayM = response;
+    } failure:^(NSError *error) {
+    }];
+}
+-(void)startNetWorkingRequestWithChangeGoodsNumWithIndex:(NSInteger)index{
+    NSDictionary *params = @{@"shoppingId":_tableView.dataArrayM[index][@"shoppingId"],
+                             @"count":_tableView.numArrayM[index]};
+    [YNHttpManagers changeGoodsNumWithParams:params success:^(id response) {
+        [self startNetWorkingRequestWithGetShoppingCartList];
+    } failure:^(NSError *error) {
+    }];
+}
+-(void)startNetWorkingRequestWithStartDelectGoods{
+    NSMutableString *shoppingIds = [NSMutableString string];
+    [self.tableView.selectArrayM enumerateObjectsUsingBlock:^(NSNumber * _Nonnull isSelect, NSUInteger idx, BOOL * _Nonnull stop) {
+        if ([isSelect boolValue]) {
+            [self.tableView.selectArrayM removeObjectAtIndex:idx];
+            [shoppingIds appendFormat:@",%@",_tableView.dataArrayM[idx][@"shoppingId"]];
+        }
+    }];
+    if (shoppingIds.length) {
+        [shoppingIds deleteCharactersInRange:NSMakeRange(0, 1)];
+        NSDictionary *params = @{@"shoppingId":shoppingIds};
+        [YNHttpManagers startDelectGoodsWithParams:params success:^(id response) {
+            [self startNetWorkingRequestWithGetShoppingCartList];
+        } failure:^(NSError *error) {
+        }];
+    }else{
+        NSLog(@"请选择货物");
+    }
+}
 #pragma mark - 视图加载
 -(YNGoodsCartTableView *)tableView{
     if (!_tableView) {
@@ -49,6 +90,11 @@
         YNGoodsCartTableView *tableView = [[YNGoodsCartTableView alloc] initWithFrame:frame];
         _tableView = tableView;
         [self.view addSubview:tableView];
+        [tableView setHandleCellEditButtonBlock:^(BOOL isEdit,NSInteger index) {
+            if (isEdit == YES) {
+                [self startNetWorkingRequestWithChangeGoodsNumWithIndex:index];
+            }
+        }];
     }
     return _tableView;
 }
@@ -57,49 +103,40 @@
 
 #pragma mark - 函数、消息
 -(void)makeData{
-    NSMutableDictionary *dictM1 = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-                                   @"testGoods",@"image",
-                                   @"书籍-设计师的自我修养",@"title",
-                                   @"2016年出版版本",@"subTitle",
-                                   @NO,@"isSelect",
-                                   @"1",@"num",
-                                   @"500.14",@"price", nil];
-    NSMutableDictionary *dictM2 = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-                                   @"testGoods",@"image",
-                                   @"书籍-设计师的自我修养",@"title",
-                                   @"2016年出版版本",@"subTitle",
-                                   @NO,@"isSelect",
-                                   @"1",@"num",
-                                   @"500.14",@"price", nil];
-    NSMutableDictionary *dictM3 = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-                                   @"testGoods",@"image",
-                                   @"书籍-设计师的自我修养",@"title",
-                                   @"2016年出版版本",@"subTitle",
-                                   @NO,@"isSelect",
-                                   @"1",@"num",
-                                   @"500.14",@"price", nil];
-    NSMutableDictionary *dictM4 = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-                                   @"testGoods",@"image",
-                                   @"书籍-设计师的自我修养",@"title",
-                                   @"2016年出版版本",@"subTitle",
-                                   @NO,@"isSelect",
-                                   @"1",@"num",
-                                   @"500.14",@"price", nil];
-    NSMutableDictionary *dictM5 = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-                                   @"testGoods",@"image",
-                                   @"书籍-设计师的自我修养",@"title",
-                                   @"2016年出版版本",@"subTitle",
-                                   @NO,@"isSelect",
-                                   @"1",@"num",
-                                   @"500.14",@"price", nil];
-    
-    self.tableView.dataArrayM = [NSMutableArray arrayWithObjects:dictM1,dictM2,dictM3,dictM4,dictM5, nil];
+    _type = [LanguageManager currentLanguageIndex];
     
 }
 -(void)makeNavigationBar{
     
 }
 -(void)makeUI{
+    
+}
+- (void)handleNotificationSelectButton:(NSNotification *)notification{
+    if (self.index == [notification.userInfo[@"index"] integerValue]) {
+        self.status = [notification.userInfo[@"status"] boolValue];
+        self.tableView.allCount = 0;
+        self.tableView.allPrice = 0;
+        [self.tableView.selectArrayM enumerateObjectsUsingBlock:^(NSNumber * _Nonnull isSelect, NSUInteger idx, BOOL * _Nonnull stop) {
+            [self.tableView.selectArrayM replaceObjectAtIndex:idx withObject:notification.userInfo[@"status"]];
+            if (self.status) {
+                self.tableView.allCount += [self.tableView.numArrayM[idx] integerValue];
+                self.tableView.allPrice += [self.tableView.numArrayM[idx] integerValue]*[self.tableView.dataArrayM[idx][@"salesprice"] floatValue];
+            }
+        }];
+        [self.tableView reloadData];
+    }
+}
+- (void)handleNotificationDelectGoodsButton:(NSNotification *)notification{
+    if (self.index == [notification.userInfo[@"index"] integerValue]) {
+        [self startNetWorkingRequestWithStartDelectGoods];
+        [self.tableView reloadData];
+    }
+}
+- (void)dealloc
+{
+    // 移除当前对象监听的事件
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
     
 }
 #pragma mark - 数据懒加载

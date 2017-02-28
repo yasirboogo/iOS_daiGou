@@ -8,9 +8,14 @@
 
 #import "YNCouponListViewController.h"
 #import "YNCouponTableView.h"
+#import "YNFirmOrderViewController.h"
 
 @interface YNCouponListViewController ()
-
+{
+    NSInteger _pageIndex;
+    NSInteger _pageSize;
+    NSString *_status;
+}
 @property (nonatomic,weak) YNCouponTableView * tableView;
 
 @property (nonatomic,weak) YNShowEmptyView * emptyView;
@@ -23,6 +28,7 @@
 
 - (void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:animated];
+    self.view.backgroundColor = COLOR_EDEDED;
 }
 
 - (void)viewDidAppear:(BOOL)animated{
@@ -33,6 +39,7 @@
     [self makeData];
     [self makeNavigationBar];
     [self makeUI];
+    [self startNetWorkingRequestWithUserCoupon];
 }
 
 - (void)viewWillDisappear:(BOOL)animated{
@@ -44,7 +51,18 @@
 }
 
 #pragma mark - 网路请求
-
+-(void)startNetWorkingRequestWithUserCoupon{
+    NSDictionary *params = @{@"userId":[DEFAULTS valueForKey:kUserLoginInfors][@"userId"],
+                             @"pageIndex":[NSNumber numberWithInteger:_pageIndex],
+                             @"pageSize":[NSNumber numberWithInteger:_pageSize],
+                             @"status":_status,
+                             };
+    [YNHttpManagers getUserCouponWithParams:params success:^(id response) {
+        self.tableView.dataArray = response;
+        self.emptyView.hidden = self.tableView.dataArray.count;
+    } failure:^(NSError *error) {
+    }];
+}
 #pragma mark - 视图加载
 -(YNCouponTableView *)tableView{
     if (!_tableView) {
@@ -53,6 +71,14 @@
         _tableView = tableView;
         [self.view addSubview:tableView];
         tableView.isInvalid = self.isInvalid;
+        tableView.allPrice = self.allPrice;
+        [tableView setDidSelectUseButtonBlock:^(NSString *money,NSString *idMark) {
+            YNFirmOrderViewController *lastVC = [self.navigationController.viewControllers objectAtIndex:self.navigationController.viewControllers.count-2];
+            if (lastVC.didSelectCouponBlock) {
+                lastVC.didSelectCouponBlock(money,idMark);
+            }
+            [self.parentViewController.navigationController popViewControllerAnimated:NO];
+        }];
     }
     return _tableView;
 }
@@ -71,13 +97,15 @@
 
 #pragma mark - 函数、消息
 -(void)makeData{
-    self.tableView.dataArray = @[@"1",@"2"];
+    _pageIndex = 1;
+    _pageSize = 10;
+    NSArray *stasus = @[@"1",@"2,3"];
+    _status = stasus[_index];
 }
 -(void)makeNavigationBar{
 
 }
 -(void)makeUI{
-    self.emptyView.hidden = _tableView.dataArray.count;
 
 }
 #pragma mark - 数据懒加载

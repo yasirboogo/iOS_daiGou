@@ -177,8 +177,6 @@ if (__CELL__ == nil) {\
 __CELL__ = [[__CELLCLASS__ alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:__INDETIFIER__];\
 }\
 }
-//切换语言
-#define NSLS(key,comment) NSLocalizedString(key,comment)
 
 #define CustomLocalizedString(key, comment) \
 [[NSBundle bundleWithPath:[[NSBundle mainBundle] pathForResource:[NSString stringWithFormat:@"%@",[[NSUserDefaults standardUserDefaults] objectForKey:@"appLanguage"]] ofType:@"lproj"]] localizedStringForKey:(key) value:@"" table:nil]
@@ -226,3 +224,9 @@ return nil; \
 return self; \
 }
 
+#define DEFAULTS  [NSUserDefaults standardUserDefaults]
+
+#define kUserLoginInfors  @"userLoginInfors"
+
+#define kKeychainService  @"daiGou"
+#define kKeychainDeviceId  @"KeyChainDeviceId"

@@ -10,4 +10,6 @@
 
 @interface YNMoreClassViewController : UIViewController
 
+@property (nonatomic,copy) NSString * classId;
+
 @end

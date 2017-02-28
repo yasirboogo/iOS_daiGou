@@ -10,12 +10,24 @@
 
 @interface YNGoodsDetailsView : UIView
 
-@property (nonatomic,copy) NSDictionary *dict;
-
-@property (nonatomic,copy) NSArray<NSString*> * imageURLs;
+@property (nonatomic,copy) NSDictionary *dataDict;
 
 @property (nonatomic,copy) void(^didSelectPlayerImgClickBlock)(NSString*);
 
 @property (nonatomic,copy) void(^didSelectShareButtonClickBlock)();
+
+@end
+@interface YNDetailImgCellFrame : NSObject
+
+@property (nonatomic,copy) NSString * imgUrl;
+
+@property (nonatomic,assign) CGFloat cellHeight;
+
++(NSMutableArray *)initWithFromDictionaries:(NSArray*)array;
+
+@end
+@interface YNDetailImgCell : UITableViewCell
+
+@property (nonatomic,copy) YNDetailImgCellFrame * cellFrame;
 
 @end

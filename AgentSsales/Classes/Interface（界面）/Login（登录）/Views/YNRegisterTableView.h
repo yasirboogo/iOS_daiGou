@@ -10,6 +10,12 @@
 
 @interface YNRegisterTableView : UITableView
 
+@property (nonatomic,copy) void(^didSelectAreaCellBlock)();
+
+@property (nonatomic,copy) void(^didSelectSendPhoneCodeBlock)();
+
+@property (nonatomic,strong) NSString *code;
+
 @property (nonatomic,strong) NSArray<NSDictionary*> *inforArray;
 
 @property (nonatomic,strong) NSMutableArray<NSString*> *textArrayM;

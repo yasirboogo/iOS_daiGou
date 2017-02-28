@@ -10,4 +10,6 @@
 
 @interface YNOrderViewController : UIViewController
 
+@property (nonatomic,assign) NSInteger index;
+
 @end

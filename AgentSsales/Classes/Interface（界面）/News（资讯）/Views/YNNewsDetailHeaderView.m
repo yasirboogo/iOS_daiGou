@@ -35,13 +35,15 @@
 
     self.headerView.dict = dict;
     
-    NSString *htmlStr = @"“供给侧结构性改革是一场关系全局、关系长远的攻坚战。”习近平总书记在主持集体学习时，运用战略思维和辩证思维，突出问题导向，深刻论述推进供给侧结构性改革需要处理好的几个重大关系，理清了重点和难点，指明了方向和路径，为供给侧结构性改革“怎么干”提供了正确方法论。“供给侧结构性改革是一场关系全局、关系长远的攻坚战。”习近平总书记在主持集体学习时，运用战略思维和辩证思维，突出问题导向，深刻论述推进供给侧结构性改革需要处理好的几个重大关系，理清了重点和难点，指明了方向和路径，为供给侧结构性改革“怎么干”提供了正确方法论。“供给侧结构性改革是一场关系全局、关系长远的攻坚战。”习近平总书记在主持集体学习时，运用战略思维和辩证思维，突出问题导向，深刻论述推进供给侧结构性改革需要处理好的几个重大关系，理清了重点和难点，指明了方向和路径，为供给侧结构性改革“怎么干”提供了正确方法论。";
+    NSString *htmlStr = dict[@"content"];
     [self.webView loadHTMLString:htmlStr baseURL:nil];
     
-    self.footerView.dict = dict;
-
+    _footerView.dict = dict;
+    _footerView.commentNum = _commentNum;
+    [_footerView setDidSelectLikeButtonBlock:^(BOOL isLike) {
+        self.didSelectLikeButtonBlock(isLike);
+    }];
 }
-
 -(void)layoutSubviews{
     [super layoutSubviews];
 
@@ -118,10 +120,9 @@
     _dict = dict;
     
      self.titleLabel.text = dict[@"title"];
-     self.typeLabel.text = dict[@"type"];
+     self.typeLabel.text = dict[@"name"];
      self.spaceLabel.text = @"|";
-     self.timeLabel.text = dict[@"time"];
-     
+     self.timeLabel.text = dict[@"createtime"];
 }
 -(void)layoutSubviews{
     [super layoutSubviews];
@@ -199,22 +200,21 @@
 @end
 
 @implementation YNWebFooterView
--(instancetype)initWithFrame:(CGRect)frame{
-    self = [super initWithFrame:frame];
-    if (self) {
 
-    }
-    return self;
-}
 -(void)setDict:(NSDictionary *)dict{
     _dict = dict;
 
     self.seeBtn.userInteractionEnabled = NO;
-    self.seeLabel.text = @"12540";
-    self.likeBtn.selected = YES;
-    self.likeLabel.text = @"254";
+    self.seeLabel.text = [NSString stringWithFormat:@"%@",dict[@"number"]];
+    NSString *isLike = [NSString stringWithFormat:@"%@",dict[@"islike"] ];
+    self.likeBtn.selected =  [isLike boolValue];
+    self.likeLabel.text = [NSString stringWithFormat:@"%@",dict[@"thumb"]];
     self.comLabel.text = @"评论";
-    self.comNumLabel.text = [NSString stringWithFormat:@"(%@)",@"20"];
+}
+-(void)setCommentNum:(NSString *)commentNum{
+    _commentNum = commentNum;
+    self.comNumLabel.text = [NSString stringWithFormat:@"(%@)",commentNum];
+    [self layoutSubviews];
 }
 -(void)layoutSubviews{
     [super layoutSubviews];
@@ -254,10 +254,16 @@
         UIButton *likeBtn = [UIButton buttonWithType:UIButtonTypeCustom];
         _likeBtn = likeBtn;
         [self addSubview:likeBtn];
+        [likeBtn addTarget:self action:@selector(handleLikeButton:) forControlEvents:UIControlEventTouchUpInside];
         [likeBtn setBackgroundImage:[UIImage imageNamed:@"dianzan_kui"] forState:UIControlStateNormal];
         [likeBtn setBackgroundImage:[UIImage imageNamed:@"dianzan_hong"] forState:UIControlStateSelected];
     }
     return _likeBtn;
+}
+-(void)handleLikeButton:(UIButton*)btn{
+    if (self.didSelectLikeButtonBlock) {
+        self.didSelectLikeButtonBlock(self.likeBtn.selected);
+    }
 }
 -(UILabel *)likeLabel{
     if (!_likeLabel) {

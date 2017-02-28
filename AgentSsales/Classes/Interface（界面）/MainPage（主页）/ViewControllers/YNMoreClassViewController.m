@@ -8,9 +8,14 @@
 
 #import "YNMoreClassViewController.h"
 #import "YNHotGoodsClassesView.h"
+#import "YNTerraceGoodsViewController.h"
 
-@interface YNMoreClassViewController ()<UICollectionViewDelegate,UICollectionViewDataSource,UICollectionViewDelegateFlowLayout>
-
+@interface YNMoreClassViewController ()
+{
+    NSInteger _type;
+    NSInteger _pageIndex;
+    NSInteger _pageSize;
+}
 @property (nonatomic,weak) YNHotGoodsClassesView * collectionView;
 
 @end
@@ -25,6 +30,7 @@
 
 - (void)viewDidAppear:(BOOL)animated{
     [super viewDidAppear:animated];
+    [self startNetWorkingRequestWithGoodsClassSearch];
 }
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -41,7 +47,16 @@
 }
 
 #pragma mark - 网路请求
-
+-(void)startNetWorkingRequestWithGoodsClassSearch{
+    NSDictionary *params = @{@"type":[NSNumber numberWithInteger:_type],
+                             @"pageIndex":[NSNumber numberWithInteger:_pageIndex],
+                             @"pageSize":[NSNumber numberWithInteger:_pageSize],
+                             @"classId":_classId};
+    [YNHttpManagers goodsClassSearchWithParams:params success:^(id response) {
+        self.collectionView.dataArray = response;
+    } failure:^(NSError *error) {
+    }];
+}
 #pragma mark - 视图加载
 -(YNHotGoodsClassesView *)collectionView{
     if (!_collectionView) {
@@ -49,6 +64,11 @@
         YNHotGoodsClassesView *collectionView = [[YNHotGoodsClassesView alloc] initWithFrame:frame];
         _collectionView = collectionView;
         [self.view addSubview:collectionView];
+        [collectionView setDidSelectHotGoodsClassesCellBlock:^(NSInteger index) {
+            YNTerraceGoodsViewController *pushVC = [[YNTerraceGoodsViewController alloc] init];
+            pushVC.goodsId = self.collectionView.dataArray[index][@"goodsId"];
+            [self.navigationController pushViewController:pushVC animated:NO];
+        }];
     }
     return _collectionView;
 }
@@ -56,13 +76,9 @@
 
 #pragma mark - 函数、消息
 -(void)makeData{
-    self.collectionView.dataArray = @[
-                                      @{@"image":@"testGoods",@"name":@"休闲鞋"},
-                                      @{@"image":@"testGoods",@"name":@"休闲鞋"},
-                                      @{@"image":@"testGoods",@"name":@"休闲鞋"},
-                                      @{@"image":@"testGoods",@"name":@"休闲鞋"},
-                                      @{@"image":@"testGoods",@"name":@"休闲鞋"},
-                                      @{@"image":@"testGoods",@"name":@"休闲鞋"}];
+    _type = [LanguageManager currentLanguageIndex];
+    _pageIndex = 1;
+    _pageSize = 10;
 }
 -(void)makeUI{
     

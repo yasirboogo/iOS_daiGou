@@ -10,6 +10,12 @@
 
 @interface YNNewAddressTableView : UITableView
 
+@property (nonatomic,copy) void(^didSelectAddressCellBlock)();
+
+@property (nonatomic,strong) NSMutableDictionary * addressM;
+
+@property (nonatomic,copy) NSString * area;
+
 @property (nonatomic,copy) NSString * name;
 
 @property (nonatomic,copy) NSString * phone;
@@ -17,5 +23,7 @@
 @property (nonatomic,copy) NSString * locality;
 
 @property (nonatomic,copy) NSString * details;
+
+@property (nonatomic,copy) NSString * email;
 
 @end

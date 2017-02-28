@@ -72,7 +72,7 @@
     self.indexPath = indexPath;
     [self reloadData];
     if (self.didSelectChangeWayCellBlock) {
-        self.didSelectChangeWayCellBlock(_dataArray[indexPath.row][@"title"]);
+        self.didSelectChangeWayCellBlock(indexPath.row);
     }
 }
 - (void)showPopView:(BOOL)animated

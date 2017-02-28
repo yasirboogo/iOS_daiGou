@@ -88,7 +88,10 @@
 #pragma mark - 函数、消息
 -(void)makeData{
     [super makeData];
-    self.headerView.headImg = [UIImage imageNamed:@"testGoods"];
+    id userLoginInfors = [DEFAULTS valueForKey:kUserLoginInfors];
+    self.headerView.headImg = userLoginInfors[@"headimg"];
+    self.headerView.nickName = userLoginInfors[@"nickname"];
+    self.headerView.restMoney = userLoginInfors[@"rmb"];
 }
 -(void)makeNavigationBar{
     [super makeNavigationBar];
@@ -105,7 +108,6 @@
     [self.view addSubview:self.tableView];
 }
 #pragma mark - 数据懒加载
-
 #pragma mark - 其他
 
 @end

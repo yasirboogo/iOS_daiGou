@@ -14,15 +14,23 @@
 
 @property (nonatomic,strong) void(^didSelectOrderGoodsCell)(NSString*);
 
+@property (nonatomic,copy) void(^didFooterViewLeftButtonBlock)(NSInteger,NSInteger);
+
+@property (nonatomic,copy) void(^didFooterViewRightButtonBlock)(NSInteger,NSInteger);
+
+@property (nonatomic,copy) void(^didFooterViewQuestionButtonBlock)();
+
 @end
 @interface YNOrderGoodsCell : UICollectionViewCell
 
 @property (nonatomic,strong) NSDictionary * dict;
 
+@property (nonatomic,strong) MyOrderGoodsModel *myOrderGoodsModel;
+
 @end
 @interface YNOrderGoodsHeaderView : UICollectionReusableView
 
-@property (nonatomic,strong) NSDictionary * dict;
+@property (nonatomic,copy) NSString * orderStasus;
 
 @end
 @interface YNOrderGoodsFooterView : UICollectionReusableView
@@ -30,5 +38,11 @@
 @property (nonatomic,strong) NSDictionary * dict;
 
 @property (nonatomic,strong) NSString * status;
+
+@property (nonatomic,copy) void(^didFooterViewQuestionButtonBlock)();
+
+@property (nonatomic,copy) void(^didFooterViewLeftButtonBlock)(NSInteger);
+
+@property (nonatomic,copy) void(^didFooterViewRightButtonBlock)(NSInteger);
 
 @end

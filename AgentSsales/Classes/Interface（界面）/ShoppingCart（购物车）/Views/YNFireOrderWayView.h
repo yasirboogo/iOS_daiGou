@@ -14,7 +14,7 @@
 
 @property (nonatomic, assign) BOOL isTapGesture;
 
-@property (nonatomic, copy) void(^didSelectOrderWayCellBlock)(NSString*);
+@property (nonatomic, copy) void(^didSelectOrderWayCellBlock)(NSString*,NSString*);
 
 -(instancetype)initWithRowHeight:(CGFloat)rowHeight width:(CGFloat)width showNumber:(NSInteger)showNumber;
 

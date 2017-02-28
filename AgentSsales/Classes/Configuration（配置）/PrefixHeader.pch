@@ -41,17 +41,24 @@
 #import "UIView+CornerRadius.h"
 #import "UIColor+HEX.h"
 #import "HttpTool.h"
-#import "PDVersionTool.h"
-
+#import "YNHttpManagers.h"
+#import "YNLoginPageModel.h"
+#import "YNAreaModel.h"
+#import "YNMineModel.h"
+#import "LanguageManager.h"
+#import "UITextView+Placeholder.h"
 /* -------------------自定义视图头文件------------------- */
 #import "YNBaseViewController.h"
 #import "YNShowEmptyView.h"
 
 /* -------------------第三方类文件------------------- */
+#import <AlipaySDK/AlipaySDK.h>
 #import "UIImageView+WebCache.h"
 #import "TYTabButtonPagerController.h"
 #import "YYKit.h"
 #import "JKDBModel.h"
-
+#import "LGAlertView.h"
+#import "IQKeyboardManager.h"
+#import "MJRefresh.h"
 #endif /* PrefixHeader_pch */
 

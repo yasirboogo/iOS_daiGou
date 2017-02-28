@@ -70,7 +70,7 @@
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
-    return _dataArray.count;
+    return 2;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
@@ -87,7 +87,17 @@
             [walletCell.contentView addSubview:lineView];
         }
     }
-    walletCell.dict = _dataArray[indexPath.row];
+    
+    if (indexPath.row == 0) {
+        walletCell.flagImgView.image = [UIImage imageNamed:@"malaixiya_guoqi"];
+        walletCell.countryLabel.text = @"马来西亚币";
+    }else if (indexPath.row == 1){
+        walletCell.flagImgView.image = [UIImage imageNamed:@"meiguo_guoqi"];
+        walletCell.countryLabel.text = @"美元";
+    }
+    walletCell.buyInLabel.text = [NSString stringWithFormat:@"%@",_dataArray[indexPath.row][@"buyup"]];
+    walletCell.sellOutLabel.text = [NSString stringWithFormat:@"%@",_dataArray[indexPath.row][@"sell"]];
+
     return walletCell;
 }
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
@@ -98,25 +108,9 @@
 
 @interface YNWalletTableViewCell ()
 
-@property (nonatomic,weak) UIImageView * flagImgView;
-
-@property (nonatomic,weak) UILabel * countryLabel;
-
-@property (nonatomic,weak) UILabel * buyInLabel;
-
-@property (nonatomic,weak) UILabel * sellOutLabel;
-
 @end
 
 @implementation YNWalletTableViewCell
-
--(void)setDict:(NSDictionary *)dict{
-    _dict = dict;
-    self.flagImgView.image = [UIImage imageNamed:dict[@"image"]];
-    self.countryLabel.text = dict[@"country"];
-    self.buyInLabel.text = dict[@"buyIn"];
-    self.sellOutLabel.text = dict[@"sellOut"];
-}
 
 -(UIImageView *)flagImgView{
     if (!_flagImgView) {

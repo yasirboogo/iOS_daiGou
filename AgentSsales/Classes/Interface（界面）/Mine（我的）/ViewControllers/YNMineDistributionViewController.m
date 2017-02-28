@@ -7,6 +7,7 @@
 //
 
 #import "YNMineDistributionViewController.h"
+#import "YNDocumentExplainViewController.h"
 #import "YNUpdateInforViewController.h"
 #import "YNDistributionTableView.h"
 #import "YNMineImgHeaderView.h"
@@ -32,6 +33,8 @@
 }
 - (void)viewDidLoad {
     [super viewDidLoad];
+    [self startNetWorkingRequestWithUserDistribution];
+    [self startNetWorkingRequestWithDistributionRecord];
 }
 
 - (void)viewWillDisappear:(BOOL)animated{
@@ -43,7 +46,24 @@
 }
 
 #pragma mark - 网路请求
-
+-(void)startNetWorkingRequestWithUserDistribution{
+    NSDictionary *params = @{@"userId":[DEFAULTS valueForKey:kUserLoginInfors][@"userId"]};
+    [YNHttpManagers getUserDistributionWithParams:params success:^(id response) {
+        self.headerView.topNumber = [NSString stringWithFormat:@"%.2f",[response[@"commission"] floatValue]];
+        self.headerView.leftNumber = [NSString stringWithFormat:@"%.2f",[response[@"history"] floatValue]];
+        self.headerView.rightNumber = [NSString stringWithFormat:@"%@",response[@"fans"]];
+    } failure:^(NSError *error) {
+    }];
+}
+-(void)startNetWorkingRequestWithDistributionRecord{
+    NSDictionary *params = @{@"userId":[DEFAULTS valueForKey:kUserLoginInfors][@"userId"],
+                             @"pageIndex":[NSNumber numberWithInteger:self.pageIndex],
+                             @"pageSize":[NSNumber numberWithInteger:self.pageSize]};
+    [YNHttpManagers getDistributionRecordWithParams:params success:^(id response) {
+        self.tableView.dataArray = response;
+    } failure:^(NSError *error) {
+    }];
+}
 #pragma mark - 视图加载
 -(YNMineImgHeaderView *)headerView{
     if (!_headerView) {
@@ -72,26 +92,18 @@
     self.headerView.topTitleLabel.text = @"佣金总额（元）";
     self.headerView.leftTitleLabel.text = @"历史佣金（元）";
     self.headerView.rightTitleLabel.text = @"我的粉丝（人）";
-    
-    self.headerView.topNumber = @"1024.22";
-    
-    self.headerView.leftNumber = @"1365.12";
-    
-    self.headerView.rightNumber = @"20";
-    
-    self.tableView.dataArray = @[@{@"time":@"2006.10.16",@"resouce":@"我是谁",@"money":@"20.01"},
-                                 @{@"time":@"2006.10.16",@"resouce":@"我是谁",@"money":@"20.01"},
-                                 @{@"time":@"2006.10.16",@"resouce":@"我是谁",@"money":@"20.01"},
-                                 @{@"time":@"2006.10.16",@"resouce":@"我是谁",@"money":@"20.01"}];
-    
 }
 -(void)makeNavigationBar{
     [super makeNavigationBar];
     self.navView.backgroundColor = COLOR_CLEAR;
+    __weak typeof(self) weakSelf = self;
     [self addNavigationBarBtnWithTitle:@"规则" selectTitle:@"规则" font:FONT_15 isOnRight:YES btnClickBlock:^(BOOL isSelect) {
+        YNDocumentExplainViewController *pushVC = [[YNDocumentExplainViewController alloc] init];
+        pushVC.status = 2;
+        [weakSelf.navigationController pushViewController:pushVC animated:NO];
         
     }];
-    self.titleLabel.text = @"我的分销";
+    self.titleLabel.text = kLocalizedString(@"myDistribution",@"我的分销");
 }
 -(void)makeUI{
     [super makeUI];

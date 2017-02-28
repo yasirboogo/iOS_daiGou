@@ -19,13 +19,13 @@
 -(NSArray *)dataArray{
     if (!_dataArray) {
         _dataArray = @[
-                       @{@"image":@"shoucang_wode",@"text":@"我的收藏"},
-                       @{@"image":@"fenxiao_wode",@"text":@"我的分销"},
-                       @{@"image":@"qianbao_wode",@"text":@"我的钱包"},
-                       @{@"image":@"youhuiquan_wode",@"text":@"我的优惠券"},
-                       @{@"image":@"dizhi_wode",@"text":@"收货地址管理"},
-                       @{@"image":@"erweima_wode",@"text":@"我的二维码"},
-                       @{@"image":@"shezhi_wode",@"text":@"设置"}
+                       @{@"image":@"shoucang_wode",@"text":kLocalizedString(@"myCollection",@"我的收藏")},
+                       @{@"image":@"fenxiao_wode",@"text":kLocalizedString(@"myDistribution",@"我的分销")},
+                       @{@"image":@"qianbao_wode",@"text":kLocalizedString(@"myWallet",@"我的钱包")},
+                       @{@"image":@"youhuiquan_wode",@"text":kLocalizedString(@"myCoupon",@"我的优惠券")},
+                       @{@"image":@"dizhi_wode",@"text":kLocalizedString(@"addressManagement",@"收货地址管理")},
+                       @{@"image":@"erweima_wode",@"text":kLocalizedString(@"myTwoCode",@"我的二维码")},
+                       @{@"image":@"shezhi_wode",@"text":kLocalizedString(@"settings",@"设置")}
                        ];
     }
     return _dataArray;

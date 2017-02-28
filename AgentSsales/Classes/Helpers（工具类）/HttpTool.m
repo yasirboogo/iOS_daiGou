@@ -293,7 +293,6 @@ static inline NSString *cachePath() {
   }
   AFHTTPSessionManager *manager = [self manager];
   NSString *absolute = [self absoluteUrlWithPath:url];
-  
   if ([self baseUrl] == nil) {
     if ([NSURL URLWithString:url] == nil) {
       AppLog(@"URLString无效，无法生成URL。可能是URL中有中文，请尝试Encode URL");
@@ -730,7 +729,7 @@ static inline NSString *cachePath() {
       }
       
       manager.requestSerializer.stringEncoding = NSUTF8StringEncoding;
-        DLog(@"%@",sg_httpHeaders);
+        DLog(@"sg_httpHeaders = %@",sg_httpHeaders);
       for (NSString *key in sg_httpHeaders.allKeys) {
         if (sg_httpHeaders[key] != nil) {
           [manager.requestSerializer setValue:sg_httpHeaders[key] forHTTPHeaderField:key];
@@ -774,9 +773,8 @@ static inline NSString *cachePath() {
 }
 
 + (void)logWithSuccessResponse:(id)response url:(NSString *)url params:(NSDictionary *)params {
-  AppLog(@"\n");
 #pragma mark - 配置请求头
-    if (!sg_httpHeaders) {
+    if (!sg_httpHeaders && [self tryToParseData:response][@"sid"]) {
         sg_httpHeaders = @{@"sid":[self tryToParseData:response][@"sid"]};
     }
   AppLog(@"\nRequest success, URL: %@\n params:%@\n response:%@\n\n",
@@ -809,7 +807,7 @@ static inline NSString *cachePath() {
 
 // 仅对一级字典结构起作用
 + (NSString *)generateGETAbsoluteURL:(NSString *)url params:(id)params {
-  if (params == nil || ![params isKindOfClass:[NSDictionary class]] || [params count] == 0) {
+  if (params == nil || ![params isKindOfClass:[NSDictionary class]]) {
     return url;
   }
   
@@ -876,9 +874,9 @@ static inline NSString *cachePath() {
 }
 #pragma mark 成功回调
 + (void)successResponse:(id)responseData callback:(ResponseSuccess)success {
-  if (success) {
-    success([self tryToParseData:responseData][@"param"]);
-  }
+    if (success) {
+        success([self tryToParseData:responseData]);
+    }
 }
 
 + (NSString *)URLEncode:(NSString *)url {
@@ -934,7 +932,7 @@ static inline NSString *cachePath() {
       }
     }
     
-    NSString *absoluteURL = [self generateGETAbsoluteURL:request.URL.absoluteString params:params];
+    NSString *absoluteURL = [self generateGETAbsoluteURL:request.URL.absoluteString params:nil];
     NSString *key = [NSString networking_md5:absoluteURL];
     NSString *path = [directoryPath stringByAppendingPathComponent:key];
     NSDictionary *dict = (NSDictionary *)responseObject;
@@ -949,7 +947,7 @@ static inline NSString *cachePath() {
     }
     
     if (data && error == nil) {
-      BOOL isOk = [[NSFileManager defaultManager] createFileAtPath:path contents:data attributes:nil];
+      BOOL isOk = [[NSFileManager defaultManager] createFileAtPath:path contents:data attributes:params];
       if (isOk) {
         AppLog(@"cache file ok for request: %@\n", absoluteURL);
       } else {

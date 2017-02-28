@@ -10,14 +10,27 @@
 
 @interface YNSelectParaView : UIView
 
-@property (nonatomic, strong) NSDictionary *dict;
+@property (nonatomic, strong) NSArray *dataArray;
+
+@property (nonatomic, strong) NSMutableArray<NSIndexPath*> *selectArrayM;
 
 @property (nonatomic, assign) BOOL isTapGesture;
 
-@property (nonatomic, copy) void(^didSelectSubmitButtonBlock)();
+@property (nonatomic, copy) void(^didSelectSubmitButtonBlock)(NSString*,NSString*);
 
 - (void)showPopView:(BOOL)animated;
 
 - (void)dismissPopView:(BOOL)animated;
 
+@end
+@interface YNSelectParaViewCell : UICollectionViewCell
+@property (nonatomic,copy) NSString * parameter;
+@property (nonatomic,assign) BOOL isSelect;
+@end
+@interface YNSelectCountViewCell : UICollectionViewCell
+@property (nonatomic,copy) NSString * count;
+@property (nonatomic, copy) void(^didChangeCountBlock)(NSString*);
+@end
+@interface YNSelectParaHeaderView : UICollectionReusableView
+@property (nonatomic,copy) NSString * title;
 @end

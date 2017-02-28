@@ -10,7 +10,10 @@
 #import "YNMineCollectTableView.h"
 
 @interface YNMineCollectViewController ()
-
+{
+    NSInteger _type;
+    NSMutableString *_collectionId;
+}
 @property (nonatomic,strong)UIButton *editBtn;
 
 @property (nonatomic,assign)BOOL isEdit;
@@ -36,6 +39,7 @@
 }
 - (void)viewDidLoad {
     [super viewDidLoad];
+    [self startNetWorkingRequestWithGetUserCollection];
 }
 
 - (void)viewWillDisappear:(BOOL)animated{
@@ -47,11 +51,26 @@
 }
 
 #pragma mark - 网路请求
-
-#pragma mark - 视图加载
--(void)viewDidLayoutSubviews{
-    [super viewDidLayoutSubviews];
+-(void)startNetWorkingRequestWithGetUserCollection{
+    NSDictionary *params = @{@"userId":[DEFAULTS valueForKey:kUserLoginInfors][@"userId"],
+                             @"pageIndex":[NSNumber numberWithInteger:self.pageIndex],
+                             @"pageSize":[NSNumber numberWithInteger:self.pageSize],
+                             @"type":[NSNumber numberWithInteger:_type]};
+    [YNHttpManagers getUserCollectionWithParams:params success:^(id response) {
+        self.tableView.dataArray = response;
+        self.emptyView.hidden = self.tableView.dataArray.count;
+        self.editBtn.hidden = !self.emptyView.hidden;
+    } failure:^(NSError *error) {
+    }];
 }
+-(void)startNetWorkingRequestWithEditUserCollection{
+    NSDictionary *params = @{@"collectionId":_collectionId};
+    [YNHttpManagers editUserCollectionWithParams:params success:^(id response) {
+        [self startNetWorkingRequestWithGetUserCollection];
+    } failure:^(NSError *error) {
+    }];
+}
+#pragma mark - 视图加载
 -(YNMineCollectTableView *)tableView{
     if (!_tableView) {
         YNMineCollectTableView *tableView = [[YNMineCollectTableView alloc] init];
@@ -105,64 +124,30 @@
 -(void)handleBottomButtonClick:(UIButton*)btn{
     btn.selected = !btn.selected;
     if (btn.tag == 0) {//全选按钮
-        for (NSMutableDictionary *dictM in _tableView.dataArrayM) {
-            [dictM setValue:[NSNumber numberWithBool:btn.selected] forKey:@"isSelect"];
-        }
+        [_tableView.selectArrayM enumerateObjectsUsingBlock:^(NSNumber * _Nonnull isSelect, NSUInteger idx, BOOL * _Nonnull stop) {
+            [_tableView.selectArrayM replaceObjectAtIndex:idx withObject:@YES];
+        }];
+        [_tableView reloadData];
     }else if (btn.tag == 1){//删除按钮
-        NSMutableArray<NSMutableDictionary*> *delectDicts = [NSMutableArray array];
-        for (NSMutableDictionary *dictM in _tableView.dataArrayM) {
-            if ([[dictM valueForKey:@"isSelect"] boolValue]) {
-                [delectDicts addObject:dictM];
+        _collectionId = [NSMutableString string];
+        [_tableView.selectArrayM enumerateObjectsUsingBlock:^(NSNumber * _Nonnull isSelect, NSUInteger idx, BOOL * _Nonnull stop) {
+            if ([isSelect boolValue]) {
+                [_collectionId appendFormat:@",%@",_tableView.dataArray[idx][@"collectionId"]];
             }
+        }];
+        if (_collectionId.length) {
+            [_collectionId deleteCharactersInRange:NSMakeRange(0, 1)];
+            [self startNetWorkingRequestWithEditUserCollection];
+        }else{
+            NSLog(@"选择删除内容");
         }
-        [_tableView.dataArrayM removeObjectsInArray:delectDicts];
     }
-    [_tableView reloadData];
 }
 #pragma mark - 函数、消息
 -(void)makeData{
     [super makeData];
+    _type = [LanguageManager currentLanguageIndex];
     self.isEdit = NO;
-    
-    NSMutableDictionary *dictM1 = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-                                 @"testGoods",@"image",
-                                 @"书籍-设计师的自我修养",@"title",
-                                 @"2016年出版版本",@"version",
-                                 @YES,@"isInvalid",
-                                 @NO,@"isSelect",
-                                 @"500.14",@"price", nil];
-    
-    NSMutableDictionary *dictM2 = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-                                   @"testGoods",@"image",
-                                   @"书籍-设计师的自我修养",@"title",
-                                   @"2016年出版版本",@"version",
-                                   @YES,@"isInvalid",
-                                   @NO,@"isSelect",
-                                   @"500.14",@"price", nil];
-    NSMutableDictionary *dictM3 = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-                                   @"testGoods",@"image",
-                                   @"书籍-设计师的自我修养",@"title",
-                                   @"2016年出版版本",@"version",
-                                   @YES,@"isInvalid",
-                                   @NO,@"isSelect",
-                                   @"500.14",@"price", nil];
-    NSMutableDictionary *dictM4 = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-                                   @"testGoods",@"image",
-                                   @"书籍-设计师的自我修养",@"title",
-                                   @"2016年出版版本",@"version",
-                                   @YES,@"isInvalid",
-                                   @NO,@"isSelect",
-                                   @"500.14",@"price", nil];
-    NSMutableDictionary *dictM5 = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-                                   @"testGoods",@"image",
-                                   @"书籍-设计师的自我修养",@"title",
-                                   @"2016年出版版本",@"version",
-                                   @YES,@"isInvalid",
-                                   @NO,@"isSelect",
-                                   @"500.14",@"price", nil];
-    
-    self.tableView.dataArrayM = [NSMutableArray arrayWithObjects:dictM1,dictM2,dictM3,dictM4,dictM5, nil];
-    
     
 }
 -(void)makeNavigationBar{
@@ -172,17 +157,14 @@
     _editBtn = [self addNavigationBarBtnWithTitle:@"编辑" selectTitle:@"完成" font:FONT_15 isOnRight:YES btnClickBlock:^(BOOL isSelect) {
         weakSelf.isEdit = isSelect;
         weakSelf.tableView.isEdit = isSelect;
-        weakSelf.editBtn.hidden = !weakSelf.tableView.dataArrayM.count;
-        weakSelf.emptyView.hidden = weakSelf.tableView.dataArrayM.count;
+        weakSelf.editBtn.hidden = !weakSelf.tableView.dataArray.count;
+        weakSelf.emptyView.hidden = weakSelf.tableView.dataArray.count;
 
     }];
-    
-    _editBtn.hidden = !_tableView.dataArrayM.count;
-    self.titleLabel.text = @"我的收藏";
+    self.titleLabel.text = kLocalizedString(@"myCollection",@"我的收藏");
 }
 -(void)makeUI{
     [super makeUI];
-    self.emptyView.hidden = _tableView.dataArrayM.count;
 }
 #pragma mark - 数据懒加载
 -(void)setIsEdit:(BOOL)isEdit{

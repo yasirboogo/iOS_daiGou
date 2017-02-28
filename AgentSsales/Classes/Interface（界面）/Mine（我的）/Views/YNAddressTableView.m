@@ -10,8 +10,6 @@
 
 @interface YNAddressTableView ()<UITableViewDataSource,UITableViewDelegate>
 
-@property (nonatomic,strong) NSIndexPath * indexPath;
-
 @end
 
 @implementation YNAddressTableView
@@ -53,16 +51,15 @@
         addressCell.selectionStyle = UITableViewCellSelectionStyleNone;
         addressCell.backgroundColor = COLOR_CLEAR;
     }
+    addressCell.cellFrame = _dataArrayM[indexPath.row];
+    addressCell.isSelect = [addressCell.cellFrame.dict[@"isdefault"] boolValue];
+    NSInteger addressId = [addressCell.cellFrame.dict[@"addressId"] integerValue];
     [addressCell setDidSelectButtonClickBlock:^{
-        self.indexPath = indexPath;
-        [self reloadData];
+        self.didSelectSetDefaultAddressBlock(addressId);
     }];
     [addressCell setDidDelectButtonClickBlock:^{
-        NSLog(@"删除");
+        self.didSelectSetDelectAddressBlock(addressId);
     }];
-    
-    addressCell.cellFrame = _dataArrayM[indexPath.row];
-    addressCell.isSelect = indexPath == self.indexPath ? YES :NO;
     return addressCell;
 }
 
@@ -71,14 +68,6 @@
     if (self.didSelectAddressCellBlock) {
         self.didSelectAddressCellBlock(indexPath);
     }
-}
-
--(NSIndexPath *)indexPath{
-    if (!_indexPath) {
-        _indexPath =  [NSIndexPath indexPathForRow:0 inSection:0];
-        
-    }
-    return _indexPath;
 }
 
 @end
@@ -93,7 +82,7 @@
     
     self.phoneF = CGRectMake(MaxX(_nameF)+kMinSpace,Y(_nameF),SCREEN_WIDTH-W_RATIO(20)*2-kMidSpace-MaxX(_nameF)-kMinSpace ,HEIGHT(_nameF));
 
-    CGSize addressSize = [dict[@"address"] calculateHightWithWidth:MaxX(_phoneF)-kMidSpace font:FONT(30)];
+    CGSize addressSize = [[NSString stringWithFormat:@"%@%@",dict[@"region"],dict[@"detailed"]] calculateHightWithWidth:MaxX(_phoneF)-kMidSpace font:FONT(30)];
     self.addresssF = CGRectMake(X(_nameF),MaxY(_nameF)+W_RATIO(20),addressSize.width,addressSize.height);
     
     CGSize delectSize = [@"删除" calculateHightWithFont:FONT(26) maxWidth:0];
@@ -182,7 +171,7 @@
     
     self.nameLabel.text = cellFrame.dict[@"name"];
     self.phoneLabel.text = cellFrame.dict[@"phone"];
-    self.addressLabel.text = cellFrame.dict[@"address"];
+    self.addressLabel.text = [NSString stringWithFormat:@"%@%@",cellFrame.dict[@"region"],cellFrame.dict[@"detailed"]];
     self.selectLabel.text = @"设为默认地址";
     self.delectLabel.text = @"删除";
 

@@ -9,9 +9,17 @@
 #import "YNOrderViewController.h"
 #import "YNGoodsCartCollectionView.h"
 #import "YNOrderDetailsViewController.h"
+#import "YNLogisticalMsgViewController.h"
 
 @interface YNOrderViewController ()
-
+{
+    NSInteger _orderStatus;
+    NSInteger _pageIndex;
+    NSInteger _pageSize;
+    NSInteger _type;
+    
+    NSInteger _orderId;
+}
 @property (nonatomic,weak) YNGoodsCartCollectionView * collectionView;
 
 @property (nonatomic,weak) YNShowEmptyView * emptyView;
@@ -30,10 +38,10 @@
 }
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
     [self makeData];
-    
+    [self makeNavigationBar];
     [self makeUI];
+    [self startNetWorkingRequestWithUserOrderList];
 }
 
 - (void)viewWillDisappear:(BOOL)animated{
@@ -45,7 +53,47 @@
 }
 
 #pragma mark - 网路请求
-
+-(void)startNetWorkingRequestWithUserOrderList{
+    NSDictionary *params = @{
+                             @"userId":[DEFAULTS valueForKey:kUserLoginInfors][@"userId"],
+                             @"orderStatus":[NSNumber numberWithInteger:_orderStatus],
+                             @"pageIndex":[NSNumber numberWithInteger:_pageIndex],
+                             @"pageSize":[NSNumber numberWithInteger:_pageSize],
+                             @"type":[NSNumber numberWithInteger:_type]};
+    [YNHttpManagers getUserOrderListWithParams:params success:^(id response) {
+        self.collectionView.dataArray = [MyOrderListModel arrayOfModelsFromDictionaries:response error:nil];
+        self.emptyView.hidden = self.collectionView.dataArray.count;
+    } failure:^(NSError *error) {
+    }];
+}
+-(void)startNetWorkingRequestWithCancelUserOrder{
+    NSDictionary *params = @{@"orderId":[NSNumber numberWithInteger:_orderId]};
+    [YNHttpManagers cancelUserOrderWithParams:params success:^(id response) {
+        [self startNetWorkingRequestWithUserOrderList];
+    } failure:^(NSError *error) {
+    }];
+}
+-(void)startNetWorkingRequestWithPromptShipment{
+    NSDictionary *params = @{@"orderId":[NSNumber numberWithInteger:_orderId]};
+    [YNHttpManagers promptShipmentWithParams:params success:^(id response) {
+    } failure:^(NSError *error) {
+    }];
+}
+-(void)startNetWorkingRequestWithConfirmShipment{
+    NSDictionary *params = @{@"orderId":[NSNumber numberWithInteger:_orderId]};
+    [YNHttpManagers confirmShipmentWithParams:params success:^(id response) {
+        [self startNetWorkingRequestWithUserOrderList];
+    } failure:^(NSError *error) {
+    }];
+}
+-(void)startNetWorkingRequestWithAnotherOrder{
+    NSDictionary *params = @{@"orderId":[NSNumber numberWithInteger:_orderId],
+                             @"type":[NSNumber numberWithInteger:_type]};
+    [YNHttpManagers anotherOrderWithParams:params success:^(id response) {
+        [self startNetWorkingRequestWithUserOrderList];
+    } failure:^(NSError *error) {
+    }];
+}
 #pragma mark - 视图加载
 -(YNGoodsCartCollectionView *)collectionView{
     if (!_collectionView) {
@@ -53,6 +101,36 @@
         YNGoodsCartCollectionView *collectionView = [[YNGoodsCartCollectionView alloc] initWithFrame:frame];
         _collectionView = collectionView;
         [self.view addSubview:collectionView];
+        [collectionView setDidFooterViewQuestionButtonBlock:^{
+        }];
+        [collectionView setDidFooterViewLeftButtonBlock:^(NSInteger index,NSInteger orderId) {
+            _orderId = orderId;
+            if (index == 100 + 1) {
+                [self startNetWorkingRequestWithCancelUserOrder];
+            }else if (index == 100 + 2){
+                [self startNetWorkingRequestWithCancelUserOrder];
+            }else if (index == 100 + 3){
+            }else if (index == 100 + 4){
+                YNLogisticalMsgViewController *pushVC = [[YNLogisticalMsgViewController alloc] init];
+                [self.navigationController pushViewController:pushVC animated:NO];
+            }else if (index == 100 + 5){
+                [self startNetWorkingRequestWithAnotherOrder];
+            }
+        }];
+        [collectionView setDidFooterViewRightButtonBlock:^(NSInteger index,NSInteger orderId) {
+            _orderId = orderId;
+            if (index == 200 + 1) {
+            }else if (index == 200 + 2){
+                
+            }else if (index == 200 + 3){
+                [self startNetWorkingRequestWithPromptShipment];
+            }else if (index == 200 + 4){
+                [self startNetWorkingRequestWithConfirmShipment];
+            }else if (index == 200 + 5){
+                YNLogisticalMsgViewController *pushVC = [[YNLogisticalMsgViewController alloc] init];
+                [self.navigationController pushViewController:pushVC animated:NO];
+            }
+        }];
         [collectionView setDidSelectOrderGoodsCell:^(NSString *str) {
             YNOrderDetailsViewController *pushVC = [[YNOrderDetailsViewController alloc] init];
             [self.navigationController pushViewController:pushVC animated:NO];
@@ -75,14 +153,17 @@
 
 #pragma mark - 函数、消息
 -(void)makeData{
-    self.collectionView.dataArray = @[@"1",@"2"];
-    
+    _orderStatus = _index;
+    _pageIndex = 1;
+    _pageSize = 10;
+    _type = [LanguageManager currentLanguageIndex];
 }
 -(void)makeNavigationBar{
     
 }
 -(void)makeUI{
-    self.emptyView.hidden = _collectionView.dataArray.count;
+    [self.view addSubview:self.collectionView];
+    [self.view addSubview:self.emptyView];
 }
 #pragma mark - 数据懒加载
 

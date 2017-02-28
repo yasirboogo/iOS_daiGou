@@ -12,4 +12,8 @@
 
 @property (nonatomic,copy) NSString * titleStr;
 
+@property (nonatomic,assign) NSInteger type;
+
+@property (nonatomic,copy) NSDictionary * address;
+
 @end

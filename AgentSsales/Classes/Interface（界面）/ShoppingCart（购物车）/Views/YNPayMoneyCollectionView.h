@@ -10,7 +10,7 @@
 
 @interface YNPayMoneyCollectionView : UICollectionView
 
-@property (nonatomic,strong) NSArray * inforArray;
+@property (nonatomic,strong) NSDictionary * orderDict;
 
 @property (nonatomic,strong) NSArray<NSDictionary*> * payArray;
 

@@ -10,4 +10,6 @@
 
 @interface YNTerraceGoodsViewController : YNBaseViewController
 
+@property (nonatomic,copy) NSString * goodsId;
+
 @end

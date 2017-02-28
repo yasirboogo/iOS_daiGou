@@ -18,8 +18,8 @@
     _isEdit = isEdit;
     [self reloadData];
 }
--(void)setDataArrayM:(NSMutableArray<NSMutableDictionary *> *)dataArrayM{
-    _dataArrayM = dataArrayM;
+-(void)setDataArray:(NSArray<NSDictionary *> *)dataArray{
+    _dataArray = dataArray;
     [self reloadData];
 }
 
@@ -40,7 +40,7 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
 
-    return _dataArrayM.count;
+    return _dataArray.count;
 }
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
     YNMineCollectCell * collectCell = [tableView dequeueReusableCellWithIdentifier:@"collectCell"];
@@ -50,9 +50,10 @@
         collectCell.backgroundColor = COLOR_CLEAR;
     }
     collectCell.isEdit = self.isEdit;
-    collectCell.cellDict = _dataArrayM[indexPath.row];
+    collectCell.cellDict = _dataArray[indexPath.row];
+    collectCell.isSelected = [self.selectArrayM[indexPath.row] boolValue];
     [collectCell setDidSelectedButtonClickBlock:^(BOOL isSelect) {
-        [_dataArrayM[indexPath.row] setValue:[NSNumber numberWithBool:isSelect] forKey:@"isSelect"];
+        [_selectArrayM replaceObjectAtIndex:indexPath.row withObject:[NSNumber numberWithBool:isSelect]];
         [self reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:NO];
     }];
     return collectCell;
@@ -60,8 +61,17 @@
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
     [tableView deselectRowAtIndexPath:indexPath animated:NO];
     if (self.didSelectMineCollectCellBlock) {
-        self.didSelectMineCollectCellBlock(_dataArrayM[indexPath.row][@"title"]);
+        self.didSelectMineCollectCellBlock(@"点击了我的收藏Cell");
     }
+}
+-(NSMutableArray<NSNumber *> *)selectArrayM{
+    if (!_selectArrayM) {
+        _selectArrayM = [NSMutableArray array];
+        for (NSInteger i =0; i < _dataArray.count; i++) {
+            [_selectArrayM addObject:@NO];
+        }
+    }
+    return _selectArrayM;
 }
 @end
 
@@ -80,12 +90,12 @@
 @implementation YNMineCollectCell
 -(void)setCellDict:(NSDictionary *)cellDict{
     _cellDict = cellDict;
-    self.leftImgView.image = [UIImage imageNamed:cellDict[@"image"]];
-    self.titleLabel.text = cellDict[@"title"];
-    self.versionLabel.text = cellDict[@"version"];
-    self.priceLabel.text = [NSString stringWithFormat:@"%.2f",[cellDict[@"price"] floatValue]];
-    self.invalidLabel.hidden = ![cellDict[@"isInvalid"] boolValue];
-    self.isSelected = [cellDict[@"isSelect"] boolValue];
+    [self.leftImgView sd_setImageWithURL:[NSURL URLWithString:cellDict[@"img"]] placeholderImage:[UIImage imageNamed:@"zhanwei1"]];
+    self.titleLabel.text = cellDict[@"name"];
+    self.versionLabel.text = cellDict[@"note"];
+    self.invalidLabel.text = cellDict[@"stock"];
+    self.priceLabel.text = [NSString stringWithFormat:@"%.2f",[cellDict[@"salesprice"] floatValue]];
+    self.invalidLabel.hidden = ![cellDict[@"stock"] length];
 }
 -(void)setIsSelected:(BOOL)isSelected{
     _isSelected = isSelected;
@@ -112,6 +122,10 @@
     
     CGSize versionSize = [_versionLabel.text calculateHightWithWidth:WIDTHF(_titleLabel) font:_versionLabel.font line:_versionLabel.numberOfLines];
     _versionLabel.frame = CGRectMake(XF(_titleLabel), MaxYF(_titleLabel)+kMinSpace, versionSize.width,versionSize.height);
+    
+    CGSize size = [_invalidLabel.text calculateHightWithFont:_invalidLabel.font maxWidth:0];
+    _invalidLabel.frame = CGRectMake(MaxXF(_leftImgView)+W_RATIO(20),HEIGHTF(_bgView)-kMidSpace-W_RATIO(33),size.width+kMinSpace, W_RATIO(33));
+    _invalidLabel.layer.cornerRadius = W_RATIO(10);
     
     CGSize priceSize = [_priceLabel.text calculateHightWithFont:_priceLabel.font maxWidth:0];
     _priceLabel.frame = CGRectMake(WIDTHF(_bgView)-kMidSpace-priceSize.width,YF(_invalidLabel), priceSize.width,HEIGHTF(_invalidLabel));
@@ -184,15 +198,11 @@
         _invalidLabel = invalidLabel;
         [self.bgView addSubview:invalidLabel];
         invalidLabel.font = FONT(22);
-        invalidLabel.text = @"失效";
         invalidLabel.textAlignment = NSTextAlignmentCenter;
         invalidLabel.hidden = YES;
         invalidLabel.textColor = COLOR_FFFFFF;
         invalidLabel.backgroundColor = COLOR_B7B7B7;
         invalidLabel.layer.masksToBounds = YES;
-        CGSize size = [invalidLabel.text sizeWithAttributes:@{NSFontAttributeName:invalidLabel.font}];
-        invalidLabel.frame = CGRectMake(MaxXF(_leftImgView)+W_RATIO(20),HEIGHTF(_bgView)-kMidSpace-W_RATIO(33),size.width+kMinSpace, W_RATIO(33));
-        invalidLabel.layer.cornerRadius = W_RATIO(10);
     }
     return _invalidLabel;
 }
@@ -212,7 +222,7 @@
         _markLabel = markLabel;
         [self.bgView addSubview:markLabel];
         markLabel.font = FONT(26);
-        markLabel.text = NSLS(@"moneySymbol", @"货币符号");
+        markLabel.text = @"$";
         markLabel.textColor = COLOR_666666;
     }
     return _markLabel;

@@ -88,7 +88,6 @@
 #pragma mark - 函数、消息
 -(void)makeData{
     [super makeData];
-    
     self.collectionView.dict = @{@"manMsg":@{@"name":@"李小龙",
                                              @"phone":@"13631499887",
                                              @"address":@"广东省广州市天河区五山街华南农业大学华南区12栋312"},

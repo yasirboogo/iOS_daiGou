@@ -8,9 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-
 @interface YNBaseViewController : UIViewController
-
 /**  nav背景view */
 @property (nonatomic, strong) UIView *navView;
 /**  左边的button */
@@ -18,6 +16,9 @@
 
 @property (nonatomic, strong) UILabel *titleLabel;
 
+@property (nonatomic, assign) NSInteger pageIndex;
+
+@property (nonatomic, assign) NSInteger pageSize;
 
 /**
  给导航栏添加纯图片按钮
@@ -65,4 +66,9 @@
 - (void)makeNavigationBar;
 /**  数据初始化 */
 - (void)makeData;
+@end
+@interface YNNavigationBarButton : UIButton
+
+@property (nonatomic,copy)void(^navigationBarButtonClickBlock)(BOOL);
+
 @end

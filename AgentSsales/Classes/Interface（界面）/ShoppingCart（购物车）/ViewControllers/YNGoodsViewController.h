@@ -8,6 +8,13 @@
 
 #import "YNBaseViewController.h"
 
+@class YNGoodsCartTableView;
 @interface YNGoodsViewController : UIViewController
+
+@property (nonatomic,assign) NSInteger index;
+
+@property (nonatomic,assign) BOOL status;
+
+@property (nonatomic,weak) YNGoodsCartTableView * tableView;
 
 @end

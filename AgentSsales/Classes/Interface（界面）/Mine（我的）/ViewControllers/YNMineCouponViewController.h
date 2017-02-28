@@ -10,4 +10,6 @@
 
 @interface YNMineCouponViewController : YNBaseViewController
 
+@property (nonatomic,copy) NSString *allPrice;
+
 @end

@@ -10,4 +10,6 @@
 
 @interface YNNewsDetailViewController : YNBaseViewController
 
+@property (nonatomic,copy) NSString * messageId;
+
 @end

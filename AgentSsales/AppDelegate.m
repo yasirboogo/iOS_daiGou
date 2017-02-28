@@ -9,7 +9,6 @@
 #import "AppDelegate.h"
 #import "AppDelegate+ThirdShare.h"
 
-#import "PDNewFeatureViewController.h"
 #import "YNTabBarController.h"
 
 #import "YNLoginViewController.h"
@@ -22,30 +21,24 @@
 
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    UIWindow *window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
-    
+    //第三方分享
     [self ThirdShareApplication:application didFinishLaunchingWithOptions:launchOptions];
+    //请求配置
+    [YNHttpManagers setupHttpTool];
     
+    UIWindow *window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
     self.window = window;
-//    if ([PDVersionTool needShowNewFeature]) {
-//        self.window.rootViewController = [[PDNewFeatureViewController alloc]init];
-//    }else{
-        // 设置根控制器
-    BOOL isLogin = YES;
-    if (isLogin) {
+    [window makeKeyAndVisible];
+    
+    id userLoginInfors = [DEFAULTS valueForKey:kUserLoginInfors];
+    if (userLoginInfors == nil) {
         UINavigationController *nVc = [[UINavigationController alloc] initWithRootViewController:[[YNLoginViewController alloc] init]];
         self.window.rootViewController = nVc;
     }else{
-    
         YNTabBarController *tab = [[YNTabBarController alloc]init];
-        //        UINavigationController *meNav = [[UINavigationController alloc]initWithRootViewController:vc];
         self.window.rootViewController = tab;
     }
-//    }
-    //
-    //    // 设置窗口为主窗口并可见
-    [window makeKeyAndVisible];
-
+    
     // Override point for customization after application launch.
     return YES;
 }

@@ -8,11 +8,14 @@
 
 #import "YNGoodsDetailsView.h"
 #import "ImagesPlayer.h"
+#import "YNImageSize.h"
 
 @interface YNGoodsDetailsView ()<ImagesPlayerDelegae,UITableViewDelegate,UITableViewDataSource>
 {
     UIButton *_currentBtn;
 }
+@property (nonatomic,strong) NSArray * detailUrls;
+
 @property (nonatomic,weak) UIView * headerView;
 
 @property (nonatomic,weak) ImagesPlayer * imagesPlayer;
@@ -31,6 +34,8 @@
 
 @property (nonatomic,weak) UIView * itemsView;
 
+@property (nonatomic,weak) UIView * itemDetailView;
+
 @property (nonatomic,weak) UITableView * tableView;
 
 @property (nonatomic,weak) UITableView * selectParaView;
@@ -39,26 +44,17 @@
 
 @implementation YNGoodsDetailsView
 
--(instancetype)initWithFrame:(CGRect)frame{
-    self =[super initWithFrame:frame];
-    if (self) {
-        self.imageURLs = @[@"http://www.ld12.com/upimg358/allimg/c151129/144WW1420B60-401445_lit.jpg",
-                                @"http://www.ld12.com/upimg358/allimg/c151129/144WW1420B60-401445_lit.jpg",
-                                @"http://www.ld12.com/upimg358/allimg/c151129/144WW1420B60-401445_lit.jpg"];
-        
-        [self.tableView reloadData];
-    }
-    return self;
-}
-
--(void)setDict:(NSDictionary *)dict{
-    _dict = dict;
-    self.hotLabel.text = @"热";
-    self.nameLabel.text = @"米勒洗衣机/J-FYU78";
+-(void)setDataDict:(NSDictionary *)dataDict{
+    _dataDict = dataDict;
+    [self.imagesPlayer addNetWorkImages:dataDict[@"imgArray"] placeholder:[UIImage imageNamed:@"zhanwei2"]];
+    self.hotLabel.text = kLocalizedString(@"hot", @"热");
+    self.nameLabel.text = dataDict[@"name"];
     [self.shareBtn setTitle:@"分享" forState:UIControlStateNormal];
     self.spaceLabel.text = @"|";
-    self.detailLabel.text = @"放射状分割线以其特有的方向性和运动性,赋予了服装丰富的内容和表现力,通过研究放射状分割立体裁剪技术在女装中的应用,提出放射状分割在立体裁剪过程中的几个主要";
+    self.detailLabel.text = dataDict[@"note"];
+    //self.detailUrls = [YNDetailImgCellFrame initWithFromDictionaries:dataDict[@"imgdetails"]];
 }
+
 -(void)layoutSubviews{
     [super layoutSubviews];
     
@@ -100,10 +96,6 @@
         imagesPlayer.indicatorView.pageIndicatorTintColor = COLOR_FFFFFF;
     }
     return _imagesPlayer;
-}
--(void)setImageURLs:(NSArray<NSString *> *)imageURLs{
-    _imageURLs = imageURLs;
-    [self.imagesPlayer addNetWorkImages:imageURLs placeholder:nil];
 }
 #pragma mark 广告页ImagesPlayerDelegae
 - (void)imagesPlayer:(ImagesPlayer *)player didSelectImageAtIndex:(NSInteger)index
@@ -220,32 +212,75 @@
         UITableView *tableView = [[UITableView alloc] init];
         _tableView = tableView;
         [self addSubview:tableView];
+        tableView.frame = self.bounds;
         tableView.showsVerticalScrollIndicator = NO;
         tableView.bounces = NO;
         tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
-        tableView.rowHeight = W_RATIO(90);
+        tableView.rowHeight = W_RATIO(400);
         tableView.delegate = self;
         tableView.dataSource = self;
         [tableView reloadData];
         tableView.frame = self.bounds;
+        tableView.tableHeaderView = self.headerView;
     }
     return _tableView;
 }
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
-    return 3;
+    return [(NSArray*)_dataDict[@"imgdetails"] count];
+}
+-(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
+    YNDetailImgCellFrame *cellFrame = self.detailUrls[indexPath.row];
+    return cellFrame.cellHeight;
 }
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
-    UITableViewCell * cell = [tableView dequeueReusableCellWithIdentifier:@"cell"];
-    if (cell == nil) {
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:@"cell"];
-        cell.selectionStyle = UITableViewCellSelectionStyleNone;
-        cell.textLabel.font = FONT(30);
-        cell.textLabel.textColor = COLOR_333333;
-        cell.detailTextLabel.font = FONT(28);
-        cell.detailTextLabel.textColor = COLOR_666666;
+    YNDetailImgCell * imgCell = [tableView dequeueReusableCellWithIdentifier:@"imgCell"];
+    if (imgCell == nil) {
+        imgCell = [[YNDetailImgCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:@"imgCell"];
+        imgCell.selectionStyle = UITableViewCellSelectionStyleNone;
     }
-    cell.textLabel.text = @"洗衣机品牌";
-    cell.detailTextLabel.text = @"HAIWE/海尔";
-    return cell;
+    imgCell.cellFrame = self.detailUrls[indexPath.row];
+    return imgCell;
+}
+@end
+@implementation YNDetailImgCellFrame
+-(void)setImgUrl:(NSString *)imgUrl{
+    _imgUrl = imgUrl;
+    CGSize imgSize = [YNImageSize downloadImageSizeWithURL:imgUrl];
+    self.cellHeight = imgSize.height / imgSize.width * W_RATIO(750);
+}
++(NSMutableArray *)initWithFromDictionaries:(NSArray*)array{
+    
+    NSMutableArray *tempArrayM = [NSMutableArray arrayWithArray:array];
+    
+    NSMutableArray *endArray = [NSMutableArray array];
+    
+    [tempArrayM enumerateObjectsUsingBlock:^(NSString *imgUrl, NSUInteger idx, BOOL * _Nonnull stop) {
+        YNDetailImgCellFrame *cellFrame = [[YNDetailImgCellFrame alloc] init];
+        cellFrame.imgUrl = imgUrl;
+        [endArray addObject:cellFrame];
+    }];
+    
+    return endArray;
+}
+@end
+@interface YNDetailImgCell()
+
+@property (nonatomic,weak) UIImageView * bgImgView;
+
+@end
+@implementation YNDetailImgCell
+
+-(void)setCellFrame:(YNDetailImgCellFrame *)cellFrame{
+    _cellFrame = cellFrame;
+    self.bgImgView.frame = CGRectMake(0, 0, SCREEN_WIDTH, cellFrame.cellHeight);
+    [self.bgImgView sd_setImageWithURL:[NSURL URLWithString:cellFrame.imgUrl] placeholderImage:[UIImage imageNamed:@"zhanwei2"]];
+}
+-(UIImageView *)bgImgView{
+    if (!_bgImgView) {
+        UIImageView *bgImgView = [[UIImageView alloc] init];
+        _bgImgView = bgImgView;
+        [self.contentView addSubview:bgImgView];
+    }
+    return _bgImgView;
 }
 @end

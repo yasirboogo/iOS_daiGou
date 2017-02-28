@@ -8,9 +8,12 @@
 
 #import "YNForgetPwdViewController.h"
 #import "YNForgetPwdTableView.h"
+#import "YNLoginViewController.h"
 
 @interface YNForgetPwdViewController ()
-
+{
+    NSString *_checkCode;
+}
 @property(nonatomic,strong)YNForgetPwdTableView *tableView;
 
 @property (nonatomic,weak) UIButton *submitBtn;
@@ -41,13 +44,38 @@
 }
 
 #pragma mark - 网路请求
-
+-(void)startNetWorkingRequestWithPhoneCode{
+    NSDictionary *params = @{
+                             @"loginphone":[NSString stringWithFormat:@"%@%@",self.code,self.phone]
+                             };
+    [YNHttpManagers getMsgCodeWithParams:params success:^(id response) {
+        _checkCode = response;
+    } failure:^(NSError *error) {
+        NSLog(@"%@",error);
+    }];
+}
+-(void)startNetWorkingRequestWithUpadatePwd{
+    NSDictionary *params = @{
+                             @"phone":self.phone,
+                             @"password":_tableView.textArrayM[1],
+                             };
+    [YNHttpManagers forgetPasswordWithParams:params success:^(id response) {
+        [self.view endEditing:YES];
+        YNLoginViewController *pushVC =[[YNLoginViewController alloc] init];
+        [self.navigationController pushViewController:pushVC animated:NO];
+    } failure:^(NSError *error) {
+        NSLog(@"%@",error);
+    }];
+}
 #pragma mark - 视图加载
 -(YNForgetPwdTableView *)tableView{
     if (!_tableView) {
         YNForgetPwdTableView *tableView = [[YNForgetPwdTableView alloc] init];
         _tableView  = tableView;
         [self.view addSubview:tableView];
+        [tableView setDidSelectSendPhoneCodeBlock:^{
+            [self startNetWorkingRequestWithPhoneCode];
+        }];
     }
     return _tableView;
 }
@@ -71,7 +99,7 @@
 
 #pragma mark - 函数、消息
 -(void)handleUpdatePswordSubmitButtonClick:(UIButton*)btn{
-    NSLog(@"%@",_tableView.textArrayM);
+    [self startNetWorkingRequestWithUpadatePwd];
 }
 -(void)makeData{
     [super makeData];

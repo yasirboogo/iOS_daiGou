@@ -12,7 +12,11 @@
 
 @property (nonatomic,strong) NSDictionary *dict;
 
+@property (nonatomic,strong) NSString *commentNum;
+
 @property (nonatomic,copy) void(^htmlDidLoadFinish)();
+
+@property (nonatomic,copy) void(^didSelectLikeButtonBlock)(BOOL);
 
 @end
 
@@ -21,5 +25,10 @@
 @end
 
 @interface YNWebFooterView : UIView
+
 @property (nonatomic,strong) NSDictionary *dict;
+
+@property (nonatomic,strong) NSString *commentNum;
+
+@property (nonatomic,copy) void(^didSelectLikeButtonBlock)(BOOL);
 @end

@@ -65,7 +65,7 @@
 -(void)setDict:(NSDictionary *)dict{
     _dict = dict;
     
-    CGSize msgSize = [dict[@"msg"] calculateHightWithWidth:SCREEN_WIDTH-(kMaxSpace+kMidSpace+W_RATIO(2))-kMaxSpace font:FONT(32)];
+    CGSize msgSize = [dict[@"context"] calculateHightWithWidth:SCREEN_WIDTH-(kMaxSpace+kMidSpace+W_RATIO(2))-kMaxSpace font:FONT(32)];
     self.msgF = CGRectMake(kMaxSpace+kMidSpace+W_RATIO(2), kMidSpace, msgSize.width, msgSize.height);
     
     CGSize timeSize = [dict[@"time"] calculateHightWithWidth:WIDTH(_msgF) font:FONT(26)];
@@ -135,7 +135,7 @@
     self.markImgView.frame = cellFrame.markF;
 }
 -(void)setupCellContent:(YNLogisticalCellFrame*)cellFrame{
-    self.msgLabel.text = cellFrame.dict[@"msg"];
+    self.msgLabel.text = cellFrame.dict[@"context"];
     self.timeLabel.text = cellFrame.dict[@"time"];
     
     if (cellFrame.cellType == FirstSatus) {

@@ -9,6 +9,10 @@
 #import "YNSettingViewController.h"
 #import "YNSettingTableView.h"
 #import "YNTipsSuccessBtnsView.h"
+#import "YNSendSuggestViewController.h"
+#import "YNDocumentExplainViewController.h"
+#import "YNLoginViewController.h"
+#import "AppDelegate.h"
 
 @interface YNSettingViewController ()
 
@@ -42,7 +46,13 @@
 }
 
 #pragma mark - 网路请求
-
+-(void)startNetWorkingRequestWithSetIsPushMsg:(NSString*)isPushMsg{
+    NSDictionary *params = @{@"userId":[DEFAULTS valueForKey:kUserLoginInfors][@"userId"],
+                             @"type":isPushMsg};
+    [YNHttpManagers setPushMsgWithParams:params success:^(id response) {
+    } failure:^(NSError *error) {
+    }];
+}
 #pragma mark - 视图加载
 -(YNSettingTableView *)tableView{
     if (!_tableView) {
@@ -50,6 +60,19 @@
         YNSettingTableView *tableView = [[YNSettingTableView alloc] initWithFrame:frame];
         _tableView = tableView;
         [self.view addSubview:tableView];
+        [tableView setDidSelectIsPushOnBlock:^(BOOL isOn) {
+            [self startNetWorkingRequestWithSetIsPushMsg:[NSString stringWithFormat:@"%d",isOn]];
+        }];
+        [tableView setDidSelectSettingCellBlock:^(NSInteger index) {
+            if (index == 1) {
+                YNSendSuggestViewController *pushVC = [[YNSendSuggestViewController alloc] init];
+                [self.navigationController pushViewController:pushVC animated:NO];
+            }else if (index == 2){
+                YNDocumentExplainViewController *pushVC = [[YNDocumentExplainViewController alloc] init];
+                pushVC.status = 1;
+                [self.navigationController pushViewController:pushVC animated:NO];
+            }
+        }];
     }
     return _tableView;
 }
@@ -60,7 +83,11 @@
         [self.view addSubview:btnsView];
         btnsView.btnStyle = UIButtonStyle1;
         [btnsView setDidSelectBottomButtonClickBlock:^(NSString *str) {
-            [self popActionSheet];
+            UINavigationController *nVc = [[UINavigationController alloc] initWithRootViewController:[[YNLoginViewController alloc] init]];
+            
+            AppDelegate *appDelegate =
+            (AppDelegate *)[[UIApplication sharedApplication] delegate];
+            appDelegate.window.rootViewController = nVc;
         }];
     }
     return _btnsView;
@@ -80,7 +107,7 @@
 }
 -(void)makeNavigationBar{
     [super makeNavigationBar];
-    self.titleLabel.text = @"设置";
+    self.titleLabel.text = kLocalizedString(@"settings",@"设置");
 }
 -(void)makeUI{
     [super makeUI];

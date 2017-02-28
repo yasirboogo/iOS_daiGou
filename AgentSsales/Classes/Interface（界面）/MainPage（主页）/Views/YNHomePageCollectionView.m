@@ -10,7 +10,9 @@
 #import "ImagesPlayer.h"
 
 @interface YNHomePageCollectionView ()<UICollectionViewDelegate,UICollectionViewDataSource,UICollectionViewDelegateFlowLayout,ImagesPlayerDelegae>
-
+{
+    UIButton *_showRateBtn;
+}
 @property (nonatomic,assign) BOOL isShowMoneyRate;
 
 @end
@@ -48,9 +50,24 @@
     }
     return self;
 }
+-(void)setAdArray:(NSArray *)adArray{
+    _adArray = adArray;
+    [self reloadData];
+}
+-(void)setHotArray:(NSArray *)hotArray{
+    _hotArray = hotArray;
+    [self reloadData];
+}
+-(void)setFeatureArray:(NSArray *)featureArray{
+    _featureArray = featureArray;
+    [self reloadData];
+}
 #pragma mark - 代理实现
 -(NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView{
-    return 5;
+    if (self.adArray.count&&self.hotArray&&self.featureArray.count) {
+        return 5;
+    }
+    return 0;
 }
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section{
     if (section == 0) {
@@ -62,7 +79,7 @@
     }else if (section == 3){
         return 1;
     }else if (section == 4){
-        return 2;
+        return _featureArray.count;
     }
     return 0;
 }
@@ -71,13 +88,13 @@
     if (indexPath.section == 0) {
         YNPlayerImgCell *playerCell = [collectionView dequeueReusableCellWithReuseIdentifier:@"playerCell" forIndexPath:indexPath];
         playerCell.backgroundColor = COLOR_FFFFFF;
-        NSArray *imageURLs = @[@"http://tx.haiqq.com/uploads/allimg/150326/160R95612-10.jpg",
-                               @"http://img4.duitang.com/uploads/item/201508/11/20150811220329_XyZAv.png",
-                               @"http://www.ld12.com/upimg358/allimg/c151129/144WW1420B60-401445_lit.jpg",
-                               ];
+        NSMutableArray <NSString*> *imageURLs = [NSMutableArray array];
+        [self.adArray enumerateObjectsUsingBlock:^(NSDictionary *dict, NSUInteger idx, BOOL * _Nonnull stop) {
+            [imageURLs addObject:dict[@"img"]];
+        }];
         playerCell.imageURLs = imageURLs;
-        [playerCell setDidSelectPlayerImgClickBlock:^(NSString *str) {
-            self.didSelectPlayerImgClickBlock(str);
+        [playerCell setDidSelectPlayerImgClickBlock:^(NSInteger index) {
+            self.didSelectPlayerImgClickBlock(self.adArray[index][@"url"],[NSString stringWithFormat:@"%@",self.adArray[index][@"type"]]);
         }];
         return playerCell;
     }else if (indexPath.section == 1) {
@@ -93,7 +110,6 @@
             self.didSelectPlatImgClickBlock(index);
         }];
         return selectCell;
-        
     }else if (indexPath.section == 2){
         if (!self.isShowMoneyRate) {
             //不做任何操作，隐藏
@@ -101,17 +117,17 @@
             if (indexPath.row == 0) {
                 YNRateTypesCell *typeCell = [collectionView dequeueReusableCellWithReuseIdentifier:@"typeCell" forIndexPath:indexPath];
                 typeCell.backgroundColor = COLOR_FFFFFF;
-                typeCell.rmbLabel.text = NSLS(@"人民币（主）", @"人民币（主）");
-                typeCell.buyInLabel.text = NSLS(@"买进", @"买进");
-                typeCell.sellOutLabel.text = NSLS(@"卖出", @"卖出");
+                typeCell.rmbLabel.text = @"人民币（主）";
+                typeCell.buyInLabel.text = @"买进";
+                typeCell.sellOutLabel.text = @"卖出";
                 return typeCell;
             }else{
                 YNMoneyRatesCell *rateCell = [collectionView dequeueReusableCellWithReuseIdentifier:@"rateCell" forIndexPath:indexPath];
                 rateCell.backgroundColor = COLOR_FFFFFF;
                 rateCell.flagImgView.image = [UIImage imageNamed:@"malaixiya_guoqi"];
-                rateCell.typeLabel.text = NSLS(@"马来西亚币", @"货币类型");
-                rateCell.buyLabel.text = NSLS(@"0.6545", @"买进");
-                rateCell.sellLabel.text = NSLS(@"1.6057", @"卖出");
+                rateCell.typeLabel.text = @"马来西亚币";
+                rateCell.buyLabel.text = @"0.6545";
+                rateCell.sellLabel.text = @"1.6057";
                 return rateCell;
             }
         }
@@ -120,25 +136,21 @@
         for (UIView *view in classCell.contentView.subviews) {
             [view removeFromSuperview];
         }
-        classCell.imageURLs = @[@"http://www.ld12.com/upimg358/allimg/c151129/144WW1420B60-401445_lit.jpg",
-                                @"http://www.ld12.com/upimg358/allimg/c151129/144WW1420B60-401445_lit.jpg",
-                                @"http://www.ld12.com/upimg358/allimg/c151129/144WW1420B60-401445_lit.jpg",
-                                @"http://www.ld12.com/upimg358/allimg/c151129/144WW1420B60-401445_lit.jpg",
-                                @"http://www.ld12.com/upimg358/allimg/c151129/144WW1420B60-401445_lit.jpg",
-                                @"http://www.ld12.com/upimg358/allimg/c151129/144WW1420B60-401445_lit.jpg"];
+        NSMutableArray <NSString*> *imageURLs = [NSMutableArray array];
+        [self.hotArray enumerateObjectsUsingBlock:^(NSDictionary *dict, NSUInteger idx, BOOL * _Nonnull stop) {
+            [imageURLs addObject:dict[@"classimg"]];
+        }];
+        classCell.imageURLs = imageURLs;
         classCell.backgroundColor = COLOR_69B6FF;
-        [classCell setDidSelectHotClassImgClickBlock:^(NSString *str) {
-            self.didSelectHotClassImgClickBlock(str);
+        [classCell setDidSelectHotClassImgClickBlock:^(NSInteger index) {
+            self.didSelectHotClassImgClickBlock([NSString stringWithFormat:@"%@",_hotArray[index][@"classId"]],index);
         }];
         return classCell;
     }else if(indexPath.section == 4) {
         YNShowGoodsCell *goodsCell = [collectionView dequeueReusableCellWithReuseIdentifier:@"goodCell" forIndexPath:indexPath];
         goodsCell.backgroundColor = COLOR_FFFFFF;
-        goodsCell.bigImageView.image = [UIImage imageNamed:_dataArray[indexPath.row][@"image"]];
-        goodsCell.nameLabel.text = _dataArray[indexPath.row][@"name"];
-        goodsCell.versionLabel.text = _dataArray[indexPath.row][@"version"];
-        goodsCell.priceLabel.text = _dataArray[indexPath.row][@"price"];
-        goodsCell.markLabel.text = _dataArray[indexPath.row][@"mark"];
+        goodsCell.dict = _featureArray[indexPath.row];
+        
         return goodsCell;
     }
     UICollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"cell" forIndexPath:indexPath];
@@ -219,7 +231,7 @@
         if (indexPath.section == 0) {
         }else if (indexPath.section == 1) {
             YNHeaderBarView *headerView = [collectionView dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:@"barHeader" forIndexPath:indexPath];
-            [headerView setWithTitle:NSLS(@"代购平台", @"代购平台") leftImg:[UIImage imageNamed:@"daigoupingtai_shouye"] moreImg:nil color:COLOR_FFFFFF moreClickBlock:nil];
+            [headerView setWithTitle:kLocalizedString(@"purchasePlatform",@"代购平台") leftImg:[UIImage imageNamed:@"daigoupingtai_shouye"] moreImg:nil color:COLOR_FFFFFF moreClickBlock:nil];
             return headerView;
         }else if (indexPath.section == 2){
             UICollectionReusableView *headerView = [collectionView dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:@"header" forIndexPath:indexPath];
@@ -228,14 +240,14 @@
             return headerView;
         }else if (indexPath.section == 3){
             YNHeaderBarView *headerView = [collectionView dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:@"barHeader" forIndexPath:indexPath];
-            [headerView setWithTitle:NSLS(@"热门分类", @"热门分类") leftImg:[UIImage imageNamed:@"remenfenlei_shouye"] moreImg:[UIImage imageNamed:@"gengduo_bai_shouye"] color:COLOR_69B6FF moreClickBlock:^(NSString *str) {
-                self.didSelectMoreBtnClickBlock(str);
+            [headerView setWithTitle:kLocalizedString(@"hotClasses",@"热门分类") leftImg:[UIImage imageNamed:@"remenfenlei_shouye"] moreImg:[UIImage imageNamed:@"gengduo_bai_shouye"] color:COLOR_69B6FF moreClickBlock:^ {
+                self.didSelectMoreBtnClickBlock(indexPath.section);
             }];
             return headerView;
         }else if (indexPath.section == 4){
             YNHeaderBarView *headerView = [collectionView dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:@"barHeader" forIndexPath:indexPath];
-            [headerView setWithTitle:NSLS(@"特色惠购", @"特色惠购") leftImg:[UIImage imageNamed:@"tesehuigou"] moreImg:[UIImage imageNamed:@"gengduo_kui"] color:COLOR_FFFFFF moreClickBlock:^(NSString *str) {
-                self.didSelectMoreBtnClickBlock(str);
+            [headerView setWithTitle:kLocalizedString(@"specialPurchase", @"特色惠购") leftImg:[UIImage imageNamed:@"tesehuigou"] moreImg:[UIImage imageNamed:@"gengduo_kui"] color:COLOR_FFFFFF moreClickBlock:^ {
+                self.didSelectMoreBtnClickBlock(indexPath.section);
             }];
             return headerView;
         }
@@ -250,7 +262,7 @@
 -(void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath{
     if (indexPath.section == 4) {//特色惠购可以选择
         if (self.didSelectGoodImgClickBlock) {
-            self.didSelectGoodImgClickBlock([NSString stringWithFormat:@"你选择了第%ld个图片",indexPath.row]);
+            self.didSelectGoodImgClickBlock([NSString stringWithFormat:@"%@",_featureArray[indexPath.row][@"id"]]);
         }
     }
 }
@@ -258,7 +270,7 @@
 - (void)imagesPlayer:(ImagesPlayer *)player didSelectImageAtIndex:(NSInteger)index
 {
     if (self.didSelectPlayerImgClickBlock) {
-        self.didSelectPlayerImgClickBlock([NSString stringWithFormat:@"你点击第%ld个广告页",index]);
+        self.didSelectPlayerImgClickBlock(self.adArray[index][@"url"],[NSString stringWithFormat:@"%@",self.adArray[index][@"type"]]);
     }
 }
 -(UICollectionReusableView*)addSubviewsToRateHeader:(UICollectionReusableView*)headerView{
@@ -267,7 +279,7 @@
     }
     //左边图片，标题，展开按钮
     UILabel *titleLabel = [[UILabel alloc] init];
-    titleLabel.text = NSLS(@"实时汇率", @"实时汇率");
+    titleLabel.text = kLocalizedString(@"exchangeRate",@"实时汇率");
     titleLabel.font = FONT(26);
     CGSize size = [titleLabel.text sizeWithAttributes:@{NSFontAttributeName:titleLabel.font}];
     titleLabel.frame = CGRectMake((WIDTHF(headerView)-size.width)/2.0+kMinSpace,
@@ -277,6 +289,10 @@
     titleLabel.textColor = COLOR_649CE0;
     [headerView addSubview:titleLabel];
     
+    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(showCellsForMoneyRate)];
+    titleLabel.userInteractionEnabled = YES;
+    [titleLabel addGestureRecognizer:tap];
+    
     UIImageView * imageView = [[UIImageView alloc] init];
     imageView.frame = CGRectMake(XF(titleLabel)-W_RATIO(72)-kMinSpace,
                                  YF(titleLabel)+(HEIGHTF(titleLabel)-W_RATIO(72))/2.0,
@@ -285,21 +301,21 @@
     imageView.image = [UIImage imageNamed:@"huilv_shouye"];
     [headerView addSubview:imageView];
     
-    UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
-    button.frame = CGRectMake(MaxXF(titleLabel)+kMinSpace,
+    _showRateBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+    _showRateBtn.frame = CGRectMake(MaxXF(titleLabel)+kMinSpace,
                               YF(titleLabel)+(HEIGHTF(titleLabel)-W_RATIO(14))/2.0,
                               W_RATIO(24),
                               W_RATIO(14));
-    [button setImage:[UIImage imageNamed:@"mianbaoxie_lanshang_shouye"] forState:UIControlStateNormal];
-    [button setImage:[UIImage imageNamed:@"mianbaoxie_lan_shouye"] forState:UIControlStateSelected];
-    [button addTarget:self action:@selector(showCellsForMoneyRate:) forControlEvents:UIControlEventTouchUpInside];
-    button.selected = self.isShowMoneyRate;
-    [headerView addSubview:button];
+    [_showRateBtn setImage:[UIImage imageNamed:@"mianbaoxie_lanshang_shouye"] forState:UIControlStateNormal];
+    [_showRateBtn setImage:[UIImage imageNamed:@"mianbaoxie_lan_shouye"] forState:UIControlStateSelected];
+    [_showRateBtn addTarget:self action:@selector(showCellsForMoneyRate) forControlEvents:UIControlEventTouchUpInside];
+    _showRateBtn.selected = self.isShowMoneyRate;
+    [headerView addSubview:_showRateBtn];
     return headerView;
 }
--(void)showCellsForMoneyRate:(UIButton*)btn{
-    btn.selected = !btn.selected;
-    self.isShowMoneyRate = btn.selected;
+-(void)showCellsForMoneyRate{
+    _showRateBtn.selected = !_showRateBtn.selected;
+    self.isShowMoneyRate = _showRateBtn.selected;
     NSIndexSet *indexSet=[[NSIndexSet alloc]initWithIndex:2];
     [self reloadSections:indexSet];
 }
@@ -320,14 +336,14 @@
     imagesPlayer.delegate = self;
     imagesPlayer.indicatorView.currentPageIndicatorTintColor = COLOR_DF463E;
     imagesPlayer.indicatorView.pageIndicatorTintColor = COLOR_FFFFFF;
-    [imagesPlayer addNetWorkImages:imageURLs placeholder:nil];
+    [imagesPlayer addNetWorkImages:imageURLs placeholder:[UIImage imageNamed:@"zhanwei2"]];
     [self.contentView addSubview:imagesPlayer];
 }
 #pragma mark 广告页ImagesPlayerDelegae
 - (void)imagesPlayer:(ImagesPlayer *)player didSelectImageAtIndex:(NSInteger)index
 {
     if (self.didSelectPlayerImgClickBlock) {
-        self.didSelectPlayerImgClickBlock([NSString stringWithFormat:@"你点击第%ld个广告页",index]);
+        self.didSelectPlayerImgClickBlock(index);
     }
 }
 @end
@@ -420,7 +436,7 @@
                                      (i/3)*(W_RATIO(168)+W_RATIO(2)),
                                      W_RATIO(243),
                                      W_RATIO(168));
-        [imageView sd_setImageWithURL:imageURLs[i] placeholderImage:nil];
+        [imageView sd_setImageWithURL:imageURLs[i] placeholderImage:[UIImage imageNamed:@"zhanwei2"]];
         imageView.tag = i;
         [self.contentView addSubview:imageView];
         
@@ -431,7 +447,7 @@
 }
 -(void)handleClassImgTapClick:(UITapGestureRecognizer*)tap{
     if (self.didSelectHotClassImgClickBlock) {
-        self.didSelectHotClassImgClickBlock([NSString stringWithFormat:@"你点击了热门分类第%ld图片",tap.view.tag]);
+        self.didSelectHotClassImgClickBlock(tap.view.tag);
     }
 }
 @end
@@ -495,7 +511,28 @@
 }
 @end
 #pragma mark YNShowGoodsCell
+@interface YNShowGoodsCell()
+/** 大图 */
+@property (nonatomic,weak) UIImageView *bigImageView;
+/** 名称 */
+@property (nonatomic,weak) UILabel *nameLabel;
+/** 型号 */
+@property (nonatomic,weak) UILabel *versionLabel;
+/** ￥符号 */
+@property (nonatomic,weak) UILabel *markLabel;
+/** 价格 */
+@property (nonatomic,weak) UILabel *priceLabel;
+@end
 @implementation YNShowGoodsCell
+-(void)setDict:(NSDictionary *)dict{
+    _dict = dict;
+    [self.bigImageView sd_setImageWithURL:[NSURL URLWithString:dict[@"img"]] placeholderImage:[UIImage imageNamed:@"zhanwei1"]];
+    self.nameLabel.text = dict[@"name"];
+    self.versionLabel.text = dict[@"note"];
+    self.priceLabel.text = [NSString stringWithFormat:@"%@",dict[@"salesprice"]];
+    self.markLabel.text = @"￥";
+}
+
 -(UIImageView *)bigImageView{
     if (!_bigImageView) {
         UIImageView *bigImageView= [[UIImageView alloc] init];
@@ -633,7 +670,7 @@
     if (!_moreBtn) {
         UIButton *moreBtn = [UIButton buttonWithType:UIButtonTypeCustom];
         _moreBtn = moreBtn;
-        [moreBtn setTitle:NSLS(@"更多", @"更多") forState:UIControlStateNormal];
+        [moreBtn setTitle:kLocalizedString(@"more", @"更多") forState:UIControlStateNormal];
         moreBtn.titleLabel.font = FONT(24);
         moreBtn.hidden = YES;
         [moreBtn addTarget:self action:@selector(moreButtonClick) forControlEvents:UIControlEventTouchUpInside];

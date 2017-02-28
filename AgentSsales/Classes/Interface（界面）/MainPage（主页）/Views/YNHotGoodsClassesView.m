@@ -42,6 +42,12 @@
     classCell.dict = _dataArray[indexPath.row];
     return classCell;
 }
+-(void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath{
+    [collectionView deselectItemAtIndexPath:indexPath animated:NO];
+    if (self.didSelectHotGoodsClassesCellBlock) {
+        self.didSelectHotGoodsClassesCellBlock(indexPath.row);
+    }
+}
 @end
 @interface YNHotGoodsClassesCell ()
 
@@ -54,7 +60,7 @@
 
 -(void)setDict:(NSDictionary *)dict{
     _dict = dict;
-    self.bigImgView.image = [UIImage imageNamed:dict[@"image"]];
+    [self.bigImgView sd_setImageWithURL:[NSURL URLWithString:dict[@"img"]] placeholderImage:[UIImage imageNamed:@"zhanwei1"]];
     self.nameLabel.text = dict[@"name"];
 }
 

@@ -10,4 +10,8 @@
 
 @interface YNForgetPwdViewController : YNBaseViewController
 
+@property (nonatomic,copy) NSString * code;
+
+@property (nonatomic,copy) NSString * phone;
+
 @end

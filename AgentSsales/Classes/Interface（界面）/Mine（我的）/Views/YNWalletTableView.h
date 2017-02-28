@@ -19,6 +19,12 @@
 @end
 @interface YNWalletTableViewCell : UITableViewCell
 
-@property (nonatomic,strong) NSDictionary * dict;
+@property (nonatomic,weak) UIImageView * flagImgView;
+
+@property (nonatomic,weak) UILabel * countryLabel;
+
+@property (nonatomic,weak) UILabel * buyInLabel;
+
+@property (nonatomic,weak) UILabel * sellOutLabel;
 
 @end

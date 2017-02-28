@@ -30,12 +30,12 @@
 }
 -(NSArray<NSDictionary *> *)btnInfors{
     if (!_btnInfors) {
-        _btnInfors = @[@{@"title":@"全部订单",@"image":@"quanbu_wode"},
-                      @{@"title":@"待处理",@"image":@"daichuli_wode"},
-                      @{@"title":@"待付款",@"image":@"daifukuan_wode"},
-                      @{@"title":@"待发货",@"image":@"daifahuo_wode"},
-                      @{@"title":@"待收货",@"image":@"daishouhuo_wode"},
-                      @{@"title":@"已完成",@"image":@"yiwancheng_wode"}];
+        _btnInfors = @[@{@"title":kLocalizedString(@"allOrder",@"全部订单"),@"image":@"quanbu_wode"},
+                      @{@"title":kLocalizedString(@"waitHandle",@"待处理"),@"image":@"daichuli_wode"},
+                      @{@"title":kLocalizedString(@"waitPay",@"待付款"),@"image":@"daifukuan_wode"},
+                      @{@"title":kLocalizedString(@"waitSend",@"待发货"),@"image":@"daifahuo_wode"},
+                      @{@"title":kLocalizedString(@"waitReceive",@"待收货"),@"image":@"daishouhuo_wode"},
+                      @{@"title":kLocalizedString(@"completed",@"已完成"),@"image":@"yiwancheng_wode"}];
     }
     return _btnInfors;
 }
@@ -80,7 +80,7 @@
     _moneyLabel.frame = CGRectMake(XF(_nameLabel), MaxYF(_nameLabel), WIDTHF(_nameLabel), WIDTHF(ringView)/3.0);
     _moneyLabel.font = FONT(30);
     _moneyLabel.textColor = COLOR_FFFFFF;
-    _moneyLabel.text = [NSString stringWithFormat:@"钱包余额：0.00元"];
+    _moneyLabel.text = [NSString stringWithFormat:@"%@:%@ %@",kLocalizedString(@"accountBalances",@"账户余额"),@"0.00",kLocalizedString(@"yuan",@"元")];
     
     //第二部分
     UIScrollView *btnScrView = [[UIScrollView alloc] init];
@@ -110,9 +110,9 @@
     }
 }
 
--(void)setHeadImg:(UIImage *)headImg{
+-(void)setHeadImg:(NSString *)headImg{
     _headImg = headImg;
-    _headImgView.image = headImg;
+    [_headImgView sd_setImageWithURL:[NSURL URLWithString:headImg] placeholderImage:[UIImage imageNamed:@"zhanwei1"]];
     
 }
 -(void)setNickName:(NSString *)nickName{

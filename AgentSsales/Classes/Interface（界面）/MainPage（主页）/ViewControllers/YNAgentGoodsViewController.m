@@ -40,6 +40,7 @@
 - (void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:animated];
     self.view.backgroundColor = COLOR_EDEDED;
+    [self setStatusBarBackgroundColor:COLOR_DF463E];
 }
 
 - (void)viewDidAppear:(BOOL)animated{
@@ -56,6 +57,7 @@
 - (void)viewWillDisappear:(BOOL)animated{
     [super viewWillDisappear:animated];
     self.navigationController.toolbarHidden = YES;
+    [self setStatusBarBackgroundColor:COLOR_CLEAR];
 }
 
 - (void)viewDidDisappear:(BOOL)animated{
@@ -199,7 +201,6 @@
 }
 -(void)makeNavigationBar{
     [self setAutomaticallyAdjustsScrollViewInsets:NO];
-    [self setStatusBarBackgroundColor:COLOR_DF463E];
 }
 -(void)makeUI{
     [self setupToolBarItems];

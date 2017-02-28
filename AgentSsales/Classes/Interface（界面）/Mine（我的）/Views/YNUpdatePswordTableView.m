@@ -55,7 +55,7 @@
 }
 -(NSMutableArray<NSString *> *)textArrayM{
     if (!_textArrayM) {
-        _textArrayM = [NSMutableArray arrayWithObjects:@"0",@"1",@"2", nil];
+        _textArrayM = [NSMutableArray arrayWithObjects:@"0",@"0",@"0", nil];
     }
     return _textArrayM;
 }

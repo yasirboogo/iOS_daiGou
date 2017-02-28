@@ -34,7 +34,10 @@
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
     return _inforArray.count;
 }
-
+-(void)setLocality:(NSString *)locality{
+    _locality = locality;
+    [self reloadData];
+}
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
     YNUserInforCell * inforCell = [tableView dequeueReusableCellWithIdentifier:@"inforCell"];
     if (inforCell == nil) {
@@ -52,6 +55,7 @@
     }else if (indexPath.row == 2){
         inforCell.isForbidClick = YES;
         inforCell.isShowArrowImg = YES;
+        inforCell.textFieldText = self.locality;
     }else if (indexPath.row == 3){
         
     }
@@ -62,7 +66,6 @@
         }else if (indexPath.row == 1){
             self.phone = str;
         }else if (indexPath.row == 2){
-            self.locality = str;
         }else if (indexPath.row == 3){
             self.details = str;
         }else if (indexPath.row == 4){
@@ -74,7 +77,8 @@
 }
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
     [tableView deselectRowAtIndexPath:indexPath animated:NO];
-    if (indexPath.row == 2) {
+    if (indexPath.row == 2 && self.didSelectAddressCellBlock) {
+        self.didSelectAddressCellBlock();
     }
 }
 -(NSArray<NSDictionary *> *)inforArray{

@@ -10,4 +10,6 @@
 
 @interface YNListViewController : UIViewController
 
+@property (nonatomic,strong) NSDictionary * imgInfor;
+
 @end

@@ -10,18 +10,25 @@
 
 @interface YNNewsListTableView : UITableView
 
-@property (nonatomic,strong) NSArray * dataArray;
+@property (nonatomic,strong) NSMutableArray * dataArrayM;
+
+@property (nonatomic,strong) NSDictionary * imgInfor;
+
+@property (nonatomic,strong) NSMutableArray * adArrayM;
 
 @property (nonatomic,copy) void(^didSelectNewsListCellBlock)(NSString*);
 
-@end
-@interface YNNewsHeaderView : UIView
-
-@property (nonatomic,strong) NSDictionary * dict;
+@property (nonatomic,copy) void(^didSelectAdCellBlock)(NSString*,NSString*);
 
 @end
+
 @interface YNNewsListCell : UITableViewCell
 
 @property (nonatomic,strong) NSDictionary * dict;
+
+@end
+@interface YNNewsAdCell : UITableViewCell
+
+@property (nonatomic,strong) NSString * imageUrl;
 
 @end

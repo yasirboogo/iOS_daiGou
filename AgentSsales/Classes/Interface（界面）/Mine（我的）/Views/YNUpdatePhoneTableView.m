@@ -30,6 +30,11 @@
     }
     return self;
 }
+-(void)setCode:(NSString *)code{
+    [self.textArrayM replaceObjectAtIndex:0 withObject:code];
+    _code = [NSString stringWithFormat:@"+%@",code];
+    [self reloadData];
+}
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
     return _inforArray.count;
 }
@@ -44,14 +49,22 @@
         lineView.backgroundColor = COLOR_EDEDED;
         [inforCell.contentView addSubview:lineView];
     }
-    
+    inforCell.textFieldText = nil;
     if (indexPath.row == 0) {
-        inforCell.isShowCodeBtn = YES;
-        inforCell.keyboardType = UIKeyboardTypePhonePad;
+        inforCell.textFieldText = _code;
+        inforCell.isShowArrowImg = YES;
+        inforCell.isForbidClick = YES;
     }else if (indexPath.row == 1){
+        inforCell.keyboardType = UIKeyboardTypePhonePad;
+        inforCell.isShowCodeBtn = YES;
+        [inforCell setDidSendPhoneCodeButtonBlock:^{
+            self.didSelectSendPhoneCodeBlock();
+        }];
+    }else if (indexPath.row == 2){
         inforCell.keyboardType = UIKeyboardTypeNumberPad;
+    }else if (indexPath.row == 3){
+        inforCell.keyboardType = UIKeyboardTypeASCIICapable;
     }
-    
     inforCell.inforDict = _inforArray[indexPath.row];
     
     [inforCell setInforCellTextFieldBlock:^(NSString *str) {
@@ -61,15 +74,24 @@
     
     return inforCell;
 }
+-(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
+    [tableView deselectRowAtIndexPath:indexPath animated:NO];
+    if (indexPath.row == 0) {
+        if (self.didSelectAreaCellBlock) {
+            self.didSelectAreaCellBlock();
+        }
+    }
+}
 -(NSMutableArray<NSString *> *)textArrayM{
     if (!_textArrayM) {
-        _textArrayM = [NSMutableArray arrayWithObjects:@"0",@"1", nil];
+        _textArrayM = [NSMutableArray arrayWithObjects:kZeroStr,kZeroStr,kZeroStr, nil];
     }
     return _textArrayM;
 }
 -(NSArray<NSDictionary *> *)inforArray{
     if (!_inforArray) {
         _inforArray = @[
+                        @{@"item":@"国家(区号)",@"placeholder":@"选择您所在的国家(区号)"},
                         @{@"item":@"新手机号码",@"placeholder":@"请输入新号码"},
                         @{@"item":@"验证码",@"placeholder":@"请填写验证码"}
                         ];

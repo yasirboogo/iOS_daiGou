@@ -10,17 +10,21 @@
 #import "YNGoodsDetailsView.h"
 #import "YNGoodsDetailBtnsView.h"
 #import "YNSelectParaView.h"
-
-#import <ShareSDK/ShareSDK.h>
-#import <ShareSDKUI/ShareSDK+SSUI.h>
+#import "YNShareThirdSelectView.h"
+#import "YNShoppingCartViewController.h"
 
 @interface YNTerraceGoodsViewController ()
-
+{
+    NSInteger _type;
+    UIButton *_collectBtn;
+}
 @property (nonatomic,strong) YNGoodsDetailsView * detailView;
 
 @property (nonatomic,strong) YNGoodsDetailBtnsView * bottomBtnsView;
 
 @property (nonatomic,strong) YNSelectParaView * selectParaView;
+
+@property (nonatomic,strong) YNShareThirdSelectView * selectShareView;
 
 @end
 
@@ -37,6 +41,7 @@
 }
 - (void)viewDidLoad {
     [super viewDidLoad];
+    [self startNetWorkingRequestWithGetGoodsDetails];
 }
 
 - (void)viewWillDisappear:(BOOL)animated{
@@ -48,7 +53,52 @@
 }
 
 #pragma mark - 网路请求
-
+-(void)startNetWorkingRequestWithGetGoodsDetails{
+    NSDictionary *params = @{@"userId":[DEFAULTS valueForKey:kUserLoginInfors][@"userId"],
+                             @"goodsId":_goodsId,
+                             @"type":[NSNumber numberWithInteger:_type]};
+    [YNHttpManagers getGoodsDetailsWithParams:params success:^(id response) {
+        self.detailView.dataDict = response;
+        self.bottomBtnsView.price = response[@"salesprice"];
+        _collectBtn.selected = [response[@"iscollection"] boolValue];
+    } failure:^(NSError *error) {
+    }];
+}
+-(void)startNetWorkingRequestWithCollectGoods{
+    NSDictionary *params = @{@"userId":[DEFAULTS valueForKey:kUserLoginInfors][@"userId"],
+                             @"goodsId":_goodsId};
+    [YNHttpManagers collectGoodsWithParams:params success:^(id response) {
+        _collectBtn.selected = [response[@"iscollection"] boolValue];
+    } failure:^(NSError *error) {
+    }];
+}
+-(void)startNetWorkingRequestWithSelectGoodsType{
+    NSDictionary *params = @{@"type":[NSNumber numberWithInteger:_type],
+                             @"goodsId":_goodsId};
+    [YNHttpManagers selectGoodsTypeWithParams:params success:^(id response) {
+        self.selectParaView.dataArray = response;
+        [self.selectParaView showPopView:YES];
+    } failure:^(NSError *error) {
+    }];
+}
+-(void)startNetWorkingRequestWithJoinToShoppingCartWithStyle:(NSString*)style Count:(NSString*)count{
+    NSDictionary *params = @{@"userId":[DEFAULTS valueForKey:kUserLoginInfors][@"userId"],
+                             @"goodsId":_goodsId,
+                             @"count":count,
+                             @"style":style};
+    [YNHttpManagers joinToShoppingCartWithParams:params success:^(id response) {
+        
+        
+    } failure:^(NSError *error) {
+    }];
+}
+-(void)startNetWorkingRequestWithShareToThird{
+    NSDictionary *params = @{@"userId":[DEFAULTS valueForKey:kUserLoginInfors][@"userId"],
+                             @"wayId":[NSNumber numberWithInteger:1]};
+    [YNHttpManagers shareToThirdWithParams:params success:^(id response) {
+    } failure:^(NSError *error) {
+    }];
+}
 #pragma mark - 视图加载
 -(YNGoodsDetailsView *)detailView{
     if (!_detailView) {
@@ -57,7 +107,7 @@
         _detailView = detailView;
         [self.view addSubview:detailView];
         [detailView setDidSelectShareButtonClickBlock:^{
-            [self thirdShare];
+            [self.selectShareView showPopView:YES];
         }];
     }
     return _detailView;
@@ -70,7 +120,7 @@
         bottomBtnsView.backgroundColor = COLOR_FFFFFF;
         bottomBtnsView.frame = CGRectMake(0, SCREEN_HEIGHT-W_RATIO(100), SCREEN_WIDTH, W_RATIO(100));
         [bottomBtnsView setDidSelectAddCartButtonClickBlock:^{
-            [self.selectParaView showPopView:YES];
+            [self startNetWorkingRequestWithSelectGoodsType];
         }];
         [bottomBtnsView setDidSelectBuyButtonClickBlock:^{
         }];
@@ -82,70 +132,47 @@
         CGRect frame = CGRectMake(0, SCREEN_HEIGHT-SCREEN_WIDTH, SCREEN_WIDTH, SCREEN_WIDTH);
         YNSelectParaView *selectParaView = [[YNSelectParaView alloc] initWithFrame:frame];
         _selectParaView = selectParaView;
+        [selectParaView setDidSelectSubmitButtonBlock:^(NSString *style, NSString *count) {
+            [self startNetWorkingRequestWithJoinToShoppingCartWithStyle:style Count:count];
+        }];
     }
     return _selectParaView;
+}
+-(YNShareThirdSelectView *)selectShareView{
+    if (!_selectShareView) {
+        CGRect frame = CGRectMake(0,SCREEN_HEIGHT- W_RATIO(450), SCREEN_WIDTH,  W_RATIO(450));
+        YNShareThirdSelectView *selectShareView = [[YNShareThirdSelectView alloc] initWithFrame:frame];
+        _selectShareView = selectShareView;
+        [selectShareView setDidSelectShareThirdSelectBlick:^(NSInteger index) {
+            [self thirdShareWithIndex:index];
+        }];
+    }
+    return _selectShareView;
 }
 #pragma mark - 代理实现
 
 #pragma mark - 函数、消息
 -(void)makeData{
     [super makeData];
-    self.detailView.dict = @[];
-    self.bottomBtnsView.price = @"520.14";
-    self.selectParaView.dict = @[];
+    _type = [LanguageManager currentLanguageIndex];
 }
 -(void)makeNavigationBar{
     [super makeNavigationBar];
-    [self addNavigationBarBtnWithImg:[UIImage imageNamed:@"shoucang_bai"] selectImg:[UIImage imageNamed:@"shoucang_huang"] isOnRight:YES btnClickBlock:^(BOOL isShow) {
+    __weak typeof(self) weakSelf = self;
+    _collectBtn = [self addNavigationBarBtnWithImg:[UIImage imageNamed:@"shoucang_bai"] selectImg:[UIImage imageNamed:@"shoucang_huang"] isOnRight:YES btnClickBlock:^(BOOL isShow) {
+        [weakSelf startNetWorkingRequestWithCollectGoods];
     }];
     [self addNavigationBarBtnWithImg:[UIImage imageNamed:@"jinrugouwuche"] selectImg:nil isOnRight:YES btnClickBlock:^(BOOL isShow) {
+        YNShoppingCartViewController *pushVC = [[YNShoppingCartViewController alloc] init];
+        [weakSelf.navigationController pushViewController:pushVC animated:NO];
     }];
     self.titleLabel.text = @"商品详情";
 }
 -(void)makeUI{
     [super makeUI];
-    [self.view addSubview:self.detailView];
 }
--(void)thirdShare{
-    NSMutableDictionary *shareParams = [NSMutableDictionary dictionary];
-    [shareParams SSDKSetupShareParamsByText:@"分享内容"
-                                     images:nil
-                                        url:[NSURL URLWithString:@"http://mob.com"]
-                                      title:@"分享标题"
-                                       type:SSDKContentTypeAuto];
+-(void)thirdShareWithIndex:(NSInteger)index{
     
-    
-    [ShareSDK showShareActionSheet:nil //要显示菜单的视图, iPad版中此参数作为弹出菜单的参照视图，只有传这个才可以弹出我们的分享菜单，可以传分享的按钮对象或者自己创建小的view 对象，iPhone可以传nil不会影响
-                             items:nil
-                       shareParams:shareParams
-               onShareStateChanged:^(SSDKResponseState state, SSDKPlatformType platformType, NSDictionary *userData, SSDKContentEntity *contentEntity, NSError *error, BOOL end) {
-                   
-                   switch (state) {
-                       case SSDKResponseStateSuccess:
-                       {
-                           UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"分享成功"
-                                                                               message:nil
-                                                                              delegate:nil
-                                                                     cancelButtonTitle:@"确定"
-                                                                     otherButtonTitles:nil];
-                           [alertView show];
-                           break;
-                       }
-                       case SSDKResponseStateFail:
-                       {
-                           UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"分享失败"
-                                                                           message:[NSString stringWithFormat:@"%@",error]
-                                                                          delegate:nil
-                                                                 cancelButtonTitle:@"OK"
-                                                                 otherButtonTitles:nil, nil];
-                           [alert show];
-                           break;
-                       }
-                       default:
-                           break;
-                   }
-               }
-     ];
 }
 #pragma mark - 数据懒加载
 

@@ -20,6 +20,8 @@
 
 @property (nonatomic,weak) YNTipsSuccessBtnsView *btnsView;
 
+@property (nonatomic,strong) NSDictionary *allTypeMoneys;
+
 @end
 
 @implementation YNMineWalletViewController
@@ -33,9 +35,11 @@
 
 - (void)viewDidAppear:(BOOL)animated{
     [super viewDidAppear:animated];
+    [self startNetWorkingRequestWithUserWalletWithParams];
 }
 - (void)viewDidLoad {
     [super viewDidLoad];
+    [self startNetWorkingRequestWithExchangeRate];
 }
 
 - (void)viewWillDisappear:(BOOL)animated{
@@ -47,7 +51,25 @@
 }
 
 #pragma mark - 网路请求
-
+-(void)startNetWorkingRequestWithUserWalletWithParams{
+    NSDictionary *params = @{@"userId":[DEFAULTS valueForKey:kUserLoginInfors][@"userId"],
+                             };
+    [YNHttpManagers getUserWalletWithParams:params success:^(id response) {
+        self.allTypeMoneys = response;
+        self.headerView.topNumber = [NSString stringWithFormat:@"%.2f",[response[@"rmb"] floatValue]];
+        self.headerView.leftNumber = [NSString stringWithFormat:@"%.2f",[response[@"us"] floatValue]];
+        self.headerView.rightNumber = [NSString stringWithFormat:@"%.2f",[response[@"myr"] floatValue]];
+    } failure:^(NSError *error) {
+    }];
+}
+-(void)startNetWorkingRequestWithExchangeRate{
+    NSDictionary *params = @{@"type":@1
+                             };
+    [YNHttpManagers getExchangeRateWithParams:params success:^(id response) {
+        self.tableView.dataArray  = response;
+    } failure:^(NSError *error) {
+    }];
+}
 #pragma mark - 视图加载
 -(YNMineImgHeaderView *)headerView{
     if (!_headerView) {
@@ -80,6 +102,7 @@
                 [self.navigationController pushViewController:pushVC animated:NO];
             }else if ([str isEqualToString:@"兑换货币"]){
                 YNWalletExchangeViewController *pushVC = [[YNWalletExchangeViewController alloc] init];
+                pushVC.allTypeMoneys = self.allTypeMoneys;
                 [self.navigationController pushViewController:pushVC animated:NO];
             }
         }];
@@ -96,25 +119,15 @@
     self.headerView.leftTitleLabel.text = @"美元（美元）";
     self.headerView.rightTitleLabel.text = @"马来西亚（令吉）";
     
-    self.headerView.topNumber = @"365.12";
+    self.tableView.itemTitles = @[kLocalizedString(@"exchangeRate", @"实时汇率"),@"买进",@"卖出"];
     
-    self.headerView.leftNumber = @"50.16";
-    
-    self.headerView.rightNumber = @"120.52";
-    
-    
-    self.tableView.itemTitles = @[@"实时汇率",@"买进",@"卖出"];
-    
-    self.tableView.dataArray = @[
-                                 @{@"image":@"malaixiya_guoqi",@"country":@"马来西亚币",@"buyIn":@"0.6545",@"sellOut":@"1.6057"},
-                                 @{@"image":@"meiguo_guoqi",@"country":@"美元",@"buyIn":@"5.1457",@"sellOut":@"20.1457"}];
     self.btnsView.btnTitles = @[@"充值",@"兑换货币"];
 }
 -(void)makeNavigationBar{
     [super makeNavigationBar];
     self.navView.backgroundColor = COLOR_CLEAR;
 
-    self.titleLabel.text = @"我的钱包";
+    self.titleLabel.text = kLocalizedString(@"myWallet",@"我的钱包");
 }
 -(void)makeUI{
     [super makeUI];

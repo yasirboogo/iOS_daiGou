@@ -14,6 +14,10 @@
 
 @property (nonatomic,copy) void(^didSelectAddressCellBlock)(NSIndexPath*);
 
+@property (nonatomic,copy) void(^didSelectSetDefaultAddressBlock)(NSInteger);
+
+@property (nonatomic,copy) void(^didSelectSetDelectAddressBlock)(NSInteger);
+
 @end
 
 @interface YNAddressCellFrame : NSObject

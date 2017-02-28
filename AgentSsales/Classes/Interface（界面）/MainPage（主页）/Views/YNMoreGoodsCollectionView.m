@@ -39,16 +39,12 @@
     [self reloadData];
 }
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section{
-    return self.dataArray.count;
+    return _dataArray.count;
 }
 - (__kindof UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath{
     YNShowGoodsCell *goodsCell = [collectionView dequeueReusableCellWithReuseIdentifier:@"goodCell" forIndexPath:indexPath];
     goodsCell.backgroundColor = COLOR_FFFFFF;
-    goodsCell.bigImageView.image = [UIImage imageNamed:_dataArray[indexPath.row][@"image"]];
-    goodsCell.nameLabel.text = _dataArray[indexPath.row][@"name"];
-    goodsCell.versionLabel.text = _dataArray[indexPath.row][@"version"];
-    goodsCell.priceLabel.text = _dataArray[indexPath.row][@"price"];
-    goodsCell.markLabel.text = _dataArray[indexPath.row][@"mark"];
+    goodsCell.dict = _dataArray[indexPath.row];
     return goodsCell;
 }
 

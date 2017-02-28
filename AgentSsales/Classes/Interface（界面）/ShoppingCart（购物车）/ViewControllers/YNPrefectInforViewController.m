@@ -9,10 +9,14 @@
 #import "YNPrefectInforViewController.h"
 #import "YNPrefectInforTableView.h"
 #import "YNShoppingCartViewController.h"
+#import "YNAreaSelectView.h"
+#import "YNFirmOrderViewController.h"
 
 @interface YNPrefectInforViewController ()
 
 @property(nonatomic,strong)YNPrefectInforTableView *tableView;
+
+@property(nonatomic,strong)YNAreaSelectView *areaSelectView;
 
 @property (nonatomic,weak) UIButton *submitBtn;
 
@@ -42,13 +46,50 @@
 }
 
 #pragma mark - 网路请求
-
+-(void)startNetWorkingRequestWithPrefectUserInfor{
+    NSDictionary *params = [NSDictionary dictionary];
+    if (_tableView.numberID.length) {
+        params = @{@"userId":[DEFAULTS valueForKey:kUserLoginInfors][@"userId"],
+                   @"username":_tableView.name,
+                   @"phone":_tableView.phone,
+                   @"region":_tableView.locality,
+                   @"detailed":_tableView.details,
+                   @"idCard":_tableView.numberID};
+    }else{
+        params = @{@"userId":[DEFAULTS valueForKey:kUserLoginInfors][@"userId"],
+                   @"username":_tableView.name,
+                   @"phone":_tableView.phone,
+                   @"region":_tableView.locality,
+                   @"detailed":_tableView.details};
+    }
+    [YNHttpManagers prefectUserInforWithParams:params success:^(id response) {
+        YNFirmOrderViewController *pushCV = [[YNFirmOrderViewController alloc] init];
+        pushCV.status = self.index+1;
+        [self.navigationController pushViewController:pushCV animated:NO];
+    } failure:^(NSError *error) {
+    }];
+}
 #pragma mark - 视图加载
+-(YNAreaSelectView *)areaSelectView{
+    if (!_areaSelectView) {
+        CGRect frame = CGRectMake(0,(SCREEN_HEIGHT-W_RATIO(100)*9)/2.0, SCREEN_WIDTH, W_RATIO(100)*9);
+        YNAreaSelectView *areaSelectView = [[YNAreaSelectView alloc] initWithFrame:frame];
+        _areaSelectView = areaSelectView;
+        [areaSelectView setDidSelectAreaSelectResultBlock:^(NSString *area) {
+            self.tableView.locality = area;
+        }];
+    }
+    return _areaSelectView;
+}
 -(YNPrefectInforTableView *)tableView{
     if (!_tableView) {
         YNPrefectInforTableView *tableView = [[YNPrefectInforTableView alloc] init];
         _tableView  = tableView;
         [self.view addSubview:tableView];
+        [tableView setDidSelectAddressCellBlock:^{
+            [self.view endEditing:YES];
+            [self.areaSelectView showPopView:YES];
+        }];
     }
     return _tableView;
 }
@@ -71,9 +112,7 @@
 
 #pragma mark - 函数、消息
 -(void)handlePrefectInforSubmitButtonClick:(UIButton*)btn{
-    YNShoppingCartViewController *lastVc = [self.navigationController.viewControllers objectAtIndex:self.navigationController.viewControllers.count-2];
-    lastVc.isPrefect = YES;
-    [self.navigationController popViewControllerAnimated:NO];
+    [self startNetWorkingRequestWithPrefectUserInfor];
 }
 -(void)makeData{
     [super makeData];

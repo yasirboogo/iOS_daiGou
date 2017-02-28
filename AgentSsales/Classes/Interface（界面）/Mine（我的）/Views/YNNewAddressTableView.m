@@ -27,14 +27,27 @@
         self.separatorStyle = UITableViewCellSeparatorStyleNone;
         self.delegate = self;
         self.dataSource = self;
-        [self reloadData];
     }
     return self;
 }
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
-    return _inforArray.count;
+-(void)setAddressM:(NSMutableDictionary *)addressM{
+    _addressM = addressM;
+    self.name = addressM[@"name"];
+    self.phone = addressM[@"phone"];
+    self.locality = addressM[@"region"];
+    self.details = addressM[@"detailed"];
+    self.email = addressM[@"email"];
+    [self reloadData];
 }
-
+-(void)setArea:(NSString *)area{
+    _area = area;
+    [self.addressM setObject:area forKey:@"region"];
+    self.locality = area;
+    [self reloadData];
+}
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
+    return self.inforArray.count;
+}
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
     YNUserInforCell * inforCell = [tableView dequeueReusableCellWithIdentifier:@"inforCell"];
     if (inforCell == nil) {
@@ -47,15 +60,19 @@
     }
     inforCell.inforDict = _inforArray[indexPath.row];
     if (indexPath.row == 0) {
+        inforCell.textFieldText = _name;
     }else if (indexPath.row == 1){
+        inforCell.textFieldText = _phone;
         inforCell.keyboardType = UIKeyboardTypePhonePad;
     }else if (indexPath.row == 2){
+        inforCell.textFieldText = _locality;
         inforCell.isForbidClick = YES;
         inforCell.isShowArrowImg = YES;
     }else if (indexPath.row == 3){
-        
+        inforCell.textFieldText = _details;
+    }else if (indexPath.row == 4){
+        inforCell.textFieldText = _email;
     }
-    
     [inforCell setInforCellTextFieldBlock:^(NSString *str) {
         if (indexPath.row == 0) {
             self.name = str;
@@ -65,14 +82,16 @@
             self.locality = str;
         }else if (indexPath.row == 3){
             self.details = str;
+        }else if (indexPath.row == 4){
+            self.email = str;
         }
     }];
-    
     return inforCell;
 }
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
     [tableView deselectRowAtIndexPath:indexPath animated:NO];
     if (indexPath.row == 2) {
+        self.didSelectAddressCellBlock();
     }
 }
 -(NSArray<NSDictionary *> *)inforArray{
@@ -82,6 +101,7 @@
                         @{@"item":@"手机号码",@"placeholder":@"请输入收货人的手机号码"},
                         @{@"item":@"所在地区",@"placeholder":@"请选择所在地区"},
                         @{@"item":@"详细地址",@"placeholder":@"请输入详细地址"},
+                        @{@"item":@"邮箱",@"placeholder":@"请输入收货人的邮箱"}
                         ];
     }
     return _inforArray;

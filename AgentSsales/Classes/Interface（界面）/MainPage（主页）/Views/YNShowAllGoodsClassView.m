@@ -50,8 +50,14 @@
 }
 - (__kindof UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath{
     YNShowAllGoodsClassCell *titleCell = [collectionView dequeueReusableCellWithReuseIdentifier:@"titleCell" forIndexPath:indexPath];
-    titleCell.title = _dataArray[indexPath.row];
+    titleCell.title = _dataArray[indexPath.row][@"classname"];
     return titleCell;
+}
+-(void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath{
+    [collectionView deselectItemAtIndexPath:indexPath animated:NO];
+    if (self.didSelectGoodsClassCellButtonBlock) {
+        self.didSelectGoodsClassCellButtonBlock(indexPath.row);
+    }
 }
 @end
 @interface YNShowAllGoodsClassCell ()

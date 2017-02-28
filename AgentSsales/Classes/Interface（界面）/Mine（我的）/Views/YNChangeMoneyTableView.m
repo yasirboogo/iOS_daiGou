@@ -10,7 +10,7 @@
 
 @interface YNChangeMoneyTableView ()<UITableViewDelegate,UITableViewDataSource>
 
-@property (nonatomic,strong) UIView * footerView;
+@property (nonatomic,strong) YNChangeMoneyFooterView * footerView;
 
 @end
 
@@ -33,47 +33,20 @@
     return self;
 }
 
--(UIView *)footerView{
+-(YNChangeMoneyFooterView *)footerView{
     if (!_footerView) {
-        UIView *footerView = [[UIView alloc] init];
+        CGRect frame = CGRectMake(0, 0, WIDTHF(self), W_RATIO(150));
+        YNChangeMoneyFooterView *footerView = [[YNChangeMoneyFooterView alloc] initWithFrame:frame];
         _footerView = footerView;
-        footerView.frame = CGRectMake(0, 0, WIDTHF(self), W_RATIO(150));
-
-        NSMutableAttributedString *attachText = [NSMutableAttributedString new];
-        UIFont *font = FONT(26);
-        UIImage *image = [UIImage imageNamed:@"tanhao_kui"];
-        image = [UIImage imageWithCGImage:image.CGImage scale:2 orientation:UIImageOrientationUp];
-        
-        attachText = [NSMutableAttributedString attachmentStringWithContent:image contentMode:UIViewContentModeCenter attachmentSize:image.size alignToFont:font alignment:YYTextVerticalAlignmentCenter];
-        
-        NSMutableAttributedString *str1 = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@" 当前人民币余额为%@元，",self.lastMoney] attributes:@{NSForegroundColorAttributeName:COLOR_999999,NSFontAttributeName:font}];
-        [attachText appendAttributedString:str1];
-        
-        NSMutableAttributedString *str2 = [[NSMutableAttributedString alloc] initWithString:@"全部兑换" attributes:@{NSForegroundColorAttributeName:COLOR_DF463E,NSFontAttributeName:font}];
-        YYTextHighlight *highlight = [YYTextHighlight new];
-        [str2 setTextHighlight:highlight range:str2.rangeOfAll];
-        [attachText appendAttributedString:str2];
-        highlight.tapAction = ^(UIView *containerView, NSAttributedString *text, NSRange range, CGRect rect) {
-            NSLog(@"全部兑换");
-        };
-        YYLabel *changeLabel = [[YYLabel alloc] init];
-        [footerView addSubview:changeLabel];
-        changeLabel.frame = CGRectMake(W_RATIO(20), W_RATIO(20), WIDTHF(footerView)-W_RATIO(20)*2, HEIGHTF(footerView)-W_RATIO(20)*2);
-        changeLabel.textVerticalAlignment = YYTextVerticalAlignmentTop;
-        changeLabel.userInteractionEnabled = YES;
-        changeLabel.numberOfLines = 0;
-        changeLabel.attributedText = attachText;
+        [footerView setDidSelectAllChangeMoneyBlock:^(NSString *lastMoney) {
+            self.money1 = lastMoney;
+        }];
     }
     return _footerView;
-}
--(void)setLastMoney:(NSString *)lastMoney{
-    _lastMoney = lastMoney;
-    [self reloadData];
 }
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
     return 2;
 }
-
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
     YNChangeMoneyCell * moneyCell = [tableView dequeueReusableCellWithIdentifier:@"moneyCell"];
     if (moneyCell == nil) {
@@ -99,34 +72,103 @@
     }
     [moneyCell setDidSelectMoneyTypeClickBlock:^{
         if (self.didSelectMoneyTypeClickBlock) {
-            self.didSelectMoneyTypeClickBlock(indexPath);
+            self.didSelectMoneyTypeClickBlock(indexPath.row);
         }
     }];
     
     return moneyCell;
 }
--(void)setType1:(NSString *)type1{
+-(void)setType1:(NSInteger)type1{
     _type1 = type1;
-    
-    _money2 = [NSString stringWithFormat:@"%f",[_money1 floatValue] * 10];
-    
+    [self startChangeExchange];
+    self.footerView.type1 = type1;
     [self reloadData];
 }
--(void)setType2:(NSString *)type2{
+-(void)setType2:(NSInteger)type2{
     _type2 = type2;
-    
-    _money2 = [NSString stringWithFormat:@"%f",[_money1 floatValue] * 10];
-    
+    [self startChangeExchange];
     [self reloadData];
 }
 -(void)setMoney1:(NSString *)money1{
     _money1 = money1;
-    
-    _money2 = [NSString stringWithFormat:@"%f",[_money1 floatValue] * 10];
-    
+    [self startChangeExchange];
     [self reloadData];
 }
+-(void)startChangeExchange{
+    if (_type1 == 0) {
+        self.footerView.lastMoney = [NSString stringWithFormat:@"%.2f",[self.allTypeMoneys[@"rmb"] floatValue]];
+        if (_type2 == 0) {
+            self.rateId = @"1.00";
+        }else if (_type2 == 1){
+            self.rateId = _dataArray[1][@"buyup"];
+        }else if (_type2 == 2){
+            self.rateId = _dataArray[0][@"buyup"];
+        }
+    }else if (_type1 == 1){
+        self.footerView.lastMoney = [NSString stringWithFormat:@"%.2f",[self.allTypeMoneys[@"us"] floatValue]];
+        if (_type2 == 0) {
+            self.rateId = _dataArray[1][@"sell"];
+        }else if (_type2 == 1){
+            self.rateId = @"1.00";
+        }else if (_type2 == 2){
+            self.rateId = _dataArray[2][@"sell"];
+        }
+    }else if (_type1 == 2){
+        self.footerView.lastMoney = [NSString stringWithFormat:@"%.2f",[self.allTypeMoneys[@"myr"] floatValue]];
+        if (_type2 == 0) {
+            self.rateId = _dataArray[0][@"sell"];
+        }else if (_type2 == 1){
+            self.rateId = _dataArray[2][@"buyup"];
+        }else if (_type2 == 2){
+            self.rateId = @"1.00";
+        }
+    }
+    _money2 = [NSString stringWithFormat:@"%.2f",[_money1 floatValue] *[self.rateId floatValue]];
+}
+@end
+@interface YNChangeMoneyFooterView ()
+@property (nonatomic,strong) YYLabel *changeLabel;
+@end
+@implementation YNChangeMoneyFooterView
 
+-(YYLabel *)changeLabel{
+    if (!_changeLabel) {
+        YYLabel *changeLabel = [[YYLabel alloc] init];
+        _changeLabel = changeLabel;
+        [self addSubview:changeLabel];
+        changeLabel.frame = CGRectMake(W_RATIO(20), W_RATIO(20), WIDTHF(self)-W_RATIO(20)*2, HEIGHTF(self)-W_RATIO(20)*2);
+        changeLabel.textVerticalAlignment = YYTextVerticalAlignmentTop;
+        changeLabel.userInteractionEnabled = YES;
+        changeLabel.numberOfLines = 0;
+    }
+    return _changeLabel;
+}
+-(void)setType1:(NSInteger )type1{
+    _type1 = type1;
+    NSArray *types = @[@"人民币",@"美元",@"马来西亚币"];
+    NSMutableAttributedString *attachText = [NSMutableAttributedString new];
+    UIFont *font = FONT(26);
+    UIImage *image = [UIImage imageNamed:@"tanhao_kui"];
+    image = [UIImage imageWithCGImage:image.CGImage scale:2 orientation:UIImageOrientationUp];
+    
+    attachText = [NSMutableAttributedString attachmentStringWithContent:image contentMode:UIViewContentModeCenter attachmentSize:image.size alignToFont:font alignment:YYTextVerticalAlignmentCenter];
+    NSMutableAttributedString *str1 = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@" 当前%@余额为%@，",types[type1],_lastMoney] attributes:@{NSForegroundColorAttributeName:COLOR_999999,NSFontAttributeName:font}];
+    [attachText appendAttributedString:str1];
+    
+    NSMutableAttributedString *str2 = [[NSMutableAttributedString alloc] initWithString:@"全部兑换" attributes:@{NSForegroundColorAttributeName:COLOR_DF463E,NSFontAttributeName:font}];
+    YYTextHighlight *highlight = [YYTextHighlight new];
+    [str2 setTextHighlight:highlight range:str2.rangeOfAll];
+    [attachText appendAttributedString:str2];
+    highlight.tapAction = ^(UIView *containerView, NSAttributedString *text, NSRange range, CGRect rect) {
+        if (![[NSString stringWithFormat:@"%@",self.lastMoney] isEqualToString:@"0.00"]) {
+            if (self.didSelectAllChangeMoneyBlock) {
+                self.didSelectAllChangeMoneyBlock([NSString stringWithFormat:@"%@",self.lastMoney]);
+            }
+            self.lastMoney = @"0.00";
+        }
+    };
+    self.changeLabel.attributedText = attachText;
+}
 @end
 @interface YNChangeMoneyCell ()
 
@@ -178,16 +220,16 @@
         
     }
 }
--(void)setType:(NSString *)type{
+-(void)setType:(NSInteger)type{
     _type = type;
-    
-    self.typeLabel.text = type;
-    if ([type isEqualToString:@"人民币"]) {
+    NSArray *types = @[@"人民币",@"美元",@"马来西亚币"];
+    self.typeLabel.text = types[type];
+    if (type == 0) {
         self.symbolLabel.text = @"MCY";
-    }else if ([type isEqualToString:@"马来西亚币"]){
-        self.symbolLabel.text = @"RM";
-    }else if ([type isEqualToString:@"美元"]){
+    }else if (type == 1){
         self.symbolLabel.text = @"USD";
+    }else if (type == 2){
+        self.symbolLabel.text = @"RM";
     }
 }
 -(void)setMoney:(NSString *)money{

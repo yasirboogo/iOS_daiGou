@@ -8,10 +8,13 @@
 
 #import "YNNewAddressViewController.h"
 #import "YNNewAddressTableView.h"
+#import "YNAreaSelectView.h"
 
 @interface YNNewAddressViewController ()
 
 @property(nonatomic,strong)YNNewAddressTableView *tableView;
+
+@property(nonatomic,strong)YNAreaSelectView *areaSelectView;
 
 @end
 
@@ -39,31 +42,73 @@
 }
 
 #pragma mark - 网路请求
-
+-(void)startNetWorkingRequestWithSaveNewAddress{
+    NSDictionary *params = [NSDictionary dictionary];
+    if (self.type == 0) {
+        params = @{@"name":_tableView.name,
+                   @"phone":_tableView.phone,
+                   @"region":_tableView.locality,
+                   @"detailed":_tableView.details,
+                   @"id":_address[@"addressId"],
+                   @"email":_tableView.email
+                   };
+    }else if (self.type == 1){
+        params = @{@"userId":[DEFAULTS valueForKey:kUserLoginInfors][@"userId"],
+                   @"name":_tableView.name,
+                   @"phone":_tableView.phone,
+                   @"region":_tableView.locality,
+                   @"detailed":_tableView.details,
+                   @"email":_tableView.email
+                   };
+    }
+    [YNHttpManagers saveNewAddressWithParams:params success:^(id response) {
+    } failure:^(NSError *error) {
+    }];
+}
 #pragma mark - 视图加载
 -(YNNewAddressTableView *)tableView{
     if (!_tableView) {
         YNNewAddressTableView *tableView = [[YNNewAddressTableView alloc] init];
         _tableView  = tableView;
         [self.view addSubview:tableView];
+        [tableView setDidSelectAddressCellBlock:^{
+            [self.view endEditing:YES];
+            [self.areaSelectView showPopView:YES];
+        }];
     }
     return _tableView;
 }
-
+-(YNAreaSelectView *)areaSelectView{
+    if (!_areaSelectView) {
+        CGRect frame = CGRectMake(0,(SCREEN_HEIGHT-W_RATIO(100)*9)/2.0, SCREEN_WIDTH, W_RATIO(100)*9);
+        YNAreaSelectView *areaSelectView = [[YNAreaSelectView alloc] initWithFrame:frame];
+        _areaSelectView = areaSelectView;
+        [areaSelectView setDidSelectAreaSelectResultBlock:^(NSString *area) {
+            self.tableView.area = area;
+        }];
+    }
+    return _areaSelectView;
+}
 #pragma mark - 代理实现
 
 #pragma mark - 函数、消息
 -(void)makeData{
     [super makeData];
+    if (self.address) {
+        self.tableView.addressM = [self.address mutableCopy];
+    }
 }
 -(void)makeNavigationBar{
     [super makeNavigationBar];
     __weak typeof(self) weakSelf = self;
     [self addNavigationBarBtnWithTitle:@"保存" selectTitle:@"保存" font:FONT_15 isOnRight:YES btnClickBlock:^(BOOL isShow) {
-        NSLog(@"%@",weakSelf.tableView.phone);
+        [weakSelf startNetWorkingRequestWithSaveNewAddress];
     }];
-    
-    self.titleLabel.text = self.titleStr;
+    if (self.type == 0) {
+        self.titleLabel.text = @"修改收货地址";
+    }else if (self.type == 1){
+        self.titleLabel.text = @"新增收货地址";
+    }
 }
 -(void)makeUI{
     [super makeUI];

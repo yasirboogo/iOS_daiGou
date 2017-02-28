@@ -10,7 +10,7 @@
 #import <UIKit/UIKit.h>
 
 #ifdef DEBUG
-#define AppLog(s, ... ) NSLog( @"[%@ in line %d] ===============>%@", [[NSString stringWithUTF8String:__FILE__] lastPathComponent], __LINE__, [NSString stringWithFormat:(s), ##__VA_ARGS__] )
+#define AppLog(s, ... ) NSLog( @"[%@ in line %d] ======>%@", [[NSString stringWithUTF8String:__FILE__] lastPathComponent], __LINE__, [NSString stringWithFormat:(s), ##__VA_ARGS__] )
 #else
 #define AppLog(s, ... )
 #endif

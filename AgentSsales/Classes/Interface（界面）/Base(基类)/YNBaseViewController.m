@@ -10,8 +10,6 @@
 
 @interface YNBaseViewController ()<UIGestureRecognizerDelegate>
 
-@property (nonatomic,copy) void(^navigationBarButtonClickBlock)(BOOL isShow);
-
 @property (nonatomic, strong) NSMutableArray *leftButtons;
 
 @property (nonatomic, strong) NSMutableArray *rightButtons;
@@ -49,7 +47,12 @@
     [self makeUI];
     
 }
-
+/*
+-(void)loadView{
+    UIScrollView *scrollView = [[UIScrollView alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
+    self.view = scrollView;
+}
+ */
 - (void)viewWillDisappear:(BOOL)animated{
     [super viewWillDisappear:animated];
     
@@ -125,63 +128,21 @@
     
 }
 -(void)makeData{
+    self.pageIndex = 1;
+    self.pageSize = 10;
     
 }
 #pragma mark -- 消息响应
-//-(void)addNavigationBarBtnWithWidth:(CGFloat)width titleArr:(NSArray *)titleArr colorArr:(NSArray *)colorArr imgArr:(NSArray *)imgArr isOnRight:(BOOL)isOnRight btnClickBlock:(void (^)(BOOL))btnClickBlock{
-//    UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
-//    
-//    [button setTitle:titleArr[0] forState:UIControlStateNormal];
-//    [button setTitle:titleArr[1] forState:UIControlStateSelected];
-//    
-//    [button setTitleColor:colorArr[0] forState:UIControlStateNormal];
-//    [button setTitleColor:colorArr[1] forState:UIControlStateSelected];
-//    
-//    [button setImage:imgArr[0] forState:UIControlStateNormal];
-//    [button setImage:imgArr[1] forState:UIControlStateSelected];
-//    
-//    [self setNavigationBarButtonClickBlock:^(BOOL isShow) {
-//        btnClickBlock(isShow);
-//    }];
-//    [button addTarget:self action:@selector(handleNavigationBarButtonClick:) forControlEvents:UIControlEventTouchUpInside];
-//    [_navView addSubview:button];
-//    
-//    if (width == kZero) {
-//        if (isOnRight == YES) {
-//            button.frame = CGRectMake(SCREEN_WIDTH-(kUINavBtnWidth+kUINavBtnHorSpace)*(++self.rightBtnCount), kUIStatusBar+kUINavBtnVerSpace, kUINavBtnWidth, kUINavBtnWidth);
-//        }else if(isOnRight == NO){
-//            if (self.backButton.hidden == YES) {
-//                button.frame = CGRectMake(kUINavBtnHorSpace+(kUINavBtnWidth+kUINavBtnHorSpace)*(self.leftBtnCount++), kUIStatusBar+kUINavBtnVerSpace, kUINavBtnWidth, kUINavBtnWidth);
-//            }else{
-//                button.frame = CGRectMake(kUINavBtnHorSpace+(kUINavBtnWidth+kUINavBtnHorSpace)*(++self.leftBtnCount), kUIStatusBar+kUINavBtnVerSpace, kUINavBtnWidth, kUINavBtnWidth);
-//            }
-//        }
-//    }else{
-//        if (isOnRight == YES) {
-//            [self.rightButtons addObject:button];
-//            CGFloat startX = X((UIButton*)self.rightButtons[self.rightButtons.count]);
-//            button.frame = CGRectMake(startX, kUIStatusBar+kUINavBtnVerSpace,width, kUINavBtnWidth);
-//        }else if(isOnRight == NO){
-//            
-//            [self.leftButtons addObject:button];
-//            CGFloat stopX = MaxX((UIButton*)self.rightButtons[self.rightButtons.count]);
-//            if (self.backButton.hidden == YES) {
-//                button.frame = CGRectMake(stopX+kUINavBtnHorSpace, kUIStatusBar+kUINavBtnVerSpace, kUINavBtnWidth, kUINavBtnWidth);
-//            }else{
-//                button.frame = CGRectMake(MaxX(self.backButton)+stopX+kUINavBtnHorSpace*2, kUIStatusBar+kUINavBtnVerSpace, kUINavBtnWidth, kUINavBtnWidth);
-//            }
-//        }
-//    }
-//}
-
 -(UIButton*)addNavigationBarBtnWithImg:(UIImage *)img selectImg:(UIImage *)selectImg isOnRight:(BOOL)isOnRight btnClickBlock:(void (^)(BOOL))btnClickBlock{
 
-    UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
+    YNNavigationBarButton *button = [YNNavigationBarButton buttonWithType:UIButtonTypeCustom];
     [button setImage:img forState:UIControlStateNormal];
     [button setImage:selectImg forState:UIControlStateSelected];
-    [self setNavigationBarButtonClickBlock:^(BOOL isSelect) {
+    
+    [button setNavigationBarButtonClickBlock:^(BOOL isSelect) {
         btnClickBlock(isSelect);
     }];
+    
     [button addTarget:self action:@selector(handleNavigationBarButtonClick:) forControlEvents:UIControlEventTouchUpInside];
     [_navView addSubview:button];
     
@@ -201,13 +162,15 @@
 }
 -(UIButton *)addNavigationBarBtnWithTitle:(NSString *)title selectTitle:(NSString *)selectTitle font:(UIFont *)font isOnRight:(BOOL)isOnRight btnClickBlock:(void (^)(BOOL))btnClickBlock{
     
-    UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
+    YNNavigationBarButton *button = [YNNavigationBarButton buttonWithType:UIButtonTypeCustom];
     [button setTitle:title forState:UIControlStateNormal];
     [button setTitle:selectTitle forState:UIControlStateSelected];
     button.titleLabel.font = font;
-    [self setNavigationBarButtonClickBlock:^(BOOL isSelect) {
+    
+    [button setNavigationBarButtonClickBlock:^(BOOL isSelect) {
         btnClickBlock(isSelect);
     }];
+    
     [button addTarget:self action:@selector(handleNavigationBarButtonClick:) forControlEvents:UIControlEventTouchUpInside];
     [_navView addSubview:button];
     
@@ -233,23 +196,22 @@
 
 -(UIButton *)addNavigationBarBtnWithTitle:(NSString *)title selectTitle:(NSString *)selectTitle font:(UIFont *)font img:(UIImage *)img selectImg:(UIImage *)selectImg imgWidth:(CGFloat)imgWidth isOnRight:(BOOL)isOnRight btnClickBlock:(void (^)(BOOL))btnClickBlock{
     
-    UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
+    YNNavigationBarButton *button = [YNNavigationBarButton buttonWithType:UIButtonTypeCustom];
     [button setTitle:title forState:UIControlStateNormal];
     [button setTitle:selectTitle forState:UIControlStateSelected];
     [button setImage:img forState:UIControlStateNormal];
     [button setImage:selectImg forState:UIControlStateSelected];
     button.titleLabel.font = font;
-    [self setNavigationBarButtonClickBlock:^(BOOL isSelect) {
+    
+    [button setNavigationBarButtonClickBlock:^(BOOL isSelect) {
         btnClickBlock(isSelect);
     }];
+
     [button addTarget:self action:@selector(handleNavigationBarButtonClick:) forControlEvents:UIControlEventTouchUpInside];
     [_navView addSubview:button];
     
     CGSize titleSize = [title sizeWithAttributes:@{NSFontAttributeName:font}];
     CGSize selectTitleSize = [selectTitle sizeWithAttributes:@{NSFontAttributeName:font}];
-    
-//    button.imageView.frame = CGRectMake(<#CGFloat x#>, <#CGFloat y#>, <#CGFloat width#>, <#CGFloat height#>)
-//    button.titleLabel.frame = CGRectMake(<#CGFloat x#>, <#CGFloat y#>, <#CGFloat width#>, <#CGFloat height#>)
     
     CGFloat btnWidth = imgWidth + (titleSize.width > selectTitleSize.width ? titleSize.width :selectTitleSize.width) + kUINavBtnHorSpace;
     
@@ -258,19 +220,21 @@
         button.frame = CGRectMake(SCREEN_WIDTH-self.rightBtnFrame, kUIStatusBar+kUINavBtnVerSpace, btnWidth, kUINavBtnWidth);
     }else if(isOnRight == NO){
         if (self.backButton.hidden == YES) {
-            button.frame = CGRectMake(kUINavBtnHorSpace+self.leftBtnFrame, kUIStatusBar+kUINavBtnVerSpace, kUINavBtnWidth, kUINavBtnWidth);
+            button.frame = CGRectMake(kUINavBtnHorSpace+self.leftBtnFrame, kUIStatusBar+kUINavBtnVerSpace, btnWidth, kUINavBtnWidth);
             self.leftBtnFrame += btnWidth+kUINavBtnHorSpace;
         }else{
             self.leftBtnFrame += btnWidth+kUINavBtnHorSpace;
-            button.frame = CGRectMake(kUINavBtnHorSpace+self.leftBtnFrame, kUIStatusBar+kUINavBtnVerSpace, kUINavBtnWidth, kUINavBtnWidth);
+            button.frame = CGRectMake(kUINavBtnHorSpace+self.leftBtnFrame, kUIStatusBar+kUINavBtnVerSpace, btnWidth, kUINavBtnWidth);
         }
     }
     return button;
 }
 
--(void)handleNavigationBarButtonClick:(UIButton*)btn{
+-(void)handleNavigationBarButtonClick:(YNNavigationBarButton*)btn{
     btn.selected = !btn.selected;
-    self.navigationBarButtonClickBlock(btn.selected);
+    if (btn.navigationBarButtonClickBlock) {
+        btn.navigationBarButtonClickBlock(btn.selected);
+    }
 }
 - (void)backMethod{
     [self.navigationController popViewControllerAnimated:YES];
@@ -279,5 +243,9 @@
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
 }
+
+@end
+@implementation YNNavigationBarButton
+
 
 @end

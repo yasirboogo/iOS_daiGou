@@ -10,6 +10,10 @@
 
 @interface YNSettingTableView : UITableView
 
+@property (nonatomic,copy)void(^didSelectIsPushOnBlock)(BOOL);
+
+@property (nonatomic,copy)void(^didSelectSettingCellBlock)(NSInteger);
+
 @end
 
 @interface YNSettingCell : UITableViewCell

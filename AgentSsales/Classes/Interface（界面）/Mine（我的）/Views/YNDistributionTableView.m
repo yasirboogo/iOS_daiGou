@@ -100,9 +100,9 @@
 
 -(void)setDict:(NSDictionary *)dict{
     _dict = dict;
-    self.timeLabel.text = dict[@"time"];
-    self.resouceLabel.text = dict[@"resouce"];
-    self.moneyLabel.text = [NSString stringWithFormat:@"%@%@",NSLS(@"moneySymbol", @"货币符号"),dict[@"money"]];
+    self.timeLabel.text = dict[@"createtime"];
+    self.resouceLabel.text = dict[@"nickname"];
+    self.moneyLabel.text = [NSString stringWithFormat:@"%@%@",@"$",dict[@"money"]];
 }
 
 -(UILabel *)timeLabel{

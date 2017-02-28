@@ -11,7 +11,9 @@
 #import "YNMoreGoodsCollectionView.h"
 
 @interface YNShowMoreGoodsViewController ()
-
+{
+    NSInteger _type;
+}
 @property (nonatomic,weak) YNMoreGoodsCollectionView* collectionView;
 
 @end
@@ -29,6 +31,7 @@
 }
 - (void)viewDidLoad {
     [super viewDidLoad];
+    [self startNetWorkingRequestWithGetSpecialPurchase];
 }
 
 - (void)viewWillDisappear:(BOOL)animated{
@@ -40,14 +43,22 @@
 }
 
 #pragma mark - 网路请求
-
+-(void)startNetWorkingRequestWithGetSpecialPurchase{
+    NSDictionary *params = @{@"type":[NSNumber numberWithInteger:_type],
+                             @"pageIndex":[NSNumber numberWithInteger:self.pageIndex],
+                             @"pageSize":[NSNumber numberWithInteger:self.pageSize]};
+    [YNHttpManagers getSpecialPurchaseWithParams:params success:^(id response) {
+        self.collectionView.dataArray = response;
+    } failure:^(NSError *error) {
+    }];
+}
 #pragma mark - 视图加载
 -(YNMoreGoodsCollectionView *)collectionView{
     if (!_collectionView) {
         CGRect frame = CGRectMake(0,
                                   kUINavHeight,
                                   SCREEN_WIDTH,
-                                  SCREEN_HEIGHT-kUINavHeight-kUITabBarH);
+                                  SCREEN_HEIGHT-kUINavHeight);
         YNMoreGoodsCollectionView *collectionView = [[YNMoreGoodsCollectionView alloc] initWithFrame:frame];
         _collectionView = collectionView;
         [self.view addSubview:collectionView];
@@ -59,9 +70,7 @@
 #pragma mark - 函数、消息
 -(void)makeData{
     [super makeData];
-    self.collectionView.dataArray = @[
-                           @{@"image":@"testGoods",@"name":@"米勒洗衣机",@"version":@"产品型号J-GRY4",@"price":@"500.14",@"mark":@"￥"},
-                           @{@"image":@"testGoods",@"name":@"米勒洗衣机",@"version":@"产品型号J-GRY4",@"price":@"500.14",@"mark":@"￥"}];
+    _type = [LanguageManager currentLanguageIndex];
 }
 -(void)makeNavigationBar{
     [super makeNavigationBar];
@@ -71,7 +80,7 @@
         [weakSelf.navigationController pushViewController:pushVC animated:NO];
     }];
     
-    self.titleLabel.text = NSLS(@"特色惠购", @"特色惠购");
+    self.titleLabel.text = kLocalizedString(@"specialPurchase", @"特色惠购");
 }
 -(void)makeUI{
     [super makeUI];

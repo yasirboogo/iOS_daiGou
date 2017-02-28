@@ -20,4 +20,6 @@
 
 @property (nonatomic,copy) NSString * numberID;
 
+@property (nonatomic,copy) void(^didSelectAddressCellBlock)();
+
 @end

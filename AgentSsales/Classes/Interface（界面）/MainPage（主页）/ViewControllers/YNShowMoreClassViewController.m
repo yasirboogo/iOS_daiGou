@@ -15,7 +15,7 @@
 
 @property (nonatomic, weak) UIView *tipsView;
 
-@property (nonatomic, strong) TYTabButtonPagerController *pagerController;
+@property (nonatomic, weak) TYTabButtonPagerController *pagerController;
 
 @property (nonatomic, weak) UIButton *showBtn;
 
@@ -24,7 +24,9 @@
 @end
 
 @interface YNShowMoreClassViewController ()
-
+{
+    NSInteger _type;
+}
 
 @end
 
@@ -42,6 +44,7 @@
 }
 - (void)viewDidLoad {
     [super viewDidLoad];
+    [self startNetWorkingRequestWithGetHotClass];
 }
 
 - (void)viewWillDisappear:(BOOL)animated{
@@ -53,7 +56,27 @@
 }
 
 #pragma mark - 网路请求
-
+-(void)startNetWorkingRequestWithGetHotClass{
+    NSDictionary *params = @{@"type":[NSNumber numberWithInteger:_type],
+                             @"status":@0};
+    [YNHttpManagers getHotClassWithParams:params success:^(id response) {
+        if (!self.classId.length) {
+            self.index = 0;
+        }else{
+            [(NSArray*)response enumerateObjectsUsingBlock:^(NSDictionary *dict, NSUInteger idx, BOOL * _Nonnull stop) {
+                if ([[NSString stringWithFormat:@"%@",dict[@"classId"]] isEqualToString:self.classId]) {
+                    self.index = idx;
+                    *stop = YES;
+                    return;
+                }
+            }];
+        }
+        self.showAllGoodsClassView.dataArray = response;
+        [self.pagerController moveToControllerAtIndex:self.index animated:NO];
+        [self.view bringSubviewToFront:self.showAllGoodsClassView];
+    } failure:^(NSError *error) {
+    }];
+}
 #pragma mark - 视图加载
 -(TYTabButtonPagerController *)pagerController{
     if (!_pagerController) {
@@ -102,18 +125,23 @@
         showBtn.backgroundColor = COLOR_FFFFFF;
         [showBtn setImage:[UIImage imageNamed:@"mianbaoxie_kui_xia"] forState:UIControlStateNormal];
         [showBtn setImage:[UIImage imageNamed:@"mianbaoxie_kui_shang"] forState:UIControlStateSelected];
-        [showBtn addTarget:self action:@selector(handleShowButton:) forControlEvents:UIControlEventTouchUpInside];
+        [showBtn addTarget:self action:@selector(handleShowButton) forControlEvents:UIControlEventTouchUpInside];
         showBtn.frame = CGRectMake(SCREEN_WIDTH-W_RATIO(86), 0, W_RATIO(86), W_RATIO(90));
     }
     return _showBtn;
 }
 -(YNShowAllGoodsClassView *)showAllGoodsClassView{
     if (!_showAllGoodsClassView) {
-        CGRect frame = CGRectMake(0,kUINavHeight+HEIGHTF(_showBtn)+W_RATIO(2), SCREEN_WIDTH,SCREEN_HEIGHT-MaxYF(_showBtn)-W_RATIO(2));
+        CGRect frame = CGRectMake(0,kUINavHeight+W_RATIO(86)+W_RATIO(2), SCREEN_WIDTH,SCREEN_HEIGHT-MaxYF(_showBtn)-W_RATIO(2));
         YNShowAllGoodsClassView *showAllGoodsClassView = [[YNShowAllGoodsClassView alloc] initWithFrame:frame];
         _showAllGoodsClassView = showAllGoodsClassView;
-        [self.view addSubview:showAllGoodsClassView];
         showAllGoodsClassView.hidden = YES;
+        [self.view addSubview:showAllGoodsClassView];
+        [showAllGoodsClassView setDidSelectGoodsClassCellButtonBlock:^(NSInteger index) {
+            self.showBtn.selected = YES;
+            [self handleShowButton];
+            [self.pagerController moveToControllerAtIndex:index animated:NO];
+        }];
     }
     return _showAllGoodsClassView;
 }
@@ -122,28 +150,26 @@
 
 - (NSInteger)numberOfControllersInPagerController
 {
-    NSArray * titles = @[@"为你推荐",@"女装",@"财经频道",@"时尚新天地",@"本地",@"儿童",@"政治新闻",@"娱乐",@"财经频道",@"时尚新天地",@"本地",@"儿童",@"政治新闻",@"娱乐",@"财经频道",@"时尚新天地",@"本地",@"儿童"];
-    return titles.count;
+    return self.showAllGoodsClassView.dataArray.count;
 }
 
 
 - (NSString *)pagerController:(TYPagerController *)pagerController titleForIndex:(NSInteger)index
 {
-    NSArray * titles = @[@"政治新闻",@"娱乐",@"财经频道",@"时尚新天地",@"本地",@"儿童",@"政治新闻",@"娱乐",@"财经频道",@"时尚新天地",@"本地",@"儿童",@"政治新闻",@"娱乐",@"财经频道",@"时尚新天地",@"本地",@"儿童"];
-    return titles[index];
+    return self.showAllGoodsClassView.dataArray[index][@"classname"];
 }
 
 - (UIViewController *)pagerController:(TYPagerController *)pagerController controllerForIndex:(NSInteger)index
 {
     YNMoreClassViewController *listVC = [[YNMoreClassViewController alloc] init];
+    listVC.classId = self.showAllGoodsClassView.dataArray[index][@"classId"];
     return listVC;
 }
 
 #pragma mark - 函数、消息
 -(void)makeData{
     [super makeData];
-    [self.pagerController reloadData];
-    self.showAllGoodsClassView.dataArray = @[@"为你推荐",@"女装",@"财经频道",@"时尚新天地",@"本地",@"儿童",@"政治新闻",@"娱乐",@"财经频道",@"时尚新天地",@"本地",@"儿童",@"政治新闻",@"娱乐",@"财经频道",@"时尚新天地",@"本地",@"儿童"];
+    _type = [LanguageManager currentLanguageIndex];
 }
 -(void)makeNavigationBar{
     [super makeNavigationBar];
@@ -151,10 +177,10 @@
 -(void)makeUI{
     [super makeUI];
 }
--(void)handleShowButton:(UIButton*)btn{
-    self.showAllGoodsClassView.hidden  = btn.selected;
-    self.tipsView.hidden = btn.selected;
-    btn.selected = !btn.selected;
+-(void)handleShowButton{
+    self.showAllGoodsClassView.hidden  = _showBtn.selected;
+    self.tipsView.hidden = _showBtn.selected;
+    _showBtn.selected = !_showBtn.selected;
 }
 #pragma mark - 数据懒加载
 

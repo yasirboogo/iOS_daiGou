@@ -10,6 +10,10 @@
 
 @interface YNFirmOrderViewController : YNBaseViewController
 
-@property (nonatomic,assign) NSInteger index;
+@property (nonatomic,assign) NSInteger status;
+
+@property (nonatomic,copy) NSString *shoppingId;
+
+@property (nonatomic,copy) void(^didSelectCouponBlock)(NSString*,NSString*);
 
 @end

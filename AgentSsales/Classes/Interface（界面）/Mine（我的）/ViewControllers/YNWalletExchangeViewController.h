@@ -12,4 +12,7 @@
 
 @property (nonatomic,copy) NSString * balanceMoney;
 
+@property (nonatomic,strong) NSDictionary *allTypeMoneys;
+
+
 @end

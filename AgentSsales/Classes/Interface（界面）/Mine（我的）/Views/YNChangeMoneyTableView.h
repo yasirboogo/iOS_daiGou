@@ -9,20 +9,30 @@
 #import <UIKit/UIKit.h>
 
 @interface YNChangeMoneyTableView : UITableView
-@property (nonatomic,copy) void(^didSelectMoneyTypeClickBlock)(NSIndexPath*);
+@property (nonatomic,strong) NSString *rateId;
+
+@property (nonatomic,strong) NSArray * dataArray;
+
+@property (nonatomic,strong) NSDictionary * allTypeMoneys;
+
+@property (nonatomic,copy) void(^didSelectMoneyTypeClickBlock)(NSInteger);
 
 @property (nonatomic,copy) void(^didSelectMoneyNumClickBlock)();
 
-@property (nonatomic,copy) NSString * type1;
+@property (nonatomic,assign) NSInteger type1;
 
 @property (nonatomic,copy) NSString * money1;
 
-@property (nonatomic,copy) NSString * type2;
+@property (nonatomic,assign) NSInteger type2;
 
 @property (nonatomic,copy) NSString * money2;
 
-@property (nonatomic,copy) NSString * lastMoney;
+@end
 
+@interface YNChangeMoneyFooterView : UIView
+@property (nonatomic,assign) NSInteger type1;
+@property (nonatomic,copy) NSString * lastMoney;
+@property (nonatomic,copy) void(^didSelectAllChangeMoneyBlock)(NSString*);
 @end
 
 @interface YNChangeMoneyCell : UITableViewCell
@@ -33,7 +43,7 @@
 
 @property (nonatomic,copy) NSString * name;
 
-@property (nonatomic,copy) NSString * type;
+@property (nonatomic,assign) NSInteger type;
 
 @property (nonatomic,copy) NSString * money;
 

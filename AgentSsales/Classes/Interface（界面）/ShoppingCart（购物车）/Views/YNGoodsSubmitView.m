@@ -49,7 +49,7 @@
     self.markLabel.frame = CGRectMake(MaxXF(_tipsLabel)+kMinSpace,MaxYF(_tipsLabel)-markSize.height, markSize.width, markSize.height);
     
     CGSize priceSize =[_priceLabel.text calculateHightWithFont:_priceLabel.font maxWidth:XF(_submitBtn)-MaxXF(_markLabel)-kMinSpace];
-    self.priceLabel.frame = CGRectMake(MaxXF(_markLabel),MaxYF(_markLabel)-priceSize.height, priceSize.width, priceSize.height);
+    self.priceLabel.frame = CGRectMake(MaxXF(_markLabel),MaxYF(_markLabel)-priceSize.height, XF(_submitBtn)-MaxXF(_markLabel)-kMinSpace, priceSize.height);
 }
 
 -(UILabel *)tipsLabel{

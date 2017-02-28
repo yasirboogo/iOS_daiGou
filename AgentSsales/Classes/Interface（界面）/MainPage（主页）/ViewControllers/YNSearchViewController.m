@@ -11,6 +11,9 @@
 #import "YSearchHistoryView.h"
 
 @interface YNSearchViewController ()<UITextFieldDelegate>
+{
+    NSInteger _type;
+}
 
 @property (nonatomic,copy) UITextField * searchTField;
 
@@ -28,7 +31,7 @@
 
 - (void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:animated];
-    [self setStatusBarBackgroundColor:COLOR_000000];
+    [self setStatusBarBackgroundColor:COLOR_DF463E];
 }
 
 - (void)viewDidAppear:(BOOL)animated{
@@ -46,9 +49,28 @@
 - (void)viewDidDisappear:(BOOL)animated{
     [super viewDidDisappear:animated];
 }
-
 #pragma mark - 网路请求
-
+-(void)startNetWorkingRequestWithSearchGoods{
+    NSDictionary *params = @{@"searchName":_searchTField.text,
+                             @"type":[NSNumber numberWithInteger:_type],
+                             @"pageIndex":[NSNumber numberWithInteger:self.pageIndex],
+                             @"pageSize":[NSNumber numberWithInteger:self.pageSize]
+                             };
+    [YNHttpManagers searchGoodsWithParams:params success:^(id response) {
+        self.collectionView.dataArray = response;
+        self.collectionView.hidden = !self.collectionView.dataArray.count;
+        self.emptyView.hidden = !self.collectionView.hidden;
+    } failure:^(NSError *error) {
+    }];
+}
+-(void)startNetWorkingRequestWithSaveSearchKeys{
+    NSDictionary *params = @{@"userId":[DEFAULTS valueForKey:kUserLoginInfors][@"userId"],
+                             @"content":_searchTField.text
+                             };
+    [YNHttpManagers saveSearchKeysWithParams:params success:^(id response) {
+    } failure:^(NSError *error) {
+    }];
+}
 #pragma mark - 视图加载
 -(UITextField *)searchTField{
     if (!_searchTField) {
@@ -56,7 +78,7 @@
         _searchTField = searchTField;
         [self.navView addSubview:searchTField];
         searchTField.delegate = self;
-        searchTField.placeholder = @"请输入搜索内容";
+        searchTField.placeholder = kLocalizedString(@"searchContent",@"请输入搜索内容");
         searchTField.font = FONT(28);
         searchTField.textColor = COLOR_999999;
         searchTField.clearButtonMode = UITextFieldViewModeAlways;
@@ -109,33 +131,27 @@
 #pragma mark - 函数、消息
 -(void)makeData{
     [super makeData];
+    _type = [LanguageManager currentLanguageIndex];
 }
 -(void)makeNavigationBar{
     [super makeNavigationBar];
     self.navView.backgroundColor = COLOR_FFFFFF;
     __weak typeof(self) weakSelf = self;
     [self.backButton setImage:[UIImage imageNamed:@"fanhui_kui_fanhui"] forState:UIControlStateNormal];
-    UIButton *searchBtn = [self addNavigationBarBtnWithTitle:@"搜索" selectTitle:@"搜索" font:FONT(28) isOnRight:YES btnClickBlock:^(BOOL isShow) {
-        
-        weakSelf.collectionView.dataArray = @[
-                                          @{@"image":@"testGoods",@"name":@"米勒洗衣机",@"version":@"产品型号J-GRY4",@"price":@"500.14",@"mark":@"￥"},
-                                          @{@"image":@"testGoods",@"name":@"米勒洗衣机",@"version":@"产品型号J-GRY4",@"price":@"500.14",@"mark":@"￥"}];
-        weakSelf.collectionView.dataArray = @[];
-        
-        weakSelf.collectionView.hidden = !weakSelf.collectionView.dataArray.count;
-        weakSelf.emptyView.hidden = !weakSelf.collectionView.hidden;
-        
-        
-        if (![weakSelf.searchTField.text isEqualToString:@""]) {
-            weakSelf.searchHistoryView.hidden = YES;
+    UIButton *searchBtn = [self addNavigationBarBtnWithTitle:@"搜索" selectTitle:@"搜索" font:FONT_14 isOnRight:YES btnClickBlock:^(BOOL isShow) {
+        if (weakSelf.searchTField.text.length) {
+            [weakSelf.view endEditing:YES];
+            weakSelf.collectionView.hidden = NO;
             weakSelf.searchHistoryView.searchContent = weakSelf.searchTField.text;
+            [weakSelf startNetWorkingRequestWithSearchGoods];
+            [weakSelf startNetWorkingRequestWithSaveSearchKeys];
+        }else{
+            NSLog(@"输入为空");
         }
-        
-        [weakSelf.view endEditing:YES];
-        
     }];
     searchBtn.backgroundColor = COLOR_DF463E;
     searchBtn.layer.masksToBounds = YES;
+    
     searchBtn.layer.cornerRadius = kViewRadius;
     
     self.searchTField.frame = CGRectMake(MaxXF(self.backButton), YF(searchBtn), XF(searchBtn)-MaxXF(self.backButton)-kUINavBtnHorSpace, HEIGHTF(searchBtn));

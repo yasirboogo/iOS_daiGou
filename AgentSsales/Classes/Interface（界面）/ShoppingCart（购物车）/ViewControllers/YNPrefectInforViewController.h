@@ -10,5 +10,6 @@
 
 @interface YNPrefectInforViewController : YNBaseViewController
 
+@property (nonatomic,assign) NSInteger index;
 
 @end

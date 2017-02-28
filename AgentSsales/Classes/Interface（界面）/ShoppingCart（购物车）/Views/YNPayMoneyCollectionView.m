@@ -35,8 +35,8 @@
     }
     return self;
 }
--(void)setInforArray:(NSArray *)inforArray{
-    _inforArray = inforArray;
+-(void)setOrderDict:(NSDictionary *)orderDict{
+    _orderDict = orderDict;
     [self reloadData];
 }
 -(void)setIndexPath:(NSIndexPath *)indexPath{
@@ -45,7 +45,7 @@
 }
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section{
     if (section == 0) {
-        return _inforArray.count;
+        return [(NSArray*)_orderDict[@"goodsArray"] count];
     }else if (section == 1){
         return self.payArray.count;
     }
@@ -79,7 +79,7 @@
         if (indexPath.row == 0) {
             [orderCell setViewCornerRadiusWithRectCorner:UIRectCornerTopLeft|UIRectCornerTopRight cornerSize:CGSizeMake(W_RATIO(20), W_RATIO(20))];
         }
-        orderCell.dict = _inforArray[indexPath.row];
+        orderCell.dict = _orderDict[@"goodsArray"][indexPath.row];
         return orderCell;
     }else if (indexPath.section == 1){
         YNPayWayCell *wayCell = [collectionView dequeueReusableCellWithReuseIdentifier:@"wayCell" forIndexPath:indexPath];
@@ -119,7 +119,7 @@
     }else if ([kind isEqualToString:UICollectionElementKindSectionFooter]){
         if (indexPath.section == 0) {
             YNPayFooterView *footerView = [collectionView dequeueReusableSupplementaryViewOfKind:kind withReuseIdentifier:@"footerView" forIndexPath:indexPath];
-            footerView.price = @"452.02";
+            footerView.price = _orderDict[@"totalprice"];
             return footerView;
         }
     }
@@ -131,7 +131,7 @@
                       @{@"payImg":@"malaixiya_yuan",@"payWay":@"马来西亚网银"},
                       @{@"payImg":@"malaixiya_yuan",@"payWay":@"支付宝支付"},
                       @{@"payImg":@"malaixiya_yuan",@"payWay":@"微信支付"},
-                      @{@"payImg":@"malaixiya_yuan",@"payWay":@"我的钱包"}];
+                      @{@"payImg":@"malaixiya_yuan",@"payWay":kLocalizedString(@"myWallet",@"我的钱包")}];
     }
     return _payArray;
 }
@@ -155,12 +155,11 @@
 
 -(void)setDict:(NSDictionary *)dict{
     _dict = dict;
-    self.titleLabel.text = dict[@"title"];
-    self.subTitleLabel.text = dict[@"subTitle"];
+    self.titleLabel.text = dict[@"name"];
+    self.subTitleLabel.text = dict[@"note"];
     self.markLabel.text = @"￥";
-    self.priceLabel.text = dict[@"price"];
-    self.amountLabel.text = [NSString stringWithFormat:@"x%@",dict[@"num"]];
-    [self bgView];
+    self.priceLabel.text = [NSString stringWithFormat:@"%@",dict[@"salesprice"]];
+    self.amountLabel.text = [NSString stringWithFormat:@"x%@",dict[@"count"]];
 }
 -(void)layoutSubviews{
     [super layoutSubviews];

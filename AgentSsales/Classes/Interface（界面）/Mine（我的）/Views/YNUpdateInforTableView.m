@@ -10,8 +10,6 @@
 
 @interface YNUpdateInforTableView()<UITableViewDataSource,UITableViewDelegate>
 
-@property (nonatomic,strong) NSArray<NSDictionary*> *inforArray;
-
 @end
 
 @implementation YNUpdateInforTableView
@@ -26,9 +24,19 @@
         self.separatorStyle = UITableViewCellSeparatorStyleNone;
         self.delegate = self;
         self.dataSource = self;
-        [self reloadData];
     }
     return self;
+}
+-(void)setInforDict:(NSDictionary *)inforDict{
+    _inforDict = inforDict;
+    _inforArray = @[@{@"title":@"头像",@"content":inforDict[@"headimg"]},
+                    @{@"title":@"昵称",@"content":inforDict[@"nickname"]},
+                    @{@"title":@"手机号码",@"content":inforDict[@"loginphone"]},
+                    @{@"title":@"身份证号码（选填）",@"content":inforDict[@"idcardId"]},
+                    @{@"title":@"账户安全",@"content":@"密码修改"},
+                    ];
+    [self reloadData];
+    
 }
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
     return self.inforArray.count;
@@ -52,14 +60,26 @@
     }
     if (indexPath.row == 0) {
         inforCell.titleLabel.text = _inforArray[indexPath.row][@"title"];
-        inforCell.headImgView.image = [UIImage imageNamed:_inforArray[indexPath.row][@"content"]];
+        [inforCell.headImgView sd_setImageWithURL:_inforArray[indexPath.row][@"content"] placeholderImage:[UIImage imageNamed:@"zhanwei1"]];
+        inforCell.isForbidClick = YES;
+        [inforCell setDidSelectChangeImgBlock:^{
+            self.didSelectChangeImgBlock();
+        }];
     }else{
         if (indexPath.row == 2||indexPath.row == 4) {
             inforCell.isShowArrow = YES;
+            inforCell.isForbidClick = YES;
         }
         inforCell.titleLabel.text = _inforArray[indexPath.row][@"title"];
-        inforCell.contentLabel.text = _inforArray[indexPath.row][@"content"];
+        inforCell.contentTField.text = _inforArray[indexPath.row][@"content"];
     }
+    [inforCell setInforCellTextFieldBlock:^(NSString *str) {
+        if (indexPath.row == 1) {
+            self.nickname = str;
+        }else if (indexPath.row == 3){
+            self.idcardId = str;
+        }
+    }];
     return inforCell;
 }
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
@@ -70,16 +90,17 @@
         }
     }
 }
--(NSArray<NSDictionary *> *)inforArray{
-    if (!_inforArray) {
-        _inforArray = @[@{@"title":@"头像",@"content":@"testGoods"},
-                        @{@"title":@"昵称",@"content":@"我是谁"},
-                        @{@"title":@"手机号码",@"content":@"15571699700"},
-                        @{@"title":@"身份证号码（选填）",@"content":@"420366199310101078"},
-                        @{@"title":@"账户安全",@"content":@"密码修改"},
-                        ];
+-(NSString *)nickname{
+    if (!_nickname) {
+        _nickname = self.inforArray[1][@"content"];
     }
-    return _inforArray;
+    return _nickname;
+}
+-(NSString *)idcardId{
+    if (!_idcardId) {
+        _idcardId = self.inforArray[3][@"content"];
+    }
+    return _idcardId;
 }
 @end
 
@@ -91,14 +112,17 @@
     self.titleLabel.frame = CGRectMake(kMidSpace, 0, titleSize.width, HEIGHTF(self.contentView));
     self.arrowImgView.frame = CGRectMake(SCREEN_WIDTH-(W_RATIO(50)+W_RATIO(12))/2.0,(HEIGHTF(self.contentView)-W_RATIO(22))/2.0, W_RATIO(12), W_RATIO(22));
     
-    if (self.contentLabel.text.length) {
-        self.contentLabel.frame = CGRectMake(MaxXF(_titleLabel)+kMidSpace,YF(_titleLabel), SCREEN_WIDTH-W_RATIO(50)-MaxXF(_titleLabel)-kMidSpace, HEIGHTF(_titleLabel));
-    }else if (self.headImgView.image){
+    if (self.headImgView.image) {
         self.headImgView.frame = CGRectMake(SCREEN_WIDTH-HEIGHTF(self.contentView), W_RATIO(50)/2.0,HEIGHTF(self.contentView)-W_RATIO(50), HEIGHTF(self.contentView)-W_RATIO(50));
         self.headImgView.layer.cornerRadius = WIDTHF(self.headImgView)/2.0;
+    }else{
+        self.contentTField.frame = CGRectMake(MaxXF(_titleLabel)+kMidSpace,YF(_titleLabel), SCREEN_WIDTH-W_RATIO(50)-MaxXF(_titleLabel)-kMidSpace, HEIGHTF(_titleLabel));
     }
-    
-    
+
+}
+-(void)setIsForbidClick:(BOOL)isForbidClick{
+    _isForbidClick = isForbidClick;
+    self.contentTField.enabled = !isForbidClick;
 }
 -(UILabel *)titleLabel{
     if (!_titleLabel) {
@@ -111,17 +135,17 @@
     }
     return _titleLabel;
 }
-
--(UILabel *)contentLabel{
-    if (!_contentLabel) {
-        UILabel *contentLabel = [[UILabel alloc] init];
-        _contentLabel = contentLabel;
-        contentLabel.font = FONT(32);
-        contentLabel.textColor = COLOR_333333;
-        contentLabel.textAlignment = NSTextAlignmentRight;
-        [self.contentView addSubview:contentLabel];
+-(UITextField *)contentTField{
+    if (!_contentTField) {
+        UITextField *contentTField = [[UITextField alloc] init];
+        _contentTField = contentTField;
+        [self.contentView addSubview:contentTField];
+        contentTField.font = FONT(32);
+        contentTField.textColor = COLOR_333333;
+        contentTField.textAlignment = NSTextAlignmentRight;
+        [contentTField addTarget:self action:@selector(textfieldTextDidChange:) forControlEvents:UIControlEventEditingChanged];
     }
-    return _contentLabel;
+    return _contentTField;
 }
 -(UIImageView *)headImgView{
     if (!_headImgView) {
@@ -129,8 +153,16 @@
         _headImgView = headImgView;
         headImgView.layer.masksToBounds = YES;
         [self.contentView addSubview:headImgView];
+        headImgView.userInteractionEnabled = YES;
+        UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleChangeImg)];
+        [headImgView addGestureRecognizer:tap];
     }
     return _headImgView;
+}
+-(void)handleChangeImg{
+    if (self.didSelectChangeImgBlock) {
+        self.didSelectChangeImgBlock();
+    }
 }
 -(UIImageView *)arrowImgView{
     if (!_arrowImgView) {
@@ -146,5 +178,16 @@
 -(void)setIsShowArrow:(BOOL)isShowArrow{
     _isShowArrow = isShowArrow;
     self.arrowImgView.hidden = !isShowArrow;
+}
+- (BOOL)textFieldShouldBeginEditing:(UITextField *)textField{
+    
+    return textField.enabled;
+}
+#pragma mark - private method
+- (void)textfieldTextDidChange:(UITextField *)textField
+{
+    if (self.inforCellTextFieldBlock) {
+        self.inforCellTextFieldBlock(_contentTField.text);
+    }
 }
 @end

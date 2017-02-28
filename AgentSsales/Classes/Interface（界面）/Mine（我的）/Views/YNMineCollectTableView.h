@@ -10,10 +10,12 @@
 
 @interface YNMineCollectTableView : UITableView
 
-@property (nonatomic,strong) NSMutableArray<NSMutableDictionary*> * dataArrayM;
+@property (nonatomic,strong) NSMutableArray<NSNumber*> * selectArrayM;
+
+@property (nonatomic,strong) NSArray<NSDictionary*> * dataArray;
 /** 是否编辑 */
 @property (nonatomic,assign) BOOL isEdit;
-/** 是否编辑 */
+
 @property (nonatomic,copy) void(^didSelectMineCollectCellBlock)(NSString*);
 
 @end

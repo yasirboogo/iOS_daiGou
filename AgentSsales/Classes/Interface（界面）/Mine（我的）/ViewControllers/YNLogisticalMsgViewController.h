@@ -10,4 +10,6 @@
 
 @interface YNLogisticalMsgViewController : YNBaseViewController
 
+@property (nonatomic,assign) NSInteger orderId;
+
 @end

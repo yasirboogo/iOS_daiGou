@@ -98,9 +98,7 @@
 -(void)makeData{
     [super makeData];
     
-    self.collectionView.inforArray = @[
-                                  @{@"title":@"书籍-设计师的自我修养",@"subTitle":@"2016年出版版本",@"price":@"502.12",@"num":@"2"},
-                                  @{@"title":@"书籍-设计师的自我修养",@"subTitle":@"2016年出版版本",@"price":@"502.12",@"num":@"2"}];
+    self.collectionView.orderDict = _orderDict;
 }
 -(void)makeNavigationBar{
     [super makeNavigationBar];

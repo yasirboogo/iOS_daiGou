@@ -10,7 +10,10 @@
 #import "YNListViewController.h"
 
 @interface YNNewsViewController ()<TYPagerControllerDataSource>
-
+{
+    NSInteger _type;
+}
+@property (nonatomic, strong) NSArray *dataArray;
 @property (nonatomic, strong) TYTabButtonPagerController *pagerController;
 
 @end
@@ -26,7 +29,6 @@
 
 - (void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:animated];
-    self.titleLabel.text = NSLocalizedString(@"news_Center",@"");
 }
 
 - (void)viewDidAppear:(BOOL)animated{
@@ -34,8 +36,7 @@
 }
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
-    [self.pagerController reloadData];
+    [self startNetWorkingRequestWithAllNewsClass];
 }
 
 - (void)viewWillDisappear:(BOOL)animated{
@@ -47,7 +48,14 @@
 }
 
 #pragma mark - 网路请求
-
+-(void)startNetWorkingRequestWithAllNewsClass{
+    NSDictionary *params = @{@"type":[NSNumber numberWithInteger:_type]};
+    [YNHttpManagers getAllNewsClassWithParams:params success:^(id response) {
+        self.dataArray = response;
+        [self.pagerController reloadData];
+    } failure:^(NSError *error) {
+    }];
+}
 #pragma mark - 视图加载
 -(TYTabButtonPagerController *)pagerController{
     if (!_pagerController) {
@@ -72,29 +80,30 @@
 
 - (NSInteger)numberOfControllersInPagerController
 {
-    NSArray * titles = @[@"政治新闻",@"娱乐",@"财经频道",@"时尚新天地",@"本地",@"儿童",@"政治新闻",@"娱乐",@"财经频道",@"时尚新天地",@"本地",@"儿童",@"政治新闻",@"娱乐",@"财经频道",@"时尚新天地",@"本地",@"儿童"];
-    return titles.count;
+    return _dataArray.count;
 }
 
 
 - (NSString *)pagerController:(TYPagerController *)pagerController titleForIndex:(NSInteger)index
 {
-    NSArray * titles = @[@"政治新闻",@"娱乐",@"财经频道",@"时尚新天地",@"本地",@"儿童",@"政治新闻",@"娱乐",@"财经频道",@"时尚新天地",@"本地",@"儿童",@"政治新闻",@"娱乐",@"财经频道",@"时尚新天地",@"本地",@"儿童"];
-    return titles[index];
+    return _dataArray[index][@"name"];
 }
 
 - (UIViewController *)pagerController:(TYPagerController *)pagerController controllerForIndex:(NSInteger)index
 {
-    YNListViewController *listVC = [[YNListViewController alloc] init];
-    return listVC;
+    YNListViewController *newsVC = [[YNListViewController alloc] init];
+    newsVC.imgInfor = _dataArray[index];
+    return newsVC;
 }
 
 #pragma mark - 函数、消息
 -(void)makeData{
     [super makeData];
+    _type = [LanguageManager currentLanguageIndex];
 }
 -(void)makeNavigationBar{
     [super makeNavigationBar];
+    self.titleLabel.text = kLocalizedString(@"newsCenter",@"资讯中心");
 }
 -(void)makeUI{
     [super makeUI];

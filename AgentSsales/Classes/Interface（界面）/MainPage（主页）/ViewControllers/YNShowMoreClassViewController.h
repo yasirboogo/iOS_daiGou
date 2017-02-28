@@ -10,4 +10,8 @@
 
 @interface YNShowMoreClassViewController : YNBaseViewController
 
+@property (nonatomic,assign) NSInteger index;
+
+@property (nonatomic,copy) NSString * classId;
+
 @end
