@@ -12,6 +12,8 @@
 
 @property (nonatomic,copy) NSString * price;
 
+@property (nonatomic,strong) NSDictionary * dict;
+
 @property (nonatomic,copy) void(^didSelectAddCartButtonClickBlock)();
 
 @property (nonatomic,copy) void(^didSelectBuyButtonClickBlock)();

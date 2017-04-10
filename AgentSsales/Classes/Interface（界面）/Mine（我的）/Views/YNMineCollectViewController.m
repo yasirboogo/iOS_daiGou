@@ -8,6 +8,7 @@
 
 #import "YNMineCollectViewController.h"
 #import "YNMineCollectTableView.h"
+#import "YNTerraceGoodsViewController.h"
 
 @interface YNMineCollectViewController ()
 {
@@ -39,7 +40,7 @@
 }
 - (void)viewDidLoad {
     [super viewDidLoad];
-    [self startNetWorkingRequestWithGetUserCollection];
+    [self.tableView.mj_header beginRefreshing];
 }
 
 - (void)viewWillDisappear:(BOOL)animated{
@@ -56,18 +57,31 @@
                              @"pageIndex":[NSNumber numberWithInteger:self.pageIndex],
                              @"pageSize":[NSNumber numberWithInteger:self.pageSize],
                              @"type":[NSNumber numberWithInteger:_type]};
+    
     [YNHttpManagers getUserCollectionWithParams:params success:^(id response) {
-        self.tableView.dataArray = response;
-        self.emptyView.hidden = self.tableView.dataArray.count;
-        self.editBtn.hidden = !self.emptyView.hidden;
+        [self handleEndMJRefresh];
+        if ([response[@"code"] isEqualToString:@"success"]) {
+            //do success things
+            [self handleMJRefreshComplateWithResponse:response[@"goodsArray"]];
+        }else{
+            //do failure things
+        }
     } failure:^(NSError *error) {
+        //do error things
+        [self handleEndMJRefresh];
     }];
 }
 -(void)startNetWorkingRequestWithEditUserCollection{
     NSDictionary *params = @{@"collectionId":_collectionId};
     [YNHttpManagers editUserCollectionWithParams:params success:^(id response) {
-        [self startNetWorkingRequestWithGetUserCollection];
+        if ([response[@"code"] isEqualToString:@"success"]) {
+            //do success things
+            [self startNetWorkingRequestWithGetUserCollection];
+        }else{
+            //do failure things
+        }
     } failure:^(NSError *error) {
+        //do error things
     }];
 }
 #pragma mark - 视图加载
@@ -76,8 +90,22 @@
         YNMineCollectTableView *tableView = [[YNMineCollectTableView alloc] init];
         _tableView = tableView;
         [self.view addSubview:tableView];
-        [tableView setDidSelectMineCollectCellBlock:^(NSString *str) {
-            NSLog(@"%@",str);
+        [tableView setDidSelectMineCollectCellBlock:^(NSString *goodsId) {
+            YNTerraceGoodsViewController *pushVC = [[YNTerraceGoodsViewController alloc] init];
+            pushVC.goodsId = goodsId;
+            [self.navigationController pushViewController:pushVC animated:NO];
+        }];
+        tableView.mj_header= [MJRefreshNormalHeader headerWithRefreshingBlock:^{
+            self.pageIndex = 1;
+            [tableView.mj_footer endRefreshing];
+            [self startNetWorkingRequestWithGetUserCollection];
+        }];
+        // 设置自动切换透明度(在导航栏下面自动隐藏)
+        tableView.mj_header.automaticallyChangeAlpha = YES;
+        tableView.mj_footer = [MJRefreshBackNormalFooter footerWithRefreshingBlock:^{
+            self.pageIndex += 1;
+            [tableView.mj_header endRefreshing];
+            [self startNetWorkingRequestWithGetUserCollection];
         }];
     }
     return _tableView;
@@ -89,7 +117,7 @@
         [self.view addSubview:btnsView];
         btnsView.size = CGSizeMake(SCREEN_WIDTH, W_RATIO(100));
         
-        NSArray<NSString*> *btnTitles = @[@"全选",@"删除"];
+        NSArray<NSString*> *btnTitles = @[LocalSelectAll,LocalDelete];
         [btnTitles enumerateObjectsUsingBlock:^(NSString * _Nonnull title, NSUInteger idx, BOOL * _Nonnull stop) {
             UIButton *bottomBtn = [UIButton buttonWithType:UIButtonTypeCustom];
             [btnsView addSubview:bottomBtn];
@@ -111,7 +139,7 @@
 }
 -(YNShowEmptyView *)emptyView{
     if (!_emptyView) {
-        CGRect frame = CGRectMake(0, kUINavHeight, SCREEN_WIDTH, SCREEN_HEIGHT - kUINavHeight);
+        CGRect frame = CGRectMake(0, kUINavHeight+W_RATIO(2), SCREEN_WIDTH, SCREEN_HEIGHT - kUINavHeight-W_RATIO(2));
         YNShowEmptyView *emptyView = [[YNShowEmptyView alloc] initWithFrame:frame];
         _emptyView = emptyView;
         [self.view addSubview:emptyView];
@@ -132,18 +160,48 @@
         _collectionId = [NSMutableString string];
         [_tableView.selectArrayM enumerateObjectsUsingBlock:^(NSNumber * _Nonnull isSelect, NSUInteger idx, BOOL * _Nonnull stop) {
             if ([isSelect boolValue]) {
-                [_collectionId appendFormat:@",%@",_tableView.dataArray[idx][@"collectionId"]];
+                [_collectionId appendFormat:@",%@",_tableView.dataArrayM[idx][@"collectionId"]];
             }
         }];
         if (_collectionId.length) {
             [_collectionId deleteCharactersInRange:NSMakeRange(0, 1)];
             [self startNetWorkingRequestWithEditUserCollection];
         }else{
-            NSLog(@"选择删除内容");
+            HDAlertView *alertView = [[HDAlertView alloc] initWithTitle:@"温馨提示" andMessage:@"未选择删除商品，无法删除"];
+            [alertView addButtonWithTitle:@"重新选择" type:HDAlertViewButtonTypeDestructive handler:^(HDAlertView *alertView) {
+                [alertView dismissAnimated:YES cleanup:YES];
+            }];
+            [alertView addButtonWithTitle:@"取消编辑" type:HDAlertViewButtonTypeDestructive handler:^(HDAlertView *alertView) {
+                _editBtn.selected = NO;
+                self.isEdit = NO;
+                self.tableView.isEdit = NO;
+            }];
+            [alertView show];
         }
     }
 }
 #pragma mark - 函数、消息
+-(void)handleMJRefreshComplateWithResponse:(NSArray*)response{
+    if (self.pageIndex == 1) {
+        _tableView.dataArrayM = [NSMutableArray arrayWithArray:response];
+        self.emptyView.hidden = _tableView.dataArrayM.count;
+        self.editBtn.hidden = !self.emptyView.hidden;
+    }else{
+        [_tableView.dataArrayM addObjectsFromArray:response];
+    }
+    _tableView.selectArrayM = [NSMutableArray array];
+    [_tableView reloadData];
+    if (response.count == 0) {
+        [_tableView.mj_footer endRefreshingWithNoMoreData];
+    }
+}
+-(void)handleEndMJRefresh{
+    if (self.pageIndex == 1) {
+        [self.tableView.mj_header endRefreshing];
+    }else{
+        [self.tableView.mj_footer endRefreshing];
+    }
+}
 -(void)makeData{
     [super makeData];
     _type = [LanguageManager currentLanguageIndex];
@@ -154,14 +212,14 @@
     [super makeNavigationBar];
 
     __weak typeof(self) weakSelf = self;
-    _editBtn = [self addNavigationBarBtnWithTitle:@"编辑" selectTitle:@"完成" font:FONT_15 isOnRight:YES btnClickBlock:^(BOOL isSelect) {
+    _editBtn = [self addNavigationBarBtnWithTitle:LocalEdit selectTitle:LocalDone font:FONT_15 isOnRight:YES btnClickBlock:^(BOOL isSelect) {
         weakSelf.isEdit = isSelect;
         weakSelf.tableView.isEdit = isSelect;
-        weakSelf.editBtn.hidden = !weakSelf.tableView.dataArray.count;
-        weakSelf.emptyView.hidden = weakSelf.tableView.dataArray.count;
+        weakSelf.editBtn.hidden = !weakSelf.tableView.dataArrayM.count;
+        weakSelf.emptyView.hidden = weakSelf.tableView.dataArrayM.count;
 
     }];
-    self.titleLabel.text = kLocalizedString(@"myCollection",@"我的收藏");
+    self.titleLabel.text = LocalMyCollection;
 }
 -(void)makeUI{
     [super makeUI];

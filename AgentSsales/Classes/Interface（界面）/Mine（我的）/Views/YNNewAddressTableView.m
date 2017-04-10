@@ -97,11 +97,11 @@
 -(NSArray<NSDictionary *> *)inforArray{
     if (!_inforArray) {
         _inforArray = @[
-                        @{@"item":@"姓名",@"placeholder":@"请输入收货人姓名"},
-                        @{@"item":@"手机号码",@"placeholder":@"请输入收货人的手机号码"},
-                        @{@"item":@"所在地区",@"placeholder":@"请选择所在地区"},
-                        @{@"item":@"详细地址",@"placeholder":@"请输入详细地址"},
-                        @{@"item":@"邮箱",@"placeholder":@"请输入收货人的邮箱"}
+                        @{@"item":LocalRecName,@"placeholder":LocalInputRecName},
+                        @{@"item":LocalRecPhone,@"placeholder":LocalInputRecPhone},
+                        @{@"item":LocalArea,@"placeholder":LocalSelectArea},
+                        @{@"item":LocalDetailArea,@"placeholder":LocalInputDeatilArea},
+                        @{@"item":LocalEmail,@"placeholder":LocalInputEmail}
                         ];
     }
     return _inforArray;

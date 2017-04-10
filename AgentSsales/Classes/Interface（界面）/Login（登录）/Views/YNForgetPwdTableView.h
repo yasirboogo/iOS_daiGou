@@ -14,7 +14,10 @@
 
 @property (nonatomic,strong) NSArray<NSDictionary*> *inforArray;
 
-@property (nonatomic,strong) NSMutableArray<NSString*> *textArrayM;
+@property (nonatomic,copy) NSString * checkCode;
 
+@property (nonatomic,copy) NSString * firPassword;
+
+@property (nonatomic,copy) NSString * secPassword;
 
 @end

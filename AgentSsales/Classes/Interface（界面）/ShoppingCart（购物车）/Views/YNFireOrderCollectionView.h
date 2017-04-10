@@ -47,6 +47,8 @@
 
 @property (nonatomic,copy) void(^didSelectDiscountBlock)();
 
+@property (nonatomic,assign) NSInteger statusIndex;
+
 @property (nonatomic,copy) NSString * postWay;
 
 @property (nonatomic,assign) NSInteger allCount;

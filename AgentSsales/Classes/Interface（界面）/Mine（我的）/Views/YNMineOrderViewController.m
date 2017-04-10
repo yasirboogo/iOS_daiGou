@@ -22,7 +22,7 @@
 
 - (void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:animated];
-    self.titleLabel.text = @"我的订单";
+    self.titleLabel.text = LocalMyOrder;
 }
 
 - (void)viewDidAppear:(BOOL)animated{
@@ -90,7 +90,7 @@
 #pragma mark - 数据懒加载
 -(NSArray *)btnTitles{
     if (!_btnTitles) {
-        _btnTitles = @[kLocalizedString(@"allOrder",@"全部订单"),kLocalizedString(@"waitHandle",@"待处理"),kLocalizedString(@"waitPay",@"待付款"),kLocalizedString(@"waitSend",@"待发货"),kLocalizedString(@"waitReceive",@"待收货"),kLocalizedString(@"completed",@"已完成")];
+        _btnTitles = @[LocalAllOrder,LocalWaitPay,LocalWaitHandle,LocalWaitPPay,LocalWaitSend,LocalWaitReceive,LocalCompleted];
     }
     return _btnTitles;
 }

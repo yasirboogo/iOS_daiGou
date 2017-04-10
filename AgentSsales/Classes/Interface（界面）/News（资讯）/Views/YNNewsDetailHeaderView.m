@@ -209,7 +209,7 @@
     NSString *isLike = [NSString stringWithFormat:@"%@",dict[@"islike"] ];
     self.likeBtn.selected =  [isLike boolValue];
     self.likeLabel.text = [NSString stringWithFormat:@"%@",dict[@"thumb"]];
-    self.comLabel.text = @"评论";
+    self.comLabel.text = LocalComment;
 }
 -(void)setCommentNum:(NSString *)commentNum{
     _commentNum = commentNum;

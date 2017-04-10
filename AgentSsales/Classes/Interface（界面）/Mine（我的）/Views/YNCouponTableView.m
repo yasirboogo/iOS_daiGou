@@ -19,7 +19,6 @@
     if (self) {
         self.showsVerticalScrollIndicator = NO;
         self.rowHeight = W_RATIO(240);
-        self.bounces = NO;
         self.backgroundColor = COLOR_CLEAR;
         self.separatorStyle = UITableViewCellSeparatorStyleNone;
         self.delegate = self;
@@ -33,12 +32,8 @@
     }
     return self;
 }
--(void)setDataArray:(NSArray *)dataArray{
-    _dataArray = dataArray;
-    [self reloadData];
-}
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
-    return _dataArray.count;
+    return _dataArrayM.count;
 }
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
     YNCouponCell * couponCell = [tableView dequeueReusableCellWithIdentifier:@"couponCell"];
@@ -47,14 +42,14 @@
         couponCell.selectionStyle = UITableViewCellSelectionStyleNone;
         couponCell.backgroundColor = COLOR_EDEDED;
     }
-    if ([self.allPrice floatValue] >= [_dataArray[indexPath.row][@"manzu"] floatValue]) {
+    if ([self.allPrice floatValue] >= [_dataArrayM[indexPath.row][@"manzu"] floatValue]) {
         couponCell.isShowUse = YES;
     }else{
         couponCell.isShowUse = NO;
     }
     [couponCell setDidSelectUseButtonBlock:^{
         if (self.didSelectUseButtonBlock) {
-            self.didSelectUseButtonBlock(_dataArray[indexPath.row][@"money"],_dataArray[indexPath.row][@"id"]);
+            self.didSelectUseButtonBlock(_dataArrayM[indexPath.row][@"money"],_dataArrayM[indexPath.row][@"id"]);
         }
     }];
     if (self.isInvalid == NO) {
@@ -66,7 +61,7 @@
     }else{
         couponCell.cellType = GrayType;
     }
-    couponCell.dict = _dataArray[indexPath.row];
+    couponCell.dict = _dataArrayM[indexPath.row];
     return couponCell;
 }
 @end

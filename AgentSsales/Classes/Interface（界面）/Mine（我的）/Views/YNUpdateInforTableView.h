@@ -10,7 +10,7 @@
 
 @interface YNUpdateInforTableView : UITableView
 
-@property (nonatomic,copy) void(^didSelectUpdateInforClickBlock)(NSString*);
+@property (nonatomic,copy) void(^didSelectUpdateInforClickBlock)(NSInteger);
 
 @property (nonatomic,copy) void(^didSelectChangeImgBlock)();
 

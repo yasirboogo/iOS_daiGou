@@ -32,17 +32,11 @@
     [self registerClass:[YNOrderGoodsFooterView class] forSupplementaryViewOfKind:UICollectionElementKindSectionFooter withReuseIdentifier:@"footerView"];
     return self;
 }
--(void)setDataArray:(NSArray *)dataArray{
-    _dataArray = dataArray;
-    
-    [self reloadData];
-}
-
 -(NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView{
-    return _dataArray.count;
+    return _dataArrayM.count;
 }
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section{
-    MyOrderListModel *myOrderListModel = _dataArray[section];
+    MyOrderListModel *myOrderListModel = _dataArrayM[section];
     return myOrderListModel.goodsArray.count;
 }
 -(CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout referenceSizeForHeaderInSection:(NSInteger)section{
@@ -53,20 +47,20 @@
 }
 -(UICollectionReusableView *)collectionView:(UICollectionView *)collectionView viewForSupplementaryElementOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath{
 
-    MyOrderListModel *myOrderListModel = _dataArray[indexPath.section];
+    MyOrderListModel *myOrderListModel = _dataArrayM[indexPath.section];
     
     if ([kind isEqualToString:UICollectionElementKindSectionHeader]) {
         YNOrderGoodsHeaderView *headerView = [collectionView dequeueReusableSupplementaryViewOfKind:kind withReuseIdentifier:@"headerView" forIndexPath:indexPath];
-        headerView.orderStasus = myOrderListModel.ordernumber;
+        headerView.orderStasus = myOrderListModel.orderstatus;
         return headerView;
     }else if ([kind isEqualToString:UICollectionElementKindSectionFooter]){
         YNOrderGoodsFooterView *footerView = [collectionView dequeueReusableSupplementaryViewOfKind:kind withReuseIdentifier:@"footerView" forIndexPath:indexPath];
         footerView.dict = @{@"price":myOrderListModel.totalprice,@"status":myOrderListModel.ordernumber};
         [footerView setDidFooterViewRightButtonBlock:^(NSInteger index) {
-            self.didFooterViewRightButtonBlock(index,[myOrderListModel.orderId integerValue]);
+            self.didFooterViewRightButtonBlock(index,[myOrderListModel.orderId integerValue],indexPath.section,[NSString stringWithFormat:@"%@",myOrderListModel.postage]);
         }];
         [footerView setDidFooterViewLeftButtonBlock:^(NSInteger index) {
-            self.didFooterViewLeftButtonBlock(index,[myOrderListModel.orderId integerValue]);
+            self.didFooterViewLeftButtonBlock(index,[myOrderListModel.orderId integerValue],indexPath.section,[NSString stringWithFormat:@"%@",myOrderListModel.postage]);
         }];
         [footerView setDidFooterViewQuestionButtonBlock:^{
             self.didFooterViewQuestionButtonBlock();
@@ -77,7 +71,7 @@
 }
 - (__kindof UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath{
     YNOrderGoodsCell *goodsCell = [collectionView dequeueReusableCellWithReuseIdentifier:@"goodsCell" forIndexPath:indexPath];
-    MyOrderListModel *myOrderListModel = _dataArray[indexPath.section];
+    MyOrderListModel *myOrderListModel = _dataArrayM[indexPath.section];
     MyOrderGoodsModel *myOrderGoodsModel = myOrderListModel.goodsArray[indexPath.row];
     goodsCell.myOrderGoodsModel = myOrderGoodsModel;
     return goodsCell;
@@ -86,7 +80,8 @@
 -(void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath{
     [collectionView deselectItemAtIndexPath:indexPath animated:NO];
     if (self.didSelectOrderGoodsCell) {
-        self.didSelectOrderGoodsCell(@"订单详情");
+        MyOrderListModel *myOrderListModel = _dataArrayM[indexPath.section];
+        self.didSelectOrderGoodsCell([myOrderListModel.orderId integerValue],indexPath.section,[NSString stringWithFormat:@"%@",myOrderListModel.postage]);
     }
 }
 
@@ -135,9 +130,10 @@
     self.platformLabel.text = myOrderGoodsModel.type;
     self.titleLabel.text = myOrderGoodsModel.name;
     self.subTitleLabel.text = myOrderGoodsModel.note;
-    self.markLabel.text = @"$";
-    self.priceLabel.text = myOrderGoodsModel.salesprice;
+    self.markLabel.text = LocalMoneyMark;
+    self.priceLabel.text = [NSString decimalNumberWithDouble:myOrderGoodsModel.salesprice];
     self.amountLabel.text = [NSString stringWithFormat:@"x%@",myOrderGoodsModel.count];
+    [self layoutSubviews];
 }
 -(UIView *)bgView{
     if (!_bgView) {
@@ -156,7 +152,7 @@
         [self.bgView addSubview:platformLabel];
         platformLabel.font = FONT(28);
         platformLabel.numberOfLines = 1;
-        platformLabel.textColor = COLOR_666666;
+        platformLabel.textColor = COLOR_999999;
         platformLabel.frame = CGRectMake(W_RATIO(20),W_RATIO(20), WIDTHF(self.bgView)-W_RATIO(20)*2, kMidSpace);
     }
     return _platformLabel;
@@ -234,12 +230,7 @@
 @implementation YNOrderGoodsHeaderView
 -(void)setOrderStasus:(NSString *)orderStasus{
     _orderStasus = orderStasus;
-    NSArray<NSString*> *orderStatusArr = @[kLocalizedString(@"waitHandle",@"待处理"),
-                                        kLocalizedString(@"waitPay",@"待付款"),
-                                        kLocalizedString(@"waitSend",@"待发货"),
-                                        kLocalizedString(@"waitReceive",@"待收货"),
-                                        kLocalizedString(@"completed",@"已完成")];
-    self.statusLabel.text = orderStatusArr[[orderStasus integerValue]-1];
+    self.statusLabel.text = orderStasus;
 }
 
 -(UIView *)bgView{
@@ -259,7 +250,7 @@
         UILabel *statusLabel = [[UILabel alloc] init];
         _statusLabel = statusLabel;
         [self.bgView addSubview:statusLabel];
-        statusLabel.font = FONT(24);
+        statusLabel.font = FONT(30);
         statusLabel.textAlignment = NSTextAlignmentRight;
         statusLabel.textColor = COLOR_DF463E;
         statusLabel.frame = CGRectMake(W_RATIO(20), W_RATIO(20), WIDTHF(self.bgView)-W_RATIO(20)*2, HEIGHTF(self.bgView)-W_RATIO(20)*2);
@@ -285,17 +276,24 @@
 /** 马上付款 */
 @property (nonatomic,weak) UIButton * rightBtn;
 
+/** 失效 */
+@property (nonatomic,weak) UILabel * invalidLabel;
+
 @end
 @implementation YNOrderGoodsFooterView
 
 -(void)setDict:(NSDictionary *)dict{
     _dict = dict;
     
-    self.totallLabel.text = @"共计（不含邮费）：";
-    self.markLabel.text = @"￥";
+    self.totallLabel.text = LocalTotalCost;
+    self.markLabel.text = LocalMoneyMark;
     self.priceLabel.text = dict[@"price"];
     
     self.status = dict[@"status"];
+    
+    if ([dict[@"num"] integerValue]) {
+        self.invalidLabel.text = LocalInvalid;
+    };
     
     [self setNeedsLayout];
 }
@@ -311,50 +309,52 @@
     CGSize totallSize = [_totallLabel.text calculateHightWithFont:_totallLabel.font maxWidth:XF(_markLabel)-W_RATIO(20)-kMinSpace];
     self.totallLabel.frame = CGRectMake(XF(_markLabel)-totallSize.width-kMinSpace,MaxYF(_markLabel)-totallSize.height,totallSize.width, totallSize.height);
     
+    self.invalidLabel.frame = CGRectMake(kMinSpace*2, YF(_totallLabel), XF(_totallLabel)-kMidSpace, HEIGHTF(_totallLabel));
+    
     if ([self.status isEqualToString:@"1"]) {
         self.rightBtn.tag = 200+1;
         _rightBtn.hidden = NO;
-        _rightBtn.enabled = NO;
-        [_rightBtn setTitle:@"马上付款" forState:UIControlStateNormal];
-        _rightBtn.backgroundColor = COLOR_A4A4A4;
+        _rightBtn.enabled = YES;
+        [_rightBtn setTitle:LocalPayment forState:UIControlStateNormal];
+        _rightBtn.backgroundColor = COLOR_DF463E;
         [_rightBtn setTitleColor:COLOR_FFFFFF forState:UIControlStateNormal];
         self.leftBtn.tag = 100+1;
         _leftBtn.hidden = NO;
         _leftBtn.enabled = YES;
-        [_leftBtn setTitle:@"取消订单" forState:UIControlStateNormal];
+        [_leftBtn setTitle:LocalCancelOrder forState:UIControlStateNormal];
+        _leftBtn.backgroundColor = COLOR_FFFFFF;
+        [_leftBtn setTitleColor:COLOR_000000 forState:UIControlStateNormal];
+        //待处理无法付款原因
+        self.questionBtn.hidden = YES;
+        self.questionLabel.hidden = YES;
+    }else if ([self.status isEqualToString:@"2"]){
+        self.rightBtn.tag = 200+2;
+        _rightBtn.hidden = NO;
+        _rightBtn.enabled = NO;
+        [_rightBtn setTitle:LocalPayment forState:UIControlStateNormal];
+        _rightBtn.backgroundColor = COLOR_A4A4A4;
+        [_rightBtn setTitleColor:COLOR_FFFFFF forState:UIControlStateNormal];
+        self.leftBtn.tag = 100+2;
+        _leftBtn.hidden = NO;
+        _leftBtn.enabled = YES;
+        [_leftBtn setTitle:LocalCancelOrder forState:UIControlStateNormal];
         _leftBtn.backgroundColor = COLOR_FFFFFF;
         [_leftBtn setTitleColor:COLOR_000000 forState:UIControlStateNormal];
         //待处理无法付款原因
         self.questionBtn.hidden = NO;
         self.questionLabel.hidden = NO;
-    }else if ([self.status isEqualToString:@"2"]){
-        self.rightBtn.tag = 200+2;
-        _rightBtn.hidden = NO;
-        _rightBtn.enabled = YES;
-        [_rightBtn setTitle:@"马上付款" forState:UIControlStateNormal];
-        _rightBtn.backgroundColor = COLOR_DF463E;
-        [_rightBtn setTitleColor:COLOR_FFFFFF forState:UIControlStateNormal];
-        self.leftBtn.tag = 100+2;
-        _leftBtn.hidden = NO;
-        _leftBtn.enabled = YES;
-        [_leftBtn setTitle:@"取消订单" forState:UIControlStateNormal];
-        _leftBtn.backgroundColor = COLOR_FFFFFF;
-        [_leftBtn setTitleColor:COLOR_000000 forState:UIControlStateNormal];
         
-        //待处理无法付款原因
-        self.questionBtn.hidden = YES;
-        self.questionLabel.hidden = YES;
     }else if ([self.status isEqualToString:@"3"]){
         self.rightBtn.tag = 200+3;
         _rightBtn.hidden = NO;
         _rightBtn.enabled = YES;
-        self.rightBtn.enabled = YES;
-        [_rightBtn setTitle:@"提现发货" forState:UIControlStateNormal];
-        _rightBtn.backgroundColor = COLOR_FFFFFF;
-        [_rightBtn setTitleColor:COLOR_000000 forState:UIControlStateNormal];
+        [_rightBtn setTitle:LocalPayment forState:UIControlStateNormal];
+        _rightBtn.backgroundColor = COLOR_DF463E;
+        [_rightBtn setTitleColor:COLOR_FFFFFF forState:UIControlStateNormal];
         self.leftBtn.tag = 100+3;
         _leftBtn.hidden = YES;
         _leftBtn.enabled = NO;
+        
         //待处理无法付款原因
         self.questionBtn.hidden = YES;
         self.questionLabel.hidden = YES;
@@ -362,15 +362,13 @@
         self.rightBtn.tag = 200+4;
         _rightBtn.hidden = NO;
         _rightBtn.enabled = YES;
-        [_rightBtn setTitle:@"确认收货" forState:UIControlStateNormal];
-        _rightBtn.backgroundColor = COLOR_DF463E;
-        [_rightBtn setTitleColor:COLOR_FFFFFF forState:UIControlStateNormal];
+        self.rightBtn.enabled = YES;
+        [_rightBtn setTitle:LocalPrompt forState:UIControlStateNormal];
+        _rightBtn.backgroundColor = COLOR_FFFFFF;
+        [_rightBtn setTitleColor:COLOR_000000 forState:UIControlStateNormal];
         self.leftBtn.tag = 100+4;
-        _leftBtn.hidden = NO;
-        _leftBtn.enabled = YES;
-        [_leftBtn setTitle:@"查看物流" forState:UIControlStateNormal];
-        _leftBtn.backgroundColor = COLOR_FFFFFF;
-        [_leftBtn setTitleColor:COLOR_000000 forState:UIControlStateNormal];
+        _leftBtn.hidden = YES;
+        _leftBtn.enabled = NO;
         //待处理无法付款原因
         self.questionBtn.hidden = YES;
         self.questionLabel.hidden = YES;
@@ -378,13 +376,29 @@
         self.rightBtn.tag = 200+5;
         _rightBtn.hidden = NO;
         _rightBtn.enabled = YES;
-        [_rightBtn setTitle:@"查看物流" forState:UIControlStateNormal];
-        _rightBtn.backgroundColor = COLOR_FFFFFF;
-        [_rightBtn setTitleColor:COLOR_000000 forState:UIControlStateNormal];
+        [_rightBtn setTitle:LocalConReceipt forState:UIControlStateNormal];
+        _rightBtn.backgroundColor = COLOR_DF463E;
+        [_rightBtn setTitleColor:COLOR_FFFFFF forState:UIControlStateNormal];
         self.leftBtn.tag = 100+5;
         _leftBtn.hidden = NO;
         _leftBtn.enabled = YES;
-        [_leftBtn setTitle:@"再来一单" forState:UIControlStateNormal];
+        [_leftBtn setTitle:LocalViewLogistics forState:UIControlStateNormal];
+        _leftBtn.backgroundColor = COLOR_FFFFFF;
+        [_leftBtn setTitleColor:COLOR_000000 forState:UIControlStateNormal];
+        //待处理无法付款原因
+        self.questionBtn.hidden = YES;
+        self.questionLabel.hidden = YES;
+    }else if ([self.status isEqualToString:@"6"]){
+        self.rightBtn.tag = 200+6;
+        _rightBtn.hidden = NO;
+        _rightBtn.enabled = YES;
+        [_rightBtn setTitle:LocalViewLogistics forState:UIControlStateNormal];
+        _rightBtn.backgroundColor = COLOR_FFFFFF;
+        [_rightBtn setTitleColor:COLOR_000000 forState:UIControlStateNormal];
+        self.leftBtn.tag = 100+6;
+        _leftBtn.hidden = NO;
+        _leftBtn.enabled = YES;
+        [_leftBtn setTitle:LocalAnotherOne forState:UIControlStateNormal];
         _leftBtn.backgroundColor = COLOR_FFFFFF;
         [_leftBtn setTitleColor:COLOR_000000 forState:UIControlStateNormal];
         //待处理无法付款原因
@@ -438,6 +452,16 @@
     }
     return _priceLabel;
 }
+-(UILabel *)invalidLabel{
+    if (!_invalidLabel) {
+        UILabel *invalidLabel = [[UILabel alloc] init];
+        _invalidLabel = invalidLabel;
+        [self.bgView addSubview:invalidLabel];
+        invalidLabel.font = FONT(28);
+        invalidLabel.textColor = COLOR_FF4844;
+    }
+    return _invalidLabel;
+}
 -(UIButton *)questionBtn{
     if (!_questionBtn) {
         UIButton *questionBtn = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -459,7 +483,7 @@
         UILabel *questionLabel = [[UILabel alloc] init];
         _questionLabel = questionLabel;
         [self.bgView addSubview:questionLabel];
-        questionLabel.text = @"为什么不能马上付款？";
+        questionLabel.text = LocalWhyNotPay;
         questionLabel.font = FONT(24);
         questionLabel.numberOfLines = 3;
         questionLabel.textColor = COLOR_999999;
@@ -502,7 +526,7 @@
         rightBtn.titleLabel.adjustsFontSizeToFitWidth = YES;
         [rightBtn setTitleColor:COLOR_FFFFFF forState:UIControlStateNormal];
         [rightBtn addTarget:self action:@selector(handleRightButtonClick:) forControlEvents:UIControlEventTouchUpInside];
-        rightBtn.frame = CGRectMake(MaxXF(_priceLabel)-W_RATIO(160), MaxYF(_priceLabel)+W_RATIO(20), W_RATIO(160), W_RATIO(64));
+        rightBtn.frame = CGRectMake(MaxXF(_priceLabel)-W_RATIO(160)+W_RATIO(20), MaxYF(_priceLabel)+W_RATIO(20), W_RATIO(160), W_RATIO(64));
     }
     return _rightBtn;
 }

@@ -11,9 +11,12 @@
 #import "YNTipsSuccessBtnsView.h"
 #import "YNLogisticalMsgViewController.h"
 #import "YNPaySuccessViewController.h"
+#import "YNPayMoneyViewController.h"
 
 @interface YNOrderDetailsViewController ()
-
+{
+    NSInteger _type;
+}
 @property (nonatomic,weak) YNOrderDetailsCollectionView * collectionView;
 
 @property (nonatomic,weak) YNTipsSuccessBtnsView *btnsView;
@@ -26,6 +29,7 @@
 
 - (void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:animated];
+    [self startNetWorkingRequestWithGetOrderDetail];
 }
 
 - (void)viewDidAppear:(BOOL)animated{
@@ -44,7 +48,76 @@
 }
 
 #pragma mark - 网路请求
-
+-(void)startNetWorkingRequestWithGetOrderDetail{
+    NSDictionary *params = @{@"orderId":[NSNumber numberWithInteger:_orderId],
+                             @"type":[NSNumber numberWithInteger:_type]};
+    [YNHttpManagers getOrderDetailWithParams:params success:^(id response) {
+        if ([response[@"code"] isEqualToString:@"success"]) {
+            //do success things
+            self.collectionView.myOrderListModel = _myOrderListModel;
+            self.collectionView.detailDict = response;
+            [self setBtnsViewBtnTitlesWithStatus:[response[@"orderstatus"] integerValue]];
+        }else{
+            //do failure things
+        }
+    } failure:^(NSError *error) {
+        //do error things
+    }];
+}
+-(void)startNetWorkingRequestWithConfirmShipment{
+    NSDictionary *params = @{@"orderId":[NSNumber numberWithInteger:_orderId]};
+    [YNHttpManagers confirmShipmentWithParams:params success:^(id response) {
+        if ([response[@"code"] isEqualToString:@"success"]) {
+            //do success things
+            YNPaySuccessViewController *pushVC = [[YNPaySuccessViewController alloc] init];
+            pushVC.type = 3;
+            [self.navigationController pushViewController:pushVC animated:NO];
+        }else{
+            //do failure things
+        }
+    } failure:^(NSError *error) {
+        //do error things
+    }];
+}
+-(void)startNetWorkingRequestWithCancelUserOrder{
+    NSDictionary *params = @{@"orderId":[NSNumber numberWithInteger:_orderId]};
+    [YNHttpManagers cancelUserOrderWithParams:params success:^(id response) {
+        if ([response[@"code"] isEqualToString:@"success"]) {
+            //do success things
+            [self.navigationController popViewControllerAnimated:NO];
+        }else{
+            //do failure things
+        }
+    } failure:^(NSError *error) {
+        //do error things
+    }];
+}
+-(void)startNetWorkingRequestWithPromptShipment{
+    NSDictionary *params = @{@"orderId":[NSNumber numberWithInteger:_orderId]};
+    [YNHttpManagers promptShipmentWithParams:params success:^(id response) {
+        if ([response[@"code"] isEqualToString:@"success"]) {
+            //do success things
+            [self.navigationController popViewControllerAnimated:NO];
+        }else{
+            //do failure things
+        }
+    } failure:^(NSError *error) {
+        //do error things
+    }];
+}
+-(void)startNetWorkingRequestWithAnotherOrder{
+    NSDictionary *params = @{@"orderId":[NSNumber numberWithInteger:_orderId],
+                             @"type":[NSNumber numberWithInteger:_type]};
+    [YNHttpManagers anotherOrderWithParams:params success:^(id response) {
+        if ([response[@"code"] isEqualToString:@"success"]) {
+            //do success things
+        }else{
+            //do failure things
+        }
+    } failure:^(NSError *error) {
+        //do error things
+    }];
+}
 #pragma mark - 视图加载
 -(YNOrderDetailsCollectionView *)collectionView{
     if (!_collectionView) {
@@ -68,16 +141,27 @@
         YNTipsSuccessBtnsView *btnsView = [[YNTipsSuccessBtnsView alloc] init];
         _btnsView = btnsView;
         [self.view addSubview:btnsView];
-        [self.view bringSubviewToFront:btnsView];
+        btnsView.alpha = 0;
         btnsView.btnStyle = UIButtonStyle2;
         [btnsView setDidSelectBottomButtonClickBlock:^(NSString *str) {
-            if ([str isEqualToString:@"确认收货"]) {
-                YNPaySuccessViewController *pushVC = [[YNPaySuccessViewController alloc] init];
-                pushVC.titleStr = @"确认收货";
+            if ([str isEqualToString:LocalPayment]) {
+                YNPayMoneyViewController *pushVC = [[YNPayMoneyViewController alloc] init];
+                pushVC.postage = self.postage;
+                pushVC.orderId = [NSString stringWithFormat:@"%ld",(long)_orderId];
                 [self.navigationController pushViewController:pushVC animated:NO];
-            }else if ([str isEqualToString:@"查看物流"]){
+            }else if ([str isEqualToString:LocalCancelOrder]){
+                [self startNetWorkingRequestWithCancelUserOrder];
+            }else if ([str isEqualToString:LocalPrompt]){
+                [self startNetWorkingRequestWithPromptShipment];
+            }else if ([str isEqualToString:LocalConReceipt]) {
+                [self startNetWorkingRequestWithConfirmShipment];
+            }else if ([str isEqualToString:LocalViewLogistics]){
                 YNLogisticalMsgViewController *pushVC = [[YNLogisticalMsgViewController alloc] init];
+                pushVC.orderId = _orderId;
                 [self.navigationController pushViewController:pushVC animated:NO];
+            }else if ([str isEqualToString:LocalAnotherOne]){
+                [self startNetWorkingRequestWithAnotherOrder];
+
             }
         }];
     }
@@ -86,23 +170,28 @@
 #pragma mark - 代理实现
 
 #pragma mark - 函数、消息
+-(void)setBtnsViewBtnTitlesWithStatus:(NSInteger)status{
+    if (status == 1) {
+        self.btnsView.btnTitles = @[LocalPayment,LocalCancelOrder];
+    }else if (status == 2){
+        self.btnsView.btnTitles = @[LocalCancelOrder];
+    }else if (status == 3){
+        self.btnsView.btnTitles = @[LocalPayment,LocalCancelOrder];
+    }else if (status == 4){
+        self.btnsView.btnTitles = @[LocalPrompt];
+    }else if (status == 5){
+        self.btnsView.btnTitles = @[LocalConReceipt,LocalViewLogistics];
+    }else if (status == 6){
+        self.btnsView.btnTitles = @[LocalViewLogistics,LocalAnotherOne];
+    }
+}
 -(void)makeData{
     [super makeData];
-    self.collectionView.dict = @{@"manMsg":@{@"name":@"李小龙",
-                                             @"phone":@"13631499887",
-                                             @"address":@"广东省广州市天河区五山街华南农业大学华南区12栋312"},
-                                 @"orderMsg":@{@"code":@"1234567890",
-                                               @"buyTime":@"2016年6月21日 14：16",
-                                               @"payTime":@"2016年6月22日 09：16",
-                                               @"address":@"广西桂林",
-                                               @"status":@"代收款",},
-                                 @"goodsMsg":@[],
-                                 };
-    self.btnsView.btnTitles = @[@"确认收货",@"查看物流"];
+    _type = [LanguageManager currentLanguageIndex];
 }
 -(void)makeNavigationBar{
     [super makeNavigationBar];
-    self.titleLabel.text = @"订单详情";
+    self.titleLabel.text = LocalOrderDetails;
 }
 -(void)makeUI{
     [super makeUI];

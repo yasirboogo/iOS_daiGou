@@ -10,7 +10,7 @@
 
 @interface YNNewsCommentTableView : UITableView
 
-@property (nonatomic,strong) NSArray * dataArray;
+@property (nonatomic,strong) NSMutableArray * dataArrayM;
 
 @end
 @interface YNNewsCommentCellFrame : NSObject

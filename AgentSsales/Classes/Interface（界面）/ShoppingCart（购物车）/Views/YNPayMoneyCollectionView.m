@@ -39,10 +39,6 @@
     _orderDict = orderDict;
     [self reloadData];
 }
--(void)setIndexPath:(NSIndexPath *)indexPath{
-    _indexPath = indexPath;
-    [self reloadData];
-}
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section{
     if (section == 0) {
         return [(NSArray*)_orderDict[@"goodsArray"] count];
@@ -91,7 +87,15 @@
             [wayCell setViewCornerRadiusWithRectCorner:UIRectCornerBottomLeft|UIRectCornerBottomRight cornerSize:CGSizeMake(W_RATIO(20), W_RATIO(20))];
         }
         wayCell.dict = _payArray[indexPath.row];
-        wayCell.isSelect = indexPath == self.indexPath ? YES :NO;
+        wayCell.isEnable = YES;
+        if (_typeIndex == 0 && indexPath.row == 2) {
+            wayCell.isEnable = NO;
+        }else if (_typeIndex == 1 && (indexPath.row == 0||indexPath.row == 1)){
+            wayCell.isEnable = NO;
+        }else if (_typeIndex == 2 && indexPath.row != 3){
+            wayCell.isEnable = NO;
+        }
+        wayCell.isSelect = ([indexPath compare:self.indexPath] == NSOrderedSame) ? YES : NO;
         return wayCell;
     }
     return nil;
@@ -102,8 +106,9 @@
         
     }else if (indexPath.section == 1){
         self.indexPath = indexPath;
+        [self reloadData];
         if (self.didSelectPayWayCellBlock) {
-            self.didSelectPayWayCellBlock(_payArray[indexPath.row][@"payWay"]);
+            self.didSelectPayWayCellBlock(indexPath.row);
         }
     }
 }
@@ -111,15 +116,15 @@
     if ([kind isEqualToString:UICollectionElementKindSectionHeader]) {
         YNPayHeaderView *headerView = [collectionView dequeueReusableSupplementaryViewOfKind:kind withReuseIdentifier:@"headerView" forIndexPath:indexPath];
         if (indexPath.section == 0) {
-            headerView.tips = @"订单信息";
+            headerView.tips = LocalOrderInfor;
         }else if (indexPath.section == 1){
-            headerView.tips = @"付款方式";
+            headerView.tips = LocalPayWay;
         }
         return headerView;
     }else if ([kind isEqualToString:UICollectionElementKindSectionFooter]){
         if (indexPath.section == 0) {
             YNPayFooterView *footerView = [collectionView dequeueReusableSupplementaryViewOfKind:kind withReuseIdentifier:@"footerView" forIndexPath:indexPath];
-            footerView.price = _orderDict[@"totalprice"];
+            footerView.realprice = self.payMoney;
             return footerView;
         }
     }
@@ -127,11 +132,10 @@
 }
 -(NSArray<NSDictionary *> *)payArray{
     if (!_payArray) {
-        _payArray = @[
-                      @{@"payImg":@"malaixiya_yuan",@"payWay":@"马来西亚网银"},
-                      @{@"payImg":@"malaixiya_yuan",@"payWay":@"支付宝支付"},
-                      @{@"payImg":@"malaixiya_yuan",@"payWay":@"微信支付"},
-                      @{@"payImg":@"malaixiya_yuan",@"payWay":kLocalizedString(@"myWallet",@"我的钱包")}];
+        _payArray = @[@{@"payImg":@"zhifubao_gouwuche",@"payWay":LocalAlipay},
+                      @{@"payImg":@"weixinhaoyou_fenxiang",@"payWay":LocalWeichat},
+                      @{@"payImg":@"malaixiya_yuan",@"payWay":LocalBankcard},
+                      @{@"payImg":@"qianbao_gouwuche",@"payWay":LocalMyWallet}];
     }
     return _payArray;
 }
@@ -157,8 +161,8 @@
     _dict = dict;
     self.titleLabel.text = dict[@"name"];
     self.subTitleLabel.text = dict[@"note"];
-    self.markLabel.text = @"￥";
-    self.priceLabel.text = [NSString stringWithFormat:@"%@",dict[@"salesprice"]];
+    self.markLabel.text = LocalMoneyMark;
+    self.priceLabel.text = [NSString decimalNumberWithDouble:dict[@"salesprice"]];
     self.amountLabel.text = [NSString stringWithFormat:@"x%@",dict[@"count"]];
 }
 -(void)layoutSubviews{
@@ -255,15 +259,22 @@
 
 @implementation YNPayWayCell
 
--(void)setDict:(NSDictionary *)dict{
-    _dict = dict;
-    
-    self.payImgView.image = [UIImage imageNamed:dict[@"payImg"]];
-    self.paymentLabel.text = dict[@"payWay"];
-}
 -(void)setIsSelect:(BOOL)isSelect{
     _isSelect = isSelect;
     self.paymentBtn.selected = isSelect;
+}
+-(void)setIsEnable:(BOOL)isEnable{
+    _isEnable = isEnable;
+    self.payImgView.image = [UIImage imageNamed:_dict[@"payImg"]];
+    if (isEnable) {
+        self.paymentLabel.text = [NSString stringWithFormat:@"%@",_dict[@"payWay"]];
+        self.userInteractionEnabled = YES;
+        self.paymentLabel.textColor = COLOR_333333;
+    }else{
+        self.paymentLabel.text = [NSString stringWithFormat:@"%@%@",_dict[@"payWay"],LocalNoSupport];
+        self.userInteractionEnabled = NO;
+        self.paymentLabel.textColor = COLOR_999999;
+    }
 }
 -(UIImageView *)payImgView{
     if (!_payImgView) {
@@ -300,6 +311,7 @@
         _paymentLabel = paymentLabel;
         [self.contentView addSubview:paymentLabel];
         paymentLabel.font = FONT(32);
+        paymentLabel.adjustsFontSizeToFitWidth = YES;
         paymentLabel.textColor = COLOR_333333;
         paymentLabel.frame = CGRectMake(MaxXF(_payImgView)+kMidSpace,
                                         0,
@@ -347,11 +359,11 @@
 @end
 @implementation YNPayFooterView
 
--(void)setPrice:(NSString *)price{
-    _price = price;
-    self.priceLabel.text = price;
-    self.markLabel.text = @"￥";
-    self.tipsLabel.text = @"应付总额:";
+-(void)setRealprice:(NSString *)realprice{
+    _realprice = realprice;
+    self.priceLabel.text = realprice;
+    self.markLabel.text = LocalMoneyMark;
+    self.tipsLabel.text = LocalPriceTotal;
 }
 -(void)layoutSubviews{
     [super layoutSubviews];

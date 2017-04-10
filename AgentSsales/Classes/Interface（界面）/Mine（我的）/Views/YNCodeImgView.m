@@ -48,8 +48,10 @@
         UILabel *tipsLabel = [[UILabel alloc] init];
         _tipsLabel = tipsLabel;
         [self addSubview:tipsLabel];
-        tipsLabel.text = @"让朋友扫一扫，即可成为我的粉丝";
+        tipsLabel.text = LocalSharetips;
+        tipsLabel.numberOfLines = 0;
         tipsLabel.font = FONT(26);
+        tipsLabel.textAlignment = NSTextAlignmentCenter;
         tipsLabel.textColor = COLOR_999999;
         CGSize tipsSize = [tipsLabel.text calculateHightWithWidth:WIDTHF(self.codeImgView) font:tipsLabel.font];
         tipsLabel.frame = CGRectMake(XF(_codeImgView),MaxYF(_codeImgView)+W_RATIO(20), tipsSize.width, tipsSize.height);
@@ -66,7 +68,7 @@
         [shareCodeBtn setImageEdgeInsets:UIEdgeInsetsMake(0, -W_RATIO(20), 0, 0)];
         [shareCodeBtn setTitleEdgeInsets:UIEdgeInsetsMake(0, 0, 0, -W_RATIO(20))];
         [shareCodeBtn setImage:[UIImage imageNamed:@"fenxiang_wode"] forState:UIControlStateNormal];
-        [shareCodeBtn setTitle:@"分享我的二维码" forState:UIControlStateNormal];
+        [shareCodeBtn setTitle:LocalShareCode forState:UIControlStateNormal];
         [shareCodeBtn setTitleColor:COLOR_FFFFFF forState:UIControlStateNormal];
         [shareCodeBtn addTarget:self action:@selector(handleShareCodeButton) forControlEvents:UIControlEventTouchUpInside];
         shareCodeBtn.frame = CGRectMake(0, MaxYF(self.tipsLabel)+W_RATIO(20), W_RATIO(480), W_RATIO(100));

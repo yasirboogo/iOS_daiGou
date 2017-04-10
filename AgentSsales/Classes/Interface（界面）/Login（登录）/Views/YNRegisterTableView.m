@@ -30,9 +30,8 @@
     }
     return self;
 }
--(void)setCode:(NSString *)code{
-    [self.textArrayM replaceObjectAtIndex:0 withObject:code];
-    _code = [NSString stringWithFormat:@"+%@",code];
+-(void)setCountry:(NSString *)country{
+    _country = country;
     [self reloadData];
 }
 
@@ -52,7 +51,7 @@
     }
     inforCell.textFieldText = nil;
     if (indexPath.row == 0) {
-        inforCell.textFieldText = _code;
+        inforCell.textFieldText = _country;
         inforCell.isShowArrowImg = YES;
         inforCell.isForbidClick = YES;
     }else if (indexPath.row == 1){
@@ -67,10 +66,19 @@
         inforCell.keyboardType = UIKeyboardTypeASCIICapable;
     }
     inforCell.inforDict = _inforArray[indexPath.row];
+    void (^codeBtnEnable)(BOOL) = ^(BOOL isEnable){
+        inforCell.isEnableCodeBtn = isEnable;
+    };
     
     [inforCell setInforCellTextFieldBlock:^(NSString *str) {
-        
-        [self.textArrayM replaceObjectAtIndex:indexPath.row withObject:str];
+        if (indexPath.row == 1) {
+            self.loginphone = str;
+            codeBtnEnable(str.length && _country.length);
+        }else if (indexPath.row == 2){
+            self.checkCode = str;
+        }else if (indexPath.row == 3){
+            self.password = str;
+        }
     }];
     
     return inforCell;
@@ -83,19 +91,13 @@
         }
     }
 }
--(NSMutableArray<NSString *> *)textArrayM{
-    if (!_textArrayM) {
-        _textArrayM = [NSMutableArray arrayWithObjects:kZeroStr,kZeroStr,kZeroStr,kZeroStr, nil];
-    }
-    return _textArrayM;
-}
 -(NSArray<NSDictionary *> *)inforArray{
     if (!_inforArray) {
         _inforArray = @[
-                        @{@"item":@"国家(区号)",@"placeholder":@"选择您所在的国家(区号)"},
-                        @{@"item":@"手机号",@"placeholder":@"输入您的手机号"},
-                        @{@"item":@"验证码",@"placeholder":@"输入验证码"},
-                        @{@"item":@"密码",@"placeholder":@"输入登录密码"}
+                        @{@"item":LocalCountry,@"placeholder":LocalCountryID},
+                        @{@"item":LocalPhoneID,@"placeholder":LocalInputID},
+                        @{@"item":LocalCodeID,@"placeholder":LocalInputCodeID},
+                        @{@"item":LocalUserPwd,@"placeholder":LocalInputPwd}
                         ];
     }
     return _inforArray;

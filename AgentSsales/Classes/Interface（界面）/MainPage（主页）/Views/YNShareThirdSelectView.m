@@ -103,7 +103,7 @@
         UILabel *titleLabel = [[UILabel alloc] init];
         _titleLabel = titleLabel;
         [self addSubview:titleLabel];
-        titleLabel.text = @"分享";
+        titleLabel.text = LocalShare;
         titleLabel.backgroundColor = COLOR_FFFFFF;
         titleLabel.font = FONT(40);
         titleLabel.textColor = COLOR_333333;
@@ -117,7 +117,8 @@
         UIButton *cancelBtn = [UIButton buttonWithType:UIButtonTypeCustom];
         _cancelBtn = cancelBtn;
         [self addSubview:cancelBtn];
-        [cancelBtn setTitle:@"取消" forState:UIControlStateNormal];
+        cancelBtn.titleLabel.font = FONT(32);
+        [cancelBtn setTitle:LocalCancel forState:UIControlStateNormal];
         [cancelBtn setTitleColor:COLOR_999999 forState:UIControlStateNormal];
         cancelBtn.backgroundColor = COLOR_EDEDED;
         [cancelBtn addTarget:self action:@selector(handleCancelButtonClick:) forControlEvents:UIControlEventTouchUpInside];

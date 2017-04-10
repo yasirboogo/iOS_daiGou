@@ -12,9 +12,8 @@
 {
     NSInteger _type;
 }
-@property (nonatomic,weak) UIWebView * webView;
-
 @property (nonatomic,weak) WKWebView * wkWebView;
+
 @end
 
 @implementation YNDocumentExplainViewController
@@ -46,12 +45,14 @@
     NSDictionary *params = @{@"status":[NSNumber numberWithInteger:_status],
                              @"type":[NSNumber numberWithInteger:_type]};
     [YNHttpManagers commonProblemWithParams:params success:^(id response) {
-        if (iOS8) {
-            [self.wkWebView loadHTMLString:response baseURL:nil];
+        if ([response[@"code"] isEqualToString:@"success"]) {
+            //do success things
+            [self.wkWebView loadHTMLString:response[@"content"] baseURL:nil];
         }else{
-            [self.webView loadHTMLString:response baseURL:nil];
+            //do failure things
         }
     } failure:^(NSError *error) {
+        //do error things
     }];
 }
 #pragma mark - 视图加载
@@ -76,27 +77,13 @@
         [wkWebView setAutoresizingMask:UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight];
         [wkWebView setMultipleTouchEnabled:YES];
         [wkWebView setAutoresizesSubviews:YES];
+        wkWebView.scrollView.bounces = NO;
         [wkWebView.scrollView setAlwaysBounceVertical:YES];
         
-        //wkWebView.UIDelegate = self;
-        //wkWebView.navigationDelegate = self;
-        //wkWebView.scrollView.delegate = self;
         wkWebView.allowsBackForwardNavigationGestures =YES;//打开网页间的滑动返回
     }
     return _wkWebView;
 }
--(UIWebView *)webView{
-    if (!_webView) {
-        CGRect frame = CGRectMake(0,kUINavHeight, SCREEN_WIDTH, SCREEN_HEIGHT-kUINavHeight);
-        UIWebView *webView = [[UIWebView alloc] initWithFrame:frame];
-        _webView = webView;
-        [self.view addSubview:webView];
-        webView.scalesPageToFit = YES;
-        //webView.delegate = self;
-    }
-    return _webView;
-}
-
 #pragma mark - 代理实现
 
 #pragma mark - 函数、消息
@@ -107,11 +94,15 @@
 -(void)makeNavigationBar{
     [super makeNavigationBar];
     if (_status == 1) {
-        self.titleLabel.text = kLocalizedString(@"常见问题",@"常见问题");
+        self.titleLabel.text = LocalCommonQuestions;
     }else if (_status == 2){
-        self.titleLabel.text = kLocalizedString(@"分销规则",@"分销规则");
+        self.titleLabel.text = LocalDistributionRules;
     }else if (_status == 3){
-        self.titleLabel.text = kLocalizedString(@"兑换说明",@"兑换说明");
+        self.titleLabel.text = LocalExchangeNote;
+    }else if (_status == 4){
+        self.titleLabel.text = LocalRechargeInstructions;
+    }else if (_status == 5){
+        self.titleLabel.text = LocalAgreement;
     }
 }
 -(void)makeUI{

@@ -12,11 +12,13 @@
 
 @property (nonatomic, strong) NSArray *dataArray;
 
+@property (nonatomic, assign) NSInteger maxNum;
+
 @property (nonatomic, strong) NSMutableArray<NSIndexPath*> *selectArrayM;
 
 @property (nonatomic, assign) BOOL isTapGesture;
 
-@property (nonatomic, copy) void(^didSelectSubmitButtonBlock)(NSString*,NSString*);
+@property (nonatomic, copy) void(^didSelectSubmitButtonBlock)(NSString*,NSString*,CGFloat);
 
 - (void)showPopView:(BOOL)animated;
 
@@ -29,6 +31,7 @@
 @end
 @interface YNSelectCountViewCell : UICollectionViewCell
 @property (nonatomic,copy) NSString * count;
+@property (nonatomic, assign) NSInteger maxNum;
 @property (nonatomic, copy) void(^didChangeCountBlock)(NSString*);
 @end
 @interface YNSelectParaHeaderView : UICollectionReusableView

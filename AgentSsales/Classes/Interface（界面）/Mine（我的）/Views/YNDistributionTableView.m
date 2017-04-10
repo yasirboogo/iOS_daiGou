@@ -15,12 +15,11 @@
 @implementation YNDistributionTableView
 
 -(instancetype)init{
-    self = [super init];
+    CGRect frame = CGRectMake(0,W_RATIO(560), SCREEN_WIDTH, SCREEN_HEIGHT-W_RATIO(560));
+    self = [super initWithFrame:frame style:UITableViewStylePlain];
     if (self) {
-        self.frame = CGRectMake(0,W_RATIO(560), SCREEN_WIDTH, SCREEN_HEIGHT-W_RATIO(560));
         self.rowHeight = W_RATIO(100);
         self.showsVerticalScrollIndicator = NO;
-        self.bounces = NO;
         self.backgroundColor = COLOR_FFFFFF;
         self.separatorStyle = UITableViewCellSeparatorStyleNone;
         self.delegate = self;
@@ -35,7 +34,7 @@
         lineView.backgroundColor = COLOR_EDEDED;
         [headerView addSubview:lineView];
         
-        NSArray<NSString*> *itemTitles = @[@"时间",@"来源",@"佣金"];
+        NSArray<NSString*> *itemTitles = @[LocalTime,LocalSource,LocalCommission];
         CGFloat itemWidth = (SCREEN_WIDTH-kMidSpace*2-kMinSpace*(itemTitles.count-1))/itemTitles.count;
         [itemTitles enumerateObjectsUsingBlock:^(NSString * _Nonnull title, NSUInteger idx, BOOL * _Nonnull stop) {
             UILabel * itemlabel = [[UILabel alloc] init];
@@ -56,12 +55,8 @@
     }
     return self;
 }
--(void)setDataArray:(NSArray *)dataArray{
-    _dataArray = dataArray;
-    [self reloadData];
-}
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
-    return _dataArray.count;
+    return self.dataArrayM.count;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
@@ -76,7 +71,7 @@
         lineView.backgroundColor = COLOR_EDEDED;
         [distributeCell.contentView addSubview:lineView];
     }
-    distributeCell.dict = _dataArray[indexPath.row];
+    distributeCell.dict = _dataArrayM[indexPath.row];
     return distributeCell;
 }
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
@@ -102,7 +97,7 @@
     _dict = dict;
     self.timeLabel.text = dict[@"createtime"];
     self.resouceLabel.text = dict[@"nickname"];
-    self.moneyLabel.text = [NSString stringWithFormat:@"%@%@",@"$",dict[@"money"]];
+    self.moneyLabel.text = [NSString stringWithFormat:@"%@%@",LocalMoneyMark,dict[@"money"]];
 }
 
 -(UILabel *)timeLabel{

@@ -20,8 +20,17 @@
 
 @implementation YNPhoneAreaCodeView
 
+-(instancetype)init{
+    self = [super init];
+    if (self) {
+        self.frame = CGRectMake(kMidSpace, (SCREEN_HEIGHT-(W_RATIO(100)*6))/2.0, SCREEN_WIDTH-kMidSpace*2, W_RATIO(100)*6);
+    }
+    return self;
+}
+
 -(void)setDataArray:(NSArray *)dataArray{
     _dataArray = dataArray;
+    [self showPopView:YES];
     [self.tableView reloadData];
 }
 -(UITableView *)tableView{
@@ -30,16 +39,27 @@
         _tableView = tableView;
         [self addSubview:tableView];
         tableView.frame = self.bounds;
-        tableView.rowHeight = W_RATIO(120);
+        tableView.rowHeight = W_RATIO(100);
         tableView.backgroundColor = COLOR_CLEAR;
         tableView.bounces = NO;
         tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
         tableView.delegate = self;
         tableView.dataSource = self;
         
+        UILabel *headLabel = [[UILabel alloc] init];
+        headLabel.frame = CGRectMake(0, 0, WIDTHF(tableView), W_RATIO(100));
+        headLabel.backgroundColor = COLOR_FFFFFF;
+        headLabel.font = FONT(36);
+        headLabel.text = LocalSelectYouCountry;
+        headLabel.textColor = COLOR_DF463E;
+        headLabel.textAlignment = NSTextAlignmentCenter;
+        tableView.tableHeaderView = headLabel;
+        
     }
     return _tableView;
 }
+
+
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
     return _dataArray.count;
 }
@@ -48,9 +68,14 @@
     if (codeCell == nil) {
         codeCell = [[YNPhoneAreaCodeCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"codeCell"];
         codeCell.selectionStyle = UITableViewCellSelectionStyleNone;
+        
+        UIView *lineView = [[UIView alloc] init];
+        lineView.frame = CGRectMake(0, 0, WIDTHF(self), W_RATIO(2));
+        lineView.backgroundColor = COLOR_EDEDED;
+        [codeCell.contentView addSubview:lineView];
     }
-    codeCell.isSelect = indexPath == self.indexPath ? YES :NO;
-    codeCell.dict = self.dataArray[indexPath.row];
+    codeCell.isSelect = ([indexPath compare:self.indexPath] == NSOrderedSame) ? YES : NO;
+    codeCell.country = self.dataArray[indexPath.row];
     return codeCell;
 }
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
@@ -74,15 +99,14 @@
     if (!animated) {
         return;
     }
-    
-    self.transform = CGAffineTransformMakeScale(0.1f, 0.1f);
+    //self.transform = CGAffineTransformMakeScale(0.1f, 0.1f);
     self.alpha = 0.f;
-    [UIView animateWithDuration:0.25f delay:0.f options:UIViewAnimationOptionCurveEaseInOut animations:^{
-        self.transform = CGAffineTransformMakeScale(1.25f, 1.25f);
+    [UIView animateWithDuration:0.25f delay:.5f options:UIViewAnimationOptionCurveEaseInOut animations:^{
+        //self.transform = CGAffineTransformMakeScale(1.25f, 1.25f);
         self.alpha = 1.0f;
     } completion:^(BOOL finished) {
         [UIView animateWithDuration:0.1f delay:0.f options:UIViewAnimationOptionCurveEaseInOut animations:^{
-            self.transform = CGAffineTransformIdentity;
+            //self.transform = CGAffineTransformIdentity;
         } completion:nil];
     }];
     
@@ -95,7 +119,7 @@
     }
     
     [UIView animateWithDuration:0.25f animations:^{
-        self.transform = CGAffineTransformMakeScale(0.1f, 0.1f);
+        //self.transform = CGAffineTransformMakeScale(0.1f, 0.1f);
         self.alpha = 0.f;
     } completion:^(BOOL finished) {
         [self.baseView removeFromSuperview];
@@ -137,10 +161,9 @@
 @end
 @implementation YNPhoneAreaCodeCell
 
--(void)setDict:(NSDictionary *)dict{
-    _dict = dict;
-    self.flagImgView.image = [UIImage imageNamed:dict[@"image"]];
-    self.titleLabel.text = [NSString stringWithFormat:@"%@(+%@)",dict[@"title"],dict[@"code"]];
+-(void)setCountry:(NSString *)country{
+    _country = country;
+    self.titleLabel.text = country;
 }
 -(void)setIsSelect:(BOOL)isSelect{
     _isSelect = isSelect;
@@ -153,8 +176,8 @@
         [self.contentView addSubview:selectBtn];
         [selectBtn setBackgroundImage:[UIImage imageNamed:@"gou_kui_gouwuche"] forState:UIControlStateNormal];
         [selectBtn setBackgroundImage:[UIImage imageNamed:@"gou_hong_gouwuche"] forState:UIControlStateSelected];
-        //        [selectBtn addTarget:self action:@selector(buttonClick:) forControlEvents:UIControlEventTouchUpInside];
-        selectBtn.frame = CGRectMake(W_RATIO(660)-kMidSpace-kMaxSpace, (W_RATIO(120)-kMidSpace)/2.0, kMidSpace, kMidSpace);
+
+        selectBtn.frame = CGRectMake(W_RATIO(660)-kMidSpace-kMaxSpace, (W_RATIO(100)-kMidSpace)/2.0, kMidSpace, kMidSpace);
     }
     return _selectBtn;
 }
@@ -163,7 +186,7 @@
         UIImageView *flagImgView = [[UIImageView alloc] init];
         _flagImgView = flagImgView;
         [self.contentView addSubview:flagImgView];
-        flagImgView.frame = CGRectMake(kMidSpace,(W_RATIO(120)-W_RATIO(60))/2.0, W_RATIO(60), W_RATIO(60));
+        flagImgView.frame = CGRectMake(kMidSpace,(W_RATIO(100)-W_RATIO(60))/2.0, W_RATIO(60), W_RATIO(60));
     }
     return _flagImgView;
 }
@@ -175,7 +198,7 @@
         [self.contentView addSubview:titleLabel];
         titleLabel.font = FONT(32);
         titleLabel.textColor = COLOR_333333;
-        titleLabel.frame = CGRectMake(MaxXF(_flagImgView)+W_RATIO(20), (W_RATIO(120)-W_RATIO(40))/2.0, XF(_selectBtn)-MaxXF(_flagImgView)-W_RATIO(20)*2, W_RATIO(40));
+        titleLabel.frame = CGRectMake(MaxXF(_flagImgView)+W_RATIO(20), (W_RATIO(100)-W_RATIO(40))/2.0, XF(_selectBtn)-MaxXF(_flagImgView)-W_RATIO(20)*2, W_RATIO(40));
     }
     return _titleLabel;
 }

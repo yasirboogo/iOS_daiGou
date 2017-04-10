@@ -11,10 +11,6 @@
 
 @interface YNOrderDetailsCollectionView ()<UICollectionViewDelegate,UICollectionViewDataSource,UICollectionViewDelegateFlowLayout,UIScrollViewDelegate>
 
-@property (nonatomic,strong) NSArray * manMsgArray;
-@property (nonatomic,strong) NSArray * orderMsgArray;
-@property (nonatomic,strong) NSDictionary * goodsMsgDict;
-
 @end
 
 @implementation YNOrderDetailsCollectionView
@@ -45,12 +41,9 @@
 
     return self;
 }
--(void)setDict:(NSDictionary *)dict{
-    _dict = dict;
+-(void)setDetailDict:(NSDictionary *)detailDict{
+    _detailDict = detailDict;
     
-    self.manMsgArray = [YNManMsgCellFrame initWithFromDictionaries:@[dict[@"manMsg"]]];
-    self.orderMsgArray = [YNOrderMsgCellFrame initWithFromDictionaries:@[dict[@"orderMsg"]]];
-    self.goodsMsgDict = dict[@"goodsMsg"];
     [self reloadData];
 }
 #pragma mark - UITableView delegate
@@ -58,27 +51,26 @@
     if (self.viewScrollBlock) {
         CGFloat alpha = (scrollView.contentOffset.y)/(self.contentSize.height - HEIGHTF(self));
         self.viewScrollBlock(alpha);
-//        self.offsetY = scrollView.contentOffset.y;//将当前位移变成缓存位移
-//        if (scrollView.contentOffset.y > self.offsetY && scrollView.contentOffset.y > 0) {
-//            //向上滑动,视图消失
-//        }else if (scrollView.contentOffset.y < self.offsetY ){
-//            //向下滑动，视图出现
-//        }
-//        self.offsetY = scrollView.contentOffset.y;//将当前位移变成缓存位移
     }
 }
 -(CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath{
     if (indexPath.section == 0) {
-        YNManMsgCellFrame *cellFrame = self.manMsgArray[0];
+        YNManMsgCellFrame *cellFrame = [YNManMsgCellFrame initWithFromDictionaries:@[_detailDict]].firstObject;
         return CGSizeMake(WIDTHF(self)-W_RATIO(20)*2,cellFrame.cellHeight);
     }else if (indexPath.section == 1){
-        YNOrderMsgCellFrame *cellFrame = self.orderMsgArray[0];
+        YNOrderMsgCellFrame *cellFrame = [YNOrderMsgCellFrame initWithFromDictionaries:@[_detailDict]].firstObject;
         return CGSizeMake(WIDTHF(self)-W_RATIO(20)*2,cellFrame.cellHeight);
-        return CGSizeMake(WIDTHF(self)-W_RATIO(20)*2, cellFrame.cellHeight);
     }else if (indexPath.section == 2){
-        return CGSizeMake(WIDTHF(self)-W_RATIO(20)*2, W_RATIO(185));
+        return CGSizeMake(WIDTHF(self)-W_RATIO(20)*2, W_RATIO(245));
     }else if (indexPath.section == 3){
-        return CGSizeMake(WIDTHF(self)-W_RATIO(20)*2, W_RATIO(300));
+        NSInteger status = [_detailDict[@"orderstatus"] integerValue];
+        CGFloat bottomHight = 0.f;
+        if (status == 1 ||status == 3 || status == 5 || status == 6) {
+            bottomHight = 2*(W_RATIO(100)+W_RATIO(20))-W_RATIO(20)+kMidSpace*2;
+        }else if (status == 2 ||status == 4 ){
+            bottomHight = 1*(W_RATIO(100)+W_RATIO(20))-W_RATIO(20)+kMidSpace*2;
+        }
+        return CGSizeMake(WIDTHF(self)-W_RATIO(20)*2, bottomHight);
     }
     return CGSizeZero;
 }
@@ -91,7 +83,7 @@
     }else if (section == 1){
         return 1;
     }else if (section == 2){
-        return 2;
+        return _myOrderListModel.goodsArray.count;
     }else if (section == 3){
         return 1;
     }
@@ -112,12 +104,23 @@
 -(UICollectionReusableView *)collectionView:(UICollectionView *)collectionView viewForSupplementaryElementOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath{
     if ([kind isEqualToString:UICollectionElementKindSectionHeader]) {
         YNOrderDetailsHeaderView *headerView = [collectionView dequeueReusableSupplementaryViewOfKind:kind withReuseIdentifier:@"headerView" forIndexPath:indexPath];
-        headerView.dict = @{@"image":@"shouhuoren_dingdan",@"tips":@"收货人信息"};
+        if (indexPath.section == 0) {
+            headerView.dict = @{@"image":@"shouhuoren_dingdan",@"tips":LocalConsignee};
+        }else if (indexPath.section == 1){
+            headerView.dict = @{@"image":@"dingdanxinxi_dingdan",@"tips":LocalOrderInfor};
+        }else if (indexPath.section == 2){
+            headerView.dict = @{@"image":@"shangpinxinxi_dingdan",@"tips":LocalGoodsInfor};
+        }
         return headerView;
     }else if ([kind isEqualToString:UICollectionElementKindSectionFooter]){
         if (indexPath.section == 2) {
             YNOrderDetailsFooterView *footerView = [collectionView dequeueReusableSupplementaryViewOfKind:kind withReuseIdentifier:@"footerView" forIndexPath:indexPath];
-            footerView.dict = @{@"name":@"淘宝商城",@"price":@"500.12"};
+            CGFloat allPrice = 0.f;
+            for (MyOrderGoodsModel  *myOrderGoodsModel in _myOrderListModel.goodsArray) {
+                CGFloat salesprice = [[NSString decimalNumberWithDouble:myOrderGoodsModel.salesprice] floatValue];
+                allPrice += salesprice*[myOrderGoodsModel.count integerValue];
+            }
+            footerView.allPrice = [NSString stringWithFormat:@"%.2f",allPrice];
             return footerView;
         }
     }
@@ -127,15 +130,15 @@
 - (__kindof UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath{
     if (indexPath.section == 0) {
         YNDetailsManMsgCell *manMsgCell = [collectionView dequeueReusableCellWithReuseIdentifier:@"manMsgCell" forIndexPath:indexPath];
-        manMsgCell.cellFrame = self.manMsgArray[0];
+        manMsgCell.cellFrame = [YNManMsgCellFrame initWithFromDictionaries:@[_detailDict]].firstObject;
         return manMsgCell;
     }else if (indexPath.section == 1){
         YNDetailsOrderMsgCell *orderMsgCell = [collectionView dequeueReusableCellWithReuseIdentifier:@"orderMsgCell" forIndexPath:indexPath];
-        orderMsgCell.cellFrame = self.orderMsgArray[0];
+          orderMsgCell.cellFrame = [YNOrderMsgCellFrame initWithFromDictionaries:@[_detailDict]].firstObject;
         return orderMsgCell;
     }else if (indexPath.section == 2){
         YNOrderGoodsCell *goodsMsgCell = [collectionView dequeueReusableCellWithReuseIdentifier:@"goodsMsgCell" forIndexPath:indexPath];
-        goodsMsgCell.dict = @{@"image":@"testGoods",@"title":@"书籍-设计师的自我修养",@"subTitle":@"2016年出版版本",@"price":@"501.21",@"amount":@"2"};
+        goodsMsgCell.myOrderGoodsModel = _myOrderListModel.goodsArray[indexPath.row];
         return goodsMsgCell;
     }else if (indexPath.section == 3){
         UICollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"cell" forIndexPath:indexPath];
@@ -152,7 +155,7 @@
 -(void)setDict:(NSDictionary *)dict{
     _dict = dict;
     
-    CGSize nameSize = [dict[@"name"] calculateHightWithFont:FONT(34) maxWidth:W_RATIO(400)];
+    CGSize nameSize = [dict[@"username"] calculateHightWithFont:FONT(34) maxWidth:W_RATIO(400)];
     self.nameF = CGRectMake(kMaxSpace, kMidSpace, nameSize.width, nameSize.height);
     
     self.phoneF = CGRectMake(MaxX(_nameF)+kMinSpace,Y(_nameF),SCREEN_WIDTH-W_RATIO(20)*2-kMidSpace-MaxX(_nameF)-kMidSpace ,HEIGHT(_nameF));
@@ -215,8 +218,8 @@
 }
 -(void)setupCellContent:(YNManMsgCellFrame*)cellFrame{
     
-    self.nameLabel.text = cellFrame.dict[@"name"];
-    self.phoneLabel.text = cellFrame.dict[@"phone"];
+    self.nameLabel.text = cellFrame.dict[@"username"];
+    self.phoneLabel.text = cellFrame.dict[@"userphone"];
     self.addressLabel.text = cellFrame.dict[@"address"];
 }
 
@@ -271,7 +274,7 @@
 -(void)setDict:(NSDictionary *)dict{
     _dict = dict;
 
-    NSArray<NSString*> *itemTitles = @[@"订单编号",@"下单时间",@"付款时间",@"发货地址",@"订单状态"];
+    NSArray<NSString*> *itemTitles = @[LocalOrderNumber,LocalOrderTime,LocalPayTime,LocalPostAddress,LocalOrderStatus];
     __block CGFloat maxWidth = 0;
     __block CGFloat maxHeight = 0;
     [itemTitles enumerateObjectsUsingBlock:^(NSString * _Nonnull itemTitle, NSUInteger idx, BOOL * _Nonnull stop) {
@@ -281,7 +284,7 @@
     }];
     
     self.codeLF = CGRectMake(kMaxSpace, kMidSpace, maxWidth, maxHeight);
-    self.codeRF = CGRectMake(MaxX(_codeLF)+kMidSpace, Y(_codeLF),SCREEN_WIDTH-W_RATIO(20)*2-MaxX(_codeLF)-kMidSpace,HEIGHT(_codeLF) );
+    self.codeRF = CGRectMake(MaxX(_codeLF)+kMidSpace, Y(_codeLF),SCREEN_WIDTH-W_RATIO(20)*2-MaxX(_codeLF)-kMidSpace*2,HEIGHT(_codeLF) );
     
     self.buyTimeLF = CGRectMake(X(_codeLF), MaxY(_codeRF)+kMidSpace,  WIDTH(_codeLF),HEIGHT(_codeLF));
     self.buyTimeRF = CGRectMake(X(_codeRF), Y(_buyTimeLF), WIDTH(_codeRF),HEIGHT(_codeRF));
@@ -291,7 +294,7 @@
     
     self.addresssLF = CGRectMake(X(_codeLF), MaxY(_payTimeLF)+kMidSpace,  WIDTH(_codeLF),HEIGHT(_codeLF));
     
-    CGSize addressSize = [dict[@"address"] calculateHightWithWidth:WIDTH(_codeRF) font:FONT(30)];
+    CGSize addressSize = [[dict[@"deliveryaddress"] length]?dict[@"deliveryaddress"]:LocalNothing calculateHightWithWidth:WIDTH(_codeRF) font:FONT(30)];
     
     self.addresssRF = CGRectMake(X(_codeRF), Y(_addresssLF), addressSize.width,addressSize.height);
     
@@ -375,17 +378,25 @@
 }
 -(void)setupCellContent:(YNOrderMsgCellFrame*)cellFrame{
     
-    NSArray<NSString*> *itemTitles = @[@"订单编号",@"下单时间",@"付款时间",@"发货地址",@"订单状态"];
+    NSArray<NSString*> *itemTitles = @[LocalOrderNumber,LocalOrderTime,LocalPayTime,LocalPostAddress,LocalOrderStatus];
     self.codeLLabel.text = itemTitles[0];
-    self.codeRLabel.text = cellFrame.dict[@"code"];
+    self.codeRLabel.text = cellFrame.dict[@"ordernumber"];
     self.buyTimeLLabel.text = itemTitles[1];
-    self.buyTimeRLabel.text = cellFrame.dict[@"buyTime"];
+    self.buyTimeRLabel.text = cellFrame.dict[@"createtime"];
     self.payTimeLLabel.text = itemTitles[2];
-    self.payTimeRLabel.text = cellFrame.dict[@"payTime"];
+    if (![cellFrame.dict[@"paytime"] length]) {
+        self.payTimeRLabel.text = LocalNothing;
+    }else{
+        self.payTimeRLabel.text = cellFrame.dict[@"paytime"];
+    }
     self.addressLLabel.text = itemTitles[3];
-    self.addressRLabel.text = cellFrame.dict[@"address"];
+    if (![cellFrame.dict[@"deliveryaddress"] length]) {
+        self.addressRLabel.text = LocalNothing;
+    }else{
+        self.addressRLabel.text = cellFrame.dict[@"deliveryaddress"];
+    }
     self.statusLLabel.text = itemTitles[4];
-    self.statusRLabel.text = cellFrame.dict[@"status"];
+    self.statusRLabel.text = @[LocalWaitPay,LocalWaitHandle,LocalWaitPPay,LocalWaitSend,LocalWaitReceive,LocalCompleted][[cellFrame.dict[@"orderstatus"] integerValue]-1];
 }
 
 -(UIView *)bgView{
@@ -403,6 +414,7 @@
     if (!_codeLLabel) {
         UILabel *codeLLabel = [[UILabel alloc] init];
         _codeLLabel = codeLLabel;
+        codeLLabel.adjustsFontSizeToFitWidth = YES;
         [self.bgView addSubview:codeLLabel];
         codeLLabel.textColor = COLOR_999999;
         codeLLabel.font = FONT(30);
@@ -424,6 +436,7 @@
         UILabel *buyTimeLLabel = [[UILabel alloc] init];
         _buyTimeLLabel = buyTimeLLabel;
         [self.bgView addSubview:buyTimeLLabel];
+        buyTimeLLabel.adjustsFontSizeToFitWidth = YES;
         buyTimeLLabel.textColor = COLOR_999999;
         buyTimeLLabel.font = FONT(30);
     }
@@ -444,6 +457,7 @@
         UILabel *payTimeLLabel = [[UILabel alloc] init];
         _payTimeLLabel = payTimeLLabel;
         [self.bgView addSubview:payTimeLLabel];
+        payTimeLLabel.adjustsFontSizeToFitWidth = YES;
         payTimeLLabel.textColor = COLOR_999999;
         payTimeLLabel.font = FONT(30);
     }
@@ -464,6 +478,7 @@
         UILabel *addressLLabel = [[UILabel alloc] init];
         _addressLLabel = addressLLabel;
         [self.bgView addSubview:addressLLabel];
+        addressLLabel.adjustsFontSizeToFitWidth = YES;
         addressLLabel.textColor = COLOR_999999;
         addressLLabel.font = FONT(30);
     }
@@ -474,6 +489,7 @@
         UILabel *addressRLabel = [[UILabel alloc] init];
         _addressRLabel = addressRLabel;
         [self.bgView addSubview:addressRLabel];
+        addressRLabel.numberOfLines = 0;
         addressRLabel.textColor = COLOR_333333;
         addressRLabel.font = FONT(30);
     }
@@ -484,6 +500,7 @@
         UILabel *statusLLabel = [[UILabel alloc] init];
         _statusLLabel = statusLLabel;
         [self.bgView addSubview:statusLLabel];
+        statusLLabel.adjustsFontSizeToFitWidth = YES;
         statusLLabel.textColor = COLOR_999999;
         statusLLabel.font = FONT(30);
     }
@@ -566,14 +583,12 @@
 @end
 @implementation YNOrderDetailsFooterView
 
--(void)setDict:(NSDictionary *)dict{
-    _dict = dict;
-    self.amountLabel.text = @"共计（不含邮费）：";
-    self.markLabel.text = @"￥";
-    self.nameLabel.text = dict[@"name"];
-    self.priceLabel.text = dict[@"price"];
+-(void)setAllPrice:(NSString *)allPrice{
+    _allPrice = allPrice;
+    self.amountLabel.text = LocalTotalCost;
+    self.markLabel.text = LocalMoneyMark;
+    self.priceLabel.text = allPrice;
 }
-
 -(void)layoutSubviews{
     [super layoutSubviews];
     

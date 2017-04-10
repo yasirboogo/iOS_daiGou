@@ -9,11 +9,12 @@
 #import "YNGoodsDetailsView.h"
 #import "ImagesPlayer.h"
 #import "YNImageSize.h"
-
 @interface YNGoodsDetailsView ()<ImagesPlayerDelegae,UITableViewDelegate,UITableViewDataSource>
 {
     UIButton *_currentBtn;
 }
+@property (nonatomic,assign) NSInteger index;
+
 @property (nonatomic,strong) NSArray * detailUrls;
 
 @property (nonatomic,weak) UIView * headerView;
@@ -28,9 +29,13 @@
 
 @property (nonatomic,weak) UILabel * spaceLabel;
 
+@property (nonatomic,weak) UIView * spaceView;
+
 @property (nonatomic,weak) UIButton * shareBtn;
 
 @property (nonatomic,weak) UILabel * detailLabel;
+
+@property (nonatomic,weak) UILabel * msgLabel;
 
 @property (nonatomic,weak) UIView * itemsView;
 
@@ -47,26 +52,49 @@
 -(void)setDataDict:(NSDictionary *)dataDict{
     _dataDict = dataDict;
     [self.imagesPlayer addNetWorkImages:dataDict[@"imgArray"] placeholder:[UIImage imageNamed:@"zhanwei2"]];
-    self.hotLabel.text = kLocalizedString(@"hot", @"热");
+    self.hotLabel.text = LocalHot;
     self.nameLabel.text = dataDict[@"name"];
-    [self.shareBtn setTitle:@"分享" forState:UIControlStateNormal];
-    self.spaceLabel.text = @"|";
+    [self.shareBtn setTitle:LocalShare forState:UIControlStateNormal];
+    self.spaceView.backgroundColor = [UIColor colorWithWhite:0.9 alpha:1];
     self.detailLabel.text = dataDict[@"note"];
-    //self.detailUrls = [YNDetailImgCellFrame initWithFromDictionaries:dataDict[@"imgdetails"]];
-}
 
+    if ([dataDict[@"isdelete"] integerValue]) {
+        self.msgLabel.text = LocalShelf;
+    }else if ([dataDict[@"stock"] integerValue]<1){
+        self.msgLabel.text = LocalStock;
+    }
+    self.index = 0;
+}
+-(void)setIndex:(NSInteger)index{
+    _index = index;
+    if (index == 0) {
+        self.detailUrls = [YNDetailImgCellFrame initWithFromDictionaries:_dataDict[@"imgdetails"]];
+    }else if (index == 1){
+        self.detailUrls = [YNDetailImgCellFrame initWithFromDictionaries:@[_dataDict[@"paraimg"]]];
+    }
+    [self.tableView reloadData];
+}
 -(void)layoutSubviews{
     [super layoutSubviews];
     
     CGSize hotSize = [_hotLabel.text calculateHightWithFont:_hotLabel.font maxWidth:0];
     self.hotLabel.frame = CGRectMake(kMidSpace,(W_RATIO(100)-hotSize.height-kMinSpace)/2.0, hotSize.width+kMinSpace,hotSize.height+kMinSpace);
     
-    CGSize nameSize = [_nameLabel.text calculateHightWithFont:_nameLabel.font maxWidth:0];
+    CGSize nameSize = [_nameLabel.text calculateHightWithFont:_nameLabel.font maxWidth:W_RATIO(450)];
     self.nameLabel.frame = CGRectMake(MaxXF(_hotLabel)+kMinSpace,(W_RATIO(100)-nameSize.height)/2.0, nameSize.width, nameSize.height);
     
     CGSize detailSize = [_detailLabel.text calculateHightWithWidth:WIDTHF(self)-kMidSpace*2 font:_detailLabel.font];
     self.detailLabel.frame = CGRectMake(kMidSpace, MaxYF(_hotLabel)+kMidSpace, detailSize.width, detailSize.height);
-    self.goodsInforView.frame = CGRectMake(0, MaxYF(_imagesPlayer), SCREEN_WIDTH, MaxYF(_detailLabel)+kMidSpace);
+    
+    CGSize msgSize = [_msgLabel.text calculateHightWithWidth:WIDTHF(self)-kMidSpace*2 font:_msgLabel.font];
+    if (_msgLabel.text.length) {
+        self.msgLabel.frame = CGRectMake(kMidSpace, MaxYF(_detailLabel)+kMidSpace, msgSize.width, msgSize.height);
+    }else{
+        self.msgLabel.frame = CGRectMake(kMidSpace, MaxYF(_detailLabel), 0, 0);
+    }
+    
+    
+    self.goodsInforView.frame = CGRectMake(0, MaxYF(_imagesPlayer), SCREEN_WIDTH, MaxYF(_msgLabel)+kMidSpace);
     
     self.itemsView.frame = CGRectMake(0, MaxYF(_goodsInforView)+W_RATIO(2), SCREEN_WIDTH, W_RATIO(80));
     
@@ -147,9 +175,18 @@
         spaceLabel.textColor = COLOR_999999;
         spaceLabel.font = FONT(60);
         spaceLabel.textAlignment = NSTextAlignmentCenter;
-        spaceLabel.frame = CGRectMake(XF(_shareBtn)-kMinSpace,(W_RATIO(100)-W_RATIO(60))/2.0, kMinSpace, W_RATIO(60));
+        spaceLabel.frame = CGRectMake(XF(_shareBtn)-kMinSpace,(W_RATIO(100)-W_RATIO(50))/2.0, kMinSpace, W_RATIO(50));
     }
     return _spaceLabel;
+}
+-(UIView *)spaceView{
+    if (!_spaceView) {
+        UIView *spaceView = [[UIView alloc] init];
+        _spaceView = spaceView;
+        [self.goodsInforView addSubview:spaceView];
+        spaceView.frame = CGRectMake(XF(_shareBtn)-kMinSpace,YF(_shareBtn), W_RATIO(4), HEIGHTF(_shareBtn));
+    }
+    return _spaceView;
 }
 -(UIButton *)shareBtn{
     if (!_shareBtn) {
@@ -157,10 +194,11 @@
         _shareBtn = shareBtn;
         [self.goodsInforView addSubview:shareBtn];
         shareBtn.titleLabel.font = FONT(28);
+        [shareBtn setImageEdgeInsets:UIEdgeInsetsMake(0, -W_RATIO(20), 0, 0)];
         [shareBtn setImage:[UIImage imageNamed:@"fenxiang"] forState:UIControlStateNormal];
         [shareBtn setTitleColor:COLOR_666666 forState:UIControlStateNormal];
         [shareBtn addTarget:self action:@selector(handleShareButtonClick:) forControlEvents:UIControlEventTouchUpInside];
-        shareBtn.frame = CGRectMake(WIDTHF(self)-W_RATIO(180), kMidSpace, W_RATIO(180), W_RATIO(33));
+        shareBtn.frame = CGRectMake(WIDTHF(self)-W_RATIO(180), W_RATIO(25), W_RATIO(180), W_RATIO(50));
     }
     return _shareBtn;
 }
@@ -180,16 +218,28 @@
     }
     return _detailLabel;
 }
+-(UILabel *)msgLabel{
+    if (!_msgLabel) {
+        UILabel *msgLabel = [[UILabel alloc] init];
+        _msgLabel = msgLabel;
+        [self.goodsInforView addSubview:msgLabel];
+        msgLabel.textColor = COLOR_FF4844;
+        msgLabel.font = FONT(28);
+        msgLabel.numberOfLines = 0;
+    }
+    return _msgLabel;
+}
 -(UIView *)itemsView{
     if (!_itemsView) {
         UIView *itemsView = [[UIView alloc] init];
         _itemsView = itemsView;
         [self.headerView addSubview:itemsView];
         itemsView.backgroundColor = COLOR_FFFFFF;
-        NSArray<NSString*> *itemsArrauy = @[@"图文详情",@"商品参数"];
+        NSArray<NSString*> *itemsArrauy = @[LocalImageDetail,LocalGoodsPara];
         [itemsArrauy enumerateObjectsUsingBlock:^(NSString * _Nonnull title, NSUInteger idx, BOOL * _Nonnull stop) {
             UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
             [itemsView addSubview:button];
+            button.tag = idx;
             button.titleLabel.font =FONT(30);
             [button setTitle:title forState:UIControlStateNormal];
             [button setTitleColor:COLOR_666666 forState:UIControlStateNormal];
@@ -205,7 +255,11 @@
     return _itemsView;
 }
 -(void)handleScrollButtonClick:(UIButton*)btn{
+    _currentBtn.selected = NO;
+    _currentBtn = btn;
+    _currentBtn.selected = YES;
     
+    self.index = btn.tag;
 }
 -(UITableView *)tableView{
     if (!_tableView) {
@@ -216,7 +270,6 @@
         tableView.showsVerticalScrollIndicator = NO;
         tableView.bounces = NO;
         tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
-        tableView.rowHeight = W_RATIO(400);
         tableView.delegate = self;
         tableView.dataSource = self;
         [tableView reloadData];
@@ -226,20 +279,45 @@
     return _tableView;
 }
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
-    return [(NSArray*)_dataDict[@"imgdetails"] count];
+    if (self.index == 0) {
+        return self.detailUrls.count+1;
+    }else if (self.index == 1){
+        return 2;
+    }
+    return 0;
 }
 -(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
-    YNDetailImgCellFrame *cellFrame = self.detailUrls[indexPath.row];
-    return cellFrame.cellHeight;
+    if (indexPath.row == 0) {
+        if ([_dataDict[@"isvideo"] integerValue]==1 & self.index == 0) {
+            return SCREEN_WIDTH/2.0;
+        }
+        return kZero;
+    }else{
+        YNDetailImgCellFrame *cellFrame = self.detailUrls[indexPath.row - 1];
+        return cellFrame.cellHeight;
+    }
 }
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
-    YNDetailImgCell * imgCell = [tableView dequeueReusableCellWithIdentifier:@"imgCell"];
-    if (imgCell == nil) {
-        imgCell = [[YNDetailImgCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:@"imgCell"];
-        imgCell.selectionStyle = UITableViewCellSelectionStyleNone;
+    if (indexPath.row == 0) {
+        YNDetailVideoCell *videoCell = [tableView dequeueReusableCellWithIdentifier:@"videoCell"];
+        if (!videoCell) {
+            videoCell = [[YNDetailVideoCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"videoCell"];
+        }
+        videoCell.videoUrl = @"about:blank";
+        if ([_dataDict[@"isvideo"] integerValue]==1 && self.index == 0) {
+            videoCell.videoUrl = _dataDict[@"videourl"];
+        }
+        return videoCell;
+    }else{
+        YNDetailImgCell * imgCell = [tableView dequeueReusableCellWithIdentifier:@"imgCell1"];
+        if (imgCell == nil) {
+            imgCell = [[YNDetailImgCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:@"imgCell"];
+            imgCell.selectionStyle = UITableViewCellSelectionStyleNone;
+        }
+        imgCell.cellFrame = self.detailUrls[indexPath.row-1];
+        return imgCell;
     }
-    imgCell.cellFrame = self.detailUrls[indexPath.row];
-    return imgCell;
+    return nil;
 }
 @end
 @implementation YNDetailImgCellFrame
@@ -282,5 +360,41 @@
         [self.contentView addSubview:bgImgView];
     }
     return _bgImgView;
+}
+@end
+
+@interface YNDetailVideoCell ()
+
+@property (nonatomic,strong) WKWebView * wKWebView;
+
+@end
+@implementation YNDetailVideoCell
+
+-(void)setVideoUrl:(NSString *)videoUrl{
+    _videoUrl = videoUrl;
+    if (![videoUrl isEqualToString:@"about:blank"]) {
+        self.wKWebView.frame = CGRectMake(0, 0, SCREEN_WIDTH, SCREEN_WIDTH/2.0);
+    }else{
+        self.wKWebView.frame = CGRectMake(0, 0, SCREEN_WIDTH, kZero);
+    }
+    [self.wKWebView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:videoUrl]]];
+}
+-(WKWebView *)wKWebView{
+    if (!_wKWebView) {
+        WKWebViewConfiguration * configuration = [[WKWebViewConfiguration alloc] init];
+        configuration.mediaPlaybackRequiresUserAction = YES;
+        WKWebView *wKWebView = [[WKWebView alloc] initWithFrame:CGRectZero configuration:configuration];
+        _wKWebView = wKWebView;
+        [self.contentView addSubview:wKWebView];
+        wKWebView.scrollView.bounces = NO;
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleCloseVideo) name:@"closeVideo" object:nil];
+    }
+    return _wKWebView;
+}
+-(void)handleCloseVideo{
+    self.videoUrl = @"about:blank";
+}
+-(void)dealloc{
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 @end

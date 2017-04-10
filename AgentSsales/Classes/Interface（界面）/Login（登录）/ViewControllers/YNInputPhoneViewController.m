@@ -12,6 +12,9 @@
 #import "YNPhoneAreaCodeView.h"
 
 @interface YNInputPhoneViewController ()
+{
+    NSInteger _type;
+}
 
 @property (nonatomic,assign) NSInteger index;
 
@@ -51,15 +54,28 @@
 
 
 #pragma mark - 视图加载
+-(void)startNetWorkingRequestWithGetCountryCode{
+    NSDictionary *params = @{@"type":[NSNumber numberWithInteger:_type]
+                             };
+    [YNHttpManagers getCountryCodeWithParams:params success:^(id response) {
+        if ([response[@"code"] isEqualToString:@"success"]) {
+            //do success things
+            self.areaCodeView.dataArray = response[@"countryArray"];
+        }else{
+            //do failure things
+        }
+    } failure:^(NSError *error) {
+        //do error things
+    }];
+}
 -(YNPhoneAreaCodeView *)areaCodeView{
     if (!_areaCodeView) {
-        CGRect frame = CGRectMake(kMidSpace, (SCREEN_HEIGHT-(W_RATIO(120)*3))/2.0, SCREEN_WIDTH-kMidSpace*2, W_RATIO(120)*3);
-        YNPhoneAreaCodeView *areaCodeView = [[YNPhoneAreaCodeView alloc] initWithFrame:frame];
+        YNPhoneAreaCodeView *areaCodeView = [[YNPhoneAreaCodeView alloc] init];
         _areaCodeView = areaCodeView;
         //areaCodeView.isTapGesture = YES;
         [areaCodeView setDidSelectCodeCellBlock:^(NSInteger index) {
             self.index = index;
-            self.tableView.code = self.areaCodeView.dataArray[_index][@"code"];
+            self.tableView.country = self.areaCodeView.dataArray[_index];
         }];
     }
     return _areaCodeView;
@@ -70,7 +86,7 @@
         _tableView  = tableView;
         [self.view addSubview:tableView];
         [tableView setDidSelectAreaCellBlock:^{
-            [self.areaCodeView showPopView:YES];
+            [self startNetWorkingRequestWithGetCountryCode];
         }];
     }
     return _tableView;
@@ -84,7 +100,7 @@
         submitBtn.layer.masksToBounds = YES;
         submitBtn.layer.cornerRadius = kViewRadius;
         submitBtn.titleLabel.font = FONT(36);
-        [submitBtn setTitle:@"下一步" forState:UIControlStateNormal];
+        [submitBtn setTitle:LocalNext forState:UIControlStateNormal];
         [submitBtn setTitleColor:COLOR_FFFFFF forState:UIControlStateNormal];
         [submitBtn addTarget:self action:@selector(handleRegisterSubmitButtonClick:) forControlEvents:UIControlEventTouchUpInside];
         [self.view addSubview:submitBtn];
@@ -96,14 +112,11 @@
 #pragma mark - 函数、消息
 -(void)makeData{
     [super makeData];
-    self.areaCodeView.dataArray =@[
-                                   @{@"image":@"zhongguo_yuan",@"title":@"中国",@"code":@"86"},
-                                   @{@"image":@"malaixiya_yuan",@"title":@"马来西亚",@"code":@"60"}
-                                   ];
+    _type = [LanguageManager currentLanguageIndex];
 }
 -(void)makeNavigationBar{
     [super makeNavigationBar];
-    self.titleLabel.text = @"输入账号";
+    self.titleLabel.text = LocalInputID;
 }
 -(void)makeUI{
     [super makeUI];
@@ -114,11 +127,15 @@
     
 }
 -(void)handleRegisterSubmitButtonClick:(UIButton*)btn{
-    
-    YNForgetPwdViewController *pushVC = [[YNForgetPwdViewController alloc] init];
-    pushVC.code = _areaCodeView.dataArray[_index][@"code"];
-    pushVC.phone = _tableView.textArrayM[1];
-    [self.navigationController pushViewController:pushVC animated:NO];
+    if (!_tableView.country.length || !_tableView.loginphone.length) {
+        [SVProgressHUD showImage:nil status:LocalInputIsEmpty];
+        [SVProgressHUD dismissWithDelay:2.0f];
+    }else{
+        YNForgetPwdViewController *pushVC = [[YNForgetPwdViewController alloc] init];
+        pushVC.type = _index;
+        pushVC.loginphone = _tableView.loginphone;
+        [self.navigationController pushViewController:pushVC animated:NO];
+    }
 }
 
 #pragma mark - 数据懒加载

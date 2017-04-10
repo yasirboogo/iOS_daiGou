@@ -51,7 +51,7 @@
         collectionView.backgroundColor = COLOR_CLEAR;
         
         collectionView.showsHorizontalScrollIndicator = NO;
-        
+        collectionView.bounces = NO;
         collectionView.delegate = self;
         collectionView.dataSource = self;
         
@@ -85,7 +85,9 @@
     }
     [areaCell setDidSelectAreaSelectCellBlock:^(NSInteger index) {
         if (indexPath.row < 3) {
-            self.collectionView.contentOffset = CGPointMake((indexPath.row+1)*SCREEN_WIDTH, 0);
+            [UIView animateWithDuration:0.3 animations:^{
+                self.collectionView.contentOffset = CGPointMake((indexPath.row+1)*SCREEN_WIDTH, 0);
+            }];
             if (indexPath.row == 0) {
                 self.countryIndex = index;
             }else if (indexPath.row == 1){
@@ -115,7 +117,7 @@
             [self dismissPopView:YES];
         }
     }];
-    NSArray *titles = @[@"选择国家",@"选择省份",@"选择城市",@"选择地区"];
+    NSArray *titles = @[LocalSelectYouCountry,LocalSelectYouProvinces,LocalSelectYouCity,LocalSelectYouArea];
     areaCell.title = titles[indexPath.row];
     if (indexPath.row == 0) {
         areaCell.dataArray = @[@"中国",@"马来西亚"];
@@ -237,6 +239,7 @@
         [self.contentView addSubview:tableView];
         tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
         tableView.rowHeight = W_RATIO(90);
+        tableView.bounces = NO;
         tableView.delegate = self;
         tableView.dataSource = self;
         tableView.backgroundColor = COLOR_FFFFFF;

@@ -47,25 +47,44 @@
                              @"pageSize":[NSNumber numberWithInteger:self.pageSize],
                              };
     [YNHttpManagers getUserAddressListWithParams:params success:^(id response) {
-        self.tableView.dataArrayM = response;
-        self.emptyView.hidden = self.tableView.dataArrayM.count;
+        [self handleEndMJRefresh];
+        if ([response[@"code"] isEqualToString:@"success"]) {
+            //do success things
+            [self handleMJRefreshComplateWithResponse:response[@"addressArray"]];
+        }else{
+            //do failure things
+        }
     } failure:^(NSError *error) {
+        //do error things
+        [self handleEndMJRefresh];
     }];
 }
 -(void)startNetWorkingRequestWithSetDefaultAddressWithAddressId:(NSInteger)addressId{
     NSDictionary *params = @{@"addressId":[NSNumber numberWithInteger:addressId],
                              };
     [YNHttpManagers setDefaultAddressWithParams:params success:^(id response) {
-        [self startNetWorkingRequestWithUserAddressList];
+        if ([response[@"code"] isEqualToString:@"success"]) {
+            //do success things
+            [self startNetWorkingRequestWithUserAddressList];
+        }else{
+            //do failure things
+        }
     } failure:^(NSError *error) {
+        //do error things
     }];
 }
 -(void)startNetWorkingRequestWithDelectUserAddressWithAddressId:(NSInteger)addressId{
     NSDictionary *params = @{@"addressId":[NSNumber numberWithInteger:addressId],
                              };
     [YNHttpManagers delectUserAddressWithParams:params success:^(id response) {
-        [self startNetWorkingRequestWithUserAddressList];
+        if ([response[@"code"] isEqualToString:@"success"]) {
+            //do success things
+            [self startNetWorkingRequestWithUserAddressList];
+        }else{
+            //do failure things
+        }
     } failure:^(NSError *error) {
+        //do error things
     }];
 }
 #pragma mark - 视图加载
@@ -87,36 +106,67 @@
         [tableView setDidSelectSetDelectAddressBlock:^(NSInteger index) {
             [self startNetWorkingRequestWithDelectUserAddressWithAddressId:index];
         }];
+        
+        tableView.mj_header= [MJRefreshNormalHeader headerWithRefreshingBlock:^{
+            self.pageIndex = 1;
+            [tableView.mj_footer endRefreshing];
+            [self startNetWorkingRequestWithUserAddressList];
+        }];
+        // 设置自动切换透明度(在导航栏下面自动隐藏)
+        tableView.mj_header.automaticallyChangeAlpha = YES;
+        tableView.mj_footer = [MJRefreshBackNormalFooter footerWithRefreshingBlock:^{
+            self.pageIndex += 1;
+            [tableView.mj_header endRefreshing];
+            [self startNetWorkingRequestWithUserAddressList];
+        }];
     }
     return _tableView;
 }
 -(YNShowEmptyView *)emptyView{
     if (!_emptyView) {
-        CGRect frame = CGRectMake(0, kUINavHeight, SCREEN_WIDTH, SCREEN_HEIGHT - kUINavHeight);
+        CGRect frame = CGRectMake(0, kUINavHeight+W_RATIO(2), SCREEN_WIDTH, SCREEN_HEIGHT - kUINavHeight-W_RATIO(2));
         YNShowEmptyView *emptyView = [[YNShowEmptyView alloc] initWithFrame:frame];
         _emptyView = emptyView;
         [self.view addSubview:emptyView];
         emptyView.tipImg = [UIImage imageNamed:@"wudizhi"];
-        emptyView.tips = @"暂无收货地址";
+        emptyView.tips = LocalNoAddressTips;
     }
     return _emptyView;
 }
 #pragma mark - 代理实现
 
 #pragma mark - 函数、消息
+-(void)handleMJRefreshComplateWithResponse:(NSArray*)response{
+    if (self.pageIndex == 1) {
+        _tableView.dataArrayM = [NSMutableArray arrayWithArray:response];
+        self.emptyView.hidden = _tableView.dataArrayM.count;
+    }else{
+        [_tableView.dataArrayM addObjectsFromArray:response];
+    }
+    [_tableView reloadData];
+    if (response.count == 0) {
+        [_tableView.mj_footer endRefreshingWithNoMoreData];
+    }
+}
+-(void)handleEndMJRefresh{
+    if (self.pageIndex == 1) {
+        [self.tableView.mj_header endRefreshing];
+    }else{
+        [self.tableView.mj_footer endRefreshing];
+    }
+}
 -(void)makeData{
     [super makeData];
-    
 }
 -(void)makeNavigationBar{
     [super makeNavigationBar];
     __weak typeof(self) weakSelf = self;
-    [self addNavigationBarBtnWithTitle:@"新建" selectTitle:@"新建" font:FONT_15 img:[UIImage imageNamed:@"xinjian"] selectImg:[UIImage imageNamed:@"xinjian"] imgWidth:W_RATIO(30) isOnRight:YES btnClickBlock:^(BOOL isSelect) {
+    [self addNavigationBarBtnWithTitle:LocalNewOne selectTitle:LocalNewOne font:FONT_15 img:[UIImage imageNamed:@"xinjian"] selectImg:[UIImage imageNamed:@"xinjian"] imgWidth:W_RATIO(30) isOnRight:YES btnClickBlock:^(BOOL isSelect) {
         YNNewAddressViewController *pushVC = [[YNNewAddressViewController alloc] init];
         pushVC.type = 1;
         [weakSelf.navigationController pushViewController:pushVC animated:NO];
     }];
-    self.titleLabel.text = kLocalizedString(@"addressManagement",@"收货地址管理");
+    self.titleLabel.text = LocalAddressManager;
 }
 -(void)makeUI{
     [super makeUI];

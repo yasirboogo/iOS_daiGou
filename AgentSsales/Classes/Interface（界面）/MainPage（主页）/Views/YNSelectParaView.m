@@ -143,9 +143,9 @@
     if ([kind isEqualToString:UICollectionElementKindSectionHeader]) {
         YNSelectParaHeaderView *headerView = [collectionView dequeueReusableSupplementaryViewOfKind:kind withReuseIdentifier:@"headerView" forIndexPath:indexPath];
         if (indexPath.section == _dataArray.count) {
-            headerView.title = [NSString stringWithFormat:@"%@",@"选择数量"];
+            headerView.title = [NSString stringWithFormat:@"%@",LocalSelectNum];
         }else{
-            headerView.title = [NSString stringWithFormat:@"%@%@",@"选择",_dataArray[indexPath.section][@"name"]];
+            headerView.title = [NSString stringWithFormat:@"%@ %@",LocalSelect,_dataArray[indexPath.section][@"name"]];
         }
         return headerView;
     }else if ([kind isEqualToString:UICollectionElementKindSectionFooter]){
@@ -157,6 +157,7 @@
 - (__kindof UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath{
     if (indexPath.section == _dataArray.count) {
         YNSelectCountViewCell *countCell = [collectionView dequeueReusableCellWithReuseIdentifier:@"countCell" forIndexPath:indexPath];
+        countCell.maxNum = self.maxNum;
         countCell.count = self.count;
         [countCell setDidChangeCountBlock:^(NSString * count) {
             self.count = count;
@@ -165,7 +166,7 @@
     }else{
         YNSelectParaViewCell *paraCell = [collectionView dequeueReusableCellWithReuseIdentifier:@"paraCell" forIndexPath:indexPath];
         paraCell.isSelect = NO;
-        if (self.selectArrayM[indexPath.section] == indexPath) {
+        if (([indexPath compare:self.selectArrayM[indexPath.section]] == NSOrderedSame)) {
             paraCell.isSelect = YES;
         }
         paraCell.parameter = _dataArray[indexPath.section][@"childArray"][indexPath.row][@"value"];
@@ -187,7 +188,7 @@
         submitBtn.backgroundColor = COLOR_DF463E;
         submitBtn.titleLabel.font = FONT(36);
         [submitBtn setTitleColor:COLOR_FFFFFF forState:UIControlStateNormal];
-        [self.submitBtn setTitle:@"完成" forState:UIControlStateNormal];
+        [self.submitBtn setTitle:LocalCompleted forState:UIControlStateNormal];
         [submitBtn addTarget:self action:@selector(handleSubmitButtonClick:) forControlEvents:UIControlEventTouchUpInside];
         submitBtn.frame = CGRectMake(0,HEIGHTF(self)-W_RATIO(100), WIDTHF(self), W_RATIO(100));
     }
@@ -197,14 +198,16 @@
     [self dismissPopView:YES];
     if(self.didSelectSubmitButtonBlock){
         NSMutableString *style = [NSMutableString string];
+        __block CGFloat price = 0.f;
         [_selectArrayM enumerateObjectsUsingBlock:^(NSIndexPath * _Nonnull indexPath, NSUInteger idx, BOOL * _Nonnull stop) {
             NSString * childId = _dataArray[indexPath.section][@"childArray"][indexPath.row][@"childId"];
             [style appendFormat:@",%@",childId];
+            price += [[NSString stringWithFormat:@"%@",_dataArray[indexPath.section][@"childArray"][indexPath.row][@"price"]] floatValue];
         }];
         if (style.length) {
             [style deleteCharactersInRange:NSMakeRange(0, 1)];
         }
-        self.didSelectSubmitButtonBlock(style,_count);
+        self.didSelectSubmitButtonBlock(style,_count,price);
     }
 }
 -(UIButton *)cancelBtn{
@@ -286,10 +289,13 @@
 -(void)setCount:(NSString *)count{
     _count = count;
     if ([count integerValue] >= 1) {
-        _subBtn.enabled = [count integerValue] == 1?NO:YES;
-        self.textField.text = count;
-        if (self.didChangeCountBlock) {
-            self.didChangeCountBlock(count);
+        self.subBtn.enabled = [count integerValue] == 1?NO:YES;
+        if ([count integerValue] <= self.maxNum) {
+            self.addBtn.enabled = [count integerValue] == self.maxNum?NO:YES;
+            self.textField.text = count;
+            if (self.didChangeCountBlock) {
+                self.didChangeCountBlock(count);
+            }
         }
     }
 }
@@ -334,10 +340,23 @@
         textField.layer.borderColor = COLOR_CECECE.CGColor;
         textField.layer.borderWidth = W_RATIO(1);
         textField.keyboardType = UIKeyboardTypeNumberPad;
+        [textField addTarget:self action:@selector(textfieldTextDidChange:) forControlEvents:UIControlEventEditingChanged];
         textField.font = FONT(30);
         textField.frame = CGRectMake(MaxXF(self.subBtn)+W_RATIO(20), YF(_subBtn), XF(self.addBtn)-MaxXF(self.subBtn)-W_RATIO(20)*2, HEIGHTF(_subBtn));
     }
     return _textField;
+}
+- (void)textfieldTextDidChange:(UITextField *)textField
+{
+    if ([textField.text integerValue]<self.maxNum) {
+        if ([textField.text integerValue]>0) {
+            self.count = textField.text;
+        }else{
+            self.count = [NSString stringWithFormat:@"1"];
+        }
+    }else{
+        self.count = [NSString stringWithFormat:@"%ld",(long)self.maxNum];
+    }
 }
 @end
 @interface YNSelectParaHeaderView()

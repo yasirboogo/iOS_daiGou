@@ -47,6 +47,17 @@
     _textFieldText = textFieldText;
     self.inforTField.text = textFieldText;
 }
+-(void)setIsEnableCodeBtn:(BOOL)isEnableCodeBtn{
+    _isEnableCodeBtn = isEnableCodeBtn;
+    if (!_timer) {
+        self.sendCodeBtn.enabled = isEnableCodeBtn;
+        if (isEnableCodeBtn) {
+            _sendCodeBtn.backgroundColor = COLOR_DF463E;
+        }else{
+            _sendCodeBtn.backgroundColor = COLOR_EDEDED;
+        }
+    }
+}
 -(void)layoutSubviews{
     [super layoutSubviews];
     self.itemLabel.frame = CGRectMake(kMidSpace, 0, W_RATIO(180), HEIGHTF(self.contentView));
@@ -63,6 +74,7 @@
         _itemLabel = itemLabel;
         itemLabel.font = FONT(30);
         itemLabel.textColor = COLOR_666666;
+        itemLabel.adjustsFontSizeToFitWidth = YES;
         [self.contentView addSubview:itemLabel];
     }
     return _itemLabel;
@@ -113,9 +125,10 @@
         UIButton *sendCodeBtn = [UIButton buttonWithType:UIButtonTypeCustom];
         _sendCodeBtn = sendCodeBtn;
         sendCodeBtn.layer.cornerRadius = kViewRadius;
-        sendCodeBtn.backgroundColor = COLOR_DF463E;
+        sendCodeBtn.enabled = NO;
+        sendCodeBtn.backgroundColor = COLOR_EDEDED;
         sendCodeBtn.titleLabel.font = FONT(28);
-        [sendCodeBtn setTitle:@"发送验证码" forState:UIControlStateNormal];
+        [sendCodeBtn setTitle:kLocalizedString(@"sendCodeID", @"发送验证码") forState:UIControlStateNormal];
         [sendCodeBtn setTitleColor:COLOR_FFFFFF forState:UIControlStateNormal];
         [sendCodeBtn setTitleColor:COLOR_DF463E forState:UIControlStateDisabled];
         [sendCodeBtn addTarget:self action:@selector(handleSendButtonCodeClick:) forControlEvents:UIControlEventTouchUpInside];
@@ -147,11 +160,11 @@
             if (lastTime+1) {
                 _sendCodeBtn.enabled = NO;
                 _sendCodeBtn.backgroundColor = COLOR_EDEDED;
-                [_sendCodeBtn setTitle:[NSString stringWithFormat:@"已发送 %02lds",lastTime--] forState:UIControlStateNormal];
+                [_sendCodeBtn setTitle:[NSString stringWithFormat:@"%@ %02lds",kLocalizedString(@"codeLast", @"已发送 "),lastTime--] forState:UIControlStateNormal];
             }else{
                 _sendCodeBtn.enabled = YES;
                 _sendCodeBtn.backgroundColor = COLOR_DF463E;
-                [_sendCodeBtn setTitle:@"发送验证码" forState:UIControlStateNormal];
+                [_sendCodeBtn setTitle:kLocalizedString(@"sendCodeID", @"发送验证码") forState:UIControlStateNormal];
                 // 取消定时器
                 dispatch_cancel(self.timer);
                 _timer = nil;

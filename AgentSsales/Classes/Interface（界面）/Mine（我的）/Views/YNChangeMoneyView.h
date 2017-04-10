@@ -10,6 +10,8 @@
 
 @interface YNChangeMoneyView : UITableView
 
+@property (nonatomic,assign) NSInteger typeIndex;
+
 @property (nonatomic,strong) NSArray * dataArray;
 
 @property (nonatomic, assign) BOOL isTapGesture;
@@ -26,6 +28,8 @@
 @interface YNChangeWayCell : UITableViewCell
 
 @property (nonatomic, assign) BOOL isSelect;
+
+@property (nonatomic, assign) BOOL isEnable;
 
 @property (nonatomic,strong) NSDictionary * dict;
 

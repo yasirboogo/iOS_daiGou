@@ -47,12 +47,7 @@
     _dataArray = dataArray;
     [self reloadData];
 }
--(NSIndexPath *)indexPath{
-    if (!_indexPath) {
-        _indexPath = [NSIndexPath indexPathForRow:0 inSection:0];
-    }
-    return _indexPath;
-}
+
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
     return _dataArray.count;
 }
@@ -63,8 +58,16 @@
         wayCell = [[YNChangeWayCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"wayCell"];
         wayCell.selectionStyle = UITableViewCellSelectionStyleNone;
     }
-    wayCell.isSelect = (self.indexPath == indexPath) ? YES : NO;
     wayCell.dict = _dataArray[indexPath.row];
+    wayCell.isSelect = ([indexPath compare:self.indexPath] == NSOrderedSame) ? YES : NO;
+    wayCell.isEnable = YES;
+    if (_typeIndex == 0 && indexPath.row != 0) {
+        wayCell.isEnable = NO;
+    }else if (_typeIndex == 1 && indexPath.row != 1){
+        wayCell.isEnable = NO;
+    }else if (_typeIndex == 2 && indexPath.row != 2){
+        wayCell.isEnable = NO;
+    }
     return wayCell;
 }
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
@@ -146,14 +149,22 @@
 @end
 @implementation YNChangeWayCell
 
--(void)setDict:(NSDictionary *)dict{
-    _dict = dict;
-    self.flagImgView.image = [UIImage imageNamed:dict[@"image"]];
-    self.titleLabel.text = dict[@"title"];
-}
 -(void)setIsSelect:(BOOL)isSelect{
     _isSelect = isSelect;
     self.selectBtn.selected = isSelect;
+}
+-(void)setIsEnable:(BOOL)isEnable{
+    _isEnable = isEnable;
+    self.flagImgView.image = [UIImage imageNamed:_dict[@"image"]];
+    if (isEnable) {
+        self.userInteractionEnabled = YES;
+        self.titleLabel.text = [NSString stringWithFormat:@"%@",_dict[@"title"]];
+        self.titleLabel.textColor = COLOR_333333;
+    }else{
+        self.userInteractionEnabled = NO;
+        self.titleLabel.text = [NSString stringWithFormat:@"%@%@",_dict[@"title"],LocalNoSupport];
+        self.titleLabel.textColor = COLOR_999999;
+    }
 }
 -(UIButton *)selectBtn{
     if (!_selectBtn) {
@@ -162,7 +173,6 @@
         [self.contentView addSubview:selectBtn];
         [selectBtn setBackgroundImage:[UIImage imageNamed:@"gou_kui_gouwuche"] forState:UIControlStateNormal];
         [selectBtn setBackgroundImage:[UIImage imageNamed:@"gou_hong_gouwuche"] forState:UIControlStateSelected];
-        //        [selectBtn addTarget:self action:@selector(buttonClick:) forControlEvents:UIControlEventTouchUpInside];
         selectBtn.frame = CGRectMake(W_RATIO(660)-kMidSpace-kMaxSpace, (W_RATIO(120)-kMidSpace)/2.0, kMidSpace, kMidSpace);
     }
     return _selectBtn;
@@ -182,6 +192,7 @@
         _titleLabel = titleLabel;
         [self.contentView addSubview:titleLabel];
         titleLabel.font = FONT(32);
+        titleLabel.adjustsFontSizeToFitWidth = YES;
         titleLabel.textColor = COLOR_333333;
         titleLabel.frame = CGRectMake(MaxXF(_flagImgView)+W_RATIO(20),(W_RATIO(120)-W_RATIO(40))/2.0, XF(_selectBtn)-MaxXF(_flagImgView)-W_RATIO(20)*2, W_RATIO(40));
     }

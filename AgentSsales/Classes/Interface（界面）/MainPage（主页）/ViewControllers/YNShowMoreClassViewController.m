@@ -60,21 +60,27 @@
     NSDictionary *params = @{@"type":[NSNumber numberWithInteger:_type],
                              @"status":@0};
     [YNHttpManagers getHotClassWithParams:params success:^(id response) {
-        if (!self.classId.length) {
-            self.index = 0;
+        if ([response[@"code"] isEqualToString:@"success"]) {
+            //do success things
+            if (!self.classId.length) {
+                self.index = 0;
+            }else{
+                [response[@"imgArray"] enumerateObjectsUsingBlock:^(NSDictionary *dict, NSUInteger idx, BOOL * _Nonnull stop) {
+                    if ([dict[@"classId"] integerValue] == [self.classId integerValue]) {
+                        self.index = idx;
+                        *stop = YES;
+                        return;
+                    }
+                }];
+            }
+            self.showAllGoodsClassView.dataArray = response[@"imgArray"];
+            [self.pagerController moveToControllerAtIndex:self.index animated:NO];
+            [self.view bringSubviewToFront:self.showAllGoodsClassView];
         }else{
-            [(NSArray*)response enumerateObjectsUsingBlock:^(NSDictionary *dict, NSUInteger idx, BOOL * _Nonnull stop) {
-                if ([[NSString stringWithFormat:@"%@",dict[@"classId"]] isEqualToString:self.classId]) {
-                    self.index = idx;
-                    *stop = YES;
-                    return;
-                }
-            }];
+            //do failure things
         }
-        self.showAllGoodsClassView.dataArray = response;
-        [self.pagerController moveToControllerAtIndex:self.index animated:NO];
-        [self.view bringSubviewToFront:self.showAllGoodsClassView];
     } failure:^(NSError *error) {
+        //do error things
     }];
 }
 #pragma mark - 视图加载
@@ -132,7 +138,7 @@
 }
 -(YNShowAllGoodsClassView *)showAllGoodsClassView{
     if (!_showAllGoodsClassView) {
-        CGRect frame = CGRectMake(0,kUINavHeight+W_RATIO(86)+W_RATIO(2), SCREEN_WIDTH,SCREEN_HEIGHT-MaxYF(_showBtn)-W_RATIO(2));
+        CGRect frame = CGRectMake(0,kUINavHeight+W_RATIO(90)+W_RATIO(2), SCREEN_WIDTH,SCREEN_HEIGHT-W_RATIO(90)-W_RATIO(2));
         YNShowAllGoodsClassView *showAllGoodsClassView = [[YNShowAllGoodsClassView alloc] initWithFrame:frame];
         _showAllGoodsClassView = showAllGoodsClassView;
         showAllGoodsClassView.hidden = YES;

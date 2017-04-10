@@ -19,7 +19,6 @@
     self = [super initWithFrame:frame];
     if (self) {
         self.showsVerticalScrollIndicator = NO;
-        self.bounces = NO;
         self.backgroundColor = COLOR_CLEAR;
         self.separatorStyle = UITableViewCellSeparatorStyleNone;
         self.delegate = self;
@@ -85,11 +84,11 @@
     CGSize addressSize = [[NSString stringWithFormat:@"%@%@",dict[@"region"],dict[@"detailed"]] calculateHightWithWidth:MaxX(_phoneF)-kMidSpace font:FONT(30)];
     self.addresssF = CGRectMake(X(_nameF),MaxY(_nameF)+W_RATIO(20),addressSize.width,addressSize.height);
     
-    CGSize delectSize = [@"删除" calculateHightWithFont:FONT(26) maxWidth:0];
+    CGSize delectSize = [LocalDelete calculateHightWithFont:FONT(26) maxWidth:0];
     self.delectF = CGRectMake(MaxX(_addresssF)-delectSize.width, MaxY(_addresssF)+W_RATIO(20), delectSize.width, delectSize.height+W_RATIO(20));
     self.delectBtnF = CGRectMake(X(_delectF)-HEIGHT(_delectF)-kMinSpace, Y(_delectF), HEIGHT(_delectF), HEIGHT(_delectF));
     
-    CGSize selectSize = [@"设置为默认地址" calculateHightWithFont:FONT(26) maxWidth:0];
+    CGSize selectSize = [LocalDefaultAddress calculateHightWithFont:FONT(26) maxWidth:0];
     self.selectBtnF = CGRectMake(X(_addresssF), Y(_delectBtnF), WIDTH(_delectBtnF), HEIGHT(_delectBtnF));
     self.selectF = CGRectMake(MaxX(_selectBtnF)+kMinSpace, Y(_selectBtnF),selectSize.width, HEIGHT(_delectBtnF));
     
@@ -172,8 +171,8 @@
     self.nameLabel.text = cellFrame.dict[@"name"];
     self.phoneLabel.text = cellFrame.dict[@"phone"];
     self.addressLabel.text = [NSString stringWithFormat:@"%@%@",cellFrame.dict[@"region"],cellFrame.dict[@"detailed"]];
-    self.selectLabel.text = @"设为默认地址";
-    self.delectLabel.text = @"删除";
+    self.selectLabel.text = LocalDefaultAddress;
+    self.delectLabel.text = LocalDelete;
 
 }
 
@@ -276,7 +275,7 @@
     return _delectLabel;
 }
 -(void)handleDelectButtonClick{
-    if (self.didDelectButtonClickBlock && !self.isSelect) {//默认地址无法删除
+    if (self.didDelectButtonClickBlock /*&& !self.isSelect*/) {//默认地址无法删除
         self.didDelectButtonClickBlock();
     }
 }

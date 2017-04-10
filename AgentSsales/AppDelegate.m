@@ -7,13 +7,15 @@
 //
 
 #import "AppDelegate.h"
-#import "AppDelegate+ThirdShare.h"
 
 #import "YNTabBarController.h"
 
 #import "YNLoginViewController.h"
 
+
+
 @interface AppDelegate ()
+
 
 @end
 
@@ -21,15 +23,27 @@
 
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    //测试更新
+    [self FirUpdateApplication:application didFinishLaunchingWithOptions:launchOptions];
     //第三方分享
     [self ThirdShareApplication:application didFinishLaunchingWithOptions:launchOptions];
+    //第三方支付
+    [self ThirdPayApplication:application didFinishLaunchingWithOptions:launchOptions];
+    //第三方客服
+    [self ThirdChatApplication:application didFinishLaunchingWithOptions:launchOptions];
+    //第三方推送
+    [self JPushApplication:application didFinishLaunchingWithOptions:launchOptions];
+    //通知设置
+    [CRToastManager setDefaultOptions:@{kCRToastNotificationTypeKey : @(CRToastTypeNavigationBar),
+                                        kCRToastFontKey             : [UIFont fontWithName:@"HelveticaNeue-Light" size:16],
+                                        kCRToastTextColorKey        : [UIColor whiteColor],
+                                        kCRToastBackgroundColorKey  : [UIColor orangeColor],
+                                        kCRToastAutorotateKey       : @(YES)}];
     //请求配置
     [YNHttpManagers setupHttpTool];
-    
     UIWindow *window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
     self.window = window;
     [window makeKeyAndVisible];
-    
     id userLoginInfors = [DEFAULTS valueForKey:kUserLoginInfors];
     if (userLoginInfors == nil) {
         UINavigationController *nVc = [[UINavigationController alloc] initWithRootViewController:[[YNLoginViewController alloc] init]];
@@ -38,12 +52,9 @@
         YNTabBarController *tab = [[YNTabBarController alloc]init];
         self.window.rootViewController = tab;
     }
-    
     // Override point for customization after application launch.
     return YES;
 }
-
-
 - (void)applicationWillResignActive:(UIApplication *)application {
     // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
     // Use this method to pause ongoing tasks, disable timers, and invalidate graphics rendering callbacks. Games should use this method to pause the game.

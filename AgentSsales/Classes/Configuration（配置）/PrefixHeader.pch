@@ -31,8 +31,14 @@
 #import "AppMacro.h"
 #import "APIMacro.h"
 #import "SystemMacro.h"
+#import "LocalMacro.h"
 
 /* -------------------公用类头文件------------------- */
+#import "AppDelegate+FirUpdate.h"
+#import "AppDelegate+ThirdShare.h"
+#import "AppDelegate+ThirdPay.h"
+#import "AppDelegate+ThirdChat.h"
+#import "AppDelegate+JPushHelper.h"
 #import <WebKit/WebKit.h>
 #import "UIImage+Extension.h"
 #import "UIView+Extension.h"
@@ -44,21 +50,27 @@
 #import "YNHttpManagers.h"
 #import "YNLoginPageModel.h"
 #import "YNAreaModel.h"
+#import "YNShoppingCartModel.h"
 #import "YNMineModel.h"
 #import "LanguageManager.h"
 #import "UITextView+Placeholder.h"
+#import "NSString+Double.h"
 /* -------------------自定义视图头文件------------------- */
 #import "YNBaseViewController.h"
 #import "YNShowEmptyView.h"
 
 /* -------------------第三方类文件------------------- */
 #import <AlipaySDK/AlipaySDK.h>
+#import "UICKeyChainStore.h"
 #import "UIImageView+WebCache.h"
 #import "TYTabButtonPagerController.h"
 #import "YYKit.h"
 #import "JKDBModel.h"
-#import "LGAlertView.h"
 #import "IQKeyboardManager.h"
 #import "MJRefresh.h"
+#import "SVProgressHUD.h"
+#import "HDAlertView.h"
+#import "JXTAlertView.h"
+#import "CRToast.h"
 #endif /* PrefixHeader_pch */
 

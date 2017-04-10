@@ -22,7 +22,7 @@
     self = [super initWithFrame:frame];
     if (self) {
         self.backgroundColor = COLOR_FFFFFF;
-        self.textField.placeholder = @"说点什么吧";
+        self.textField.placeholder = LocalSayThing;
     }
     return self;
 }
@@ -52,7 +52,7 @@
         sendBtn.layer.masksToBounds = YES;
         sendBtn.userInteractionEnabled = NO;
         sendBtn.backgroundColor = COLOR_EDEDED;
-        [sendBtn setTitle:@"发布" forState:UIControlStateNormal];
+        [sendBtn setTitle:LocalPublish forState:UIControlStateNormal];
         sendBtn.titleLabel.font = FONT(32);
         [sendBtn setTitleColor:COLOR_FFFFFF forState:UIControlStateNormal];
         [sendBtn addTarget:self action:@selector(handleSendButton:) forControlEvents:UIControlEventTouchUpInside];

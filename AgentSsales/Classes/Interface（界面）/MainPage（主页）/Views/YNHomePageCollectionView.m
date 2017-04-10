@@ -50,21 +50,9 @@
     }
     return self;
 }
--(void)setAdArray:(NSArray *)adArray{
-    _adArray = adArray;
-    [self reloadData];
-}
--(void)setHotArray:(NSArray *)hotArray{
-    _hotArray = hotArray;
-    [self reloadData];
-}
--(void)setFeatureArray:(NSArray *)featureArray{
-    _featureArray = featureArray;
-    [self reloadData];
-}
 #pragma mark - 代理实现
 -(NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView{
-    if (self.adArray.count&&self.hotArray&&self.featureArray.count) {
+    if (self.adArray.count){
         return 5;
     }
     return 0;
@@ -79,7 +67,7 @@
     }else if (section == 3){
         return 1;
     }else if (section == 4){
-        return _featureArray.count;
+        return _dataArrayM.count;
     }
     return 0;
 }
@@ -121,13 +109,20 @@
                 typeCell.buyInLabel.text = @"买进";
                 typeCell.sellOutLabel.text = @"卖出";
                 return typeCell;
-            }else{
+            }
+            else{
                 YNMoneyRatesCell *rateCell = [collectionView dequeueReusableCellWithReuseIdentifier:@"rateCell" forIndexPath:indexPath];
                 rateCell.backgroundColor = COLOR_FFFFFF;
-                rateCell.flagImgView.image = [UIImage imageNamed:@"malaixiya_guoqi"];
-                rateCell.typeLabel.text = @"马来西亚币";
-                rateCell.buyLabel.text = @"0.6545";
-                rateCell.sellLabel.text = @"1.6057";
+                if (indexPath.row == 1){
+                    rateCell.flagImgView.image = [UIImage imageNamed:@"malaixiya_guoqi"];
+                    rateCell.typeLabel.text = @"马来西亚币";
+                }else if (indexPath.row == 2){
+                    rateCell.flagImgView.image = [UIImage imageNamed:@"meiguo_guoqi"];
+                    rateCell.typeLabel.text = @"美元";
+                }
+                rateCell.buyLabel.text = [NSString stringWithFormat:@"%@",_rateArray[indexPath.row-1][@"buyup"]];
+                rateCell.sellLabel.text = [NSString stringWithFormat:@"%@",_rateArray[indexPath.row-1][@"sell"]];
+                
                 return rateCell;
             }
         }
@@ -149,7 +144,7 @@
     }else if(indexPath.section == 4) {
         YNShowGoodsCell *goodsCell = [collectionView dequeueReusableCellWithReuseIdentifier:@"goodCell" forIndexPath:indexPath];
         goodsCell.backgroundColor = COLOR_FFFFFF;
-        goodsCell.dict = _featureArray[indexPath.row];
+        goodsCell.dict = _dataArrayM[indexPath.row];
         
         return goodsCell;
     }
@@ -229,8 +224,10 @@
 - (UICollectionReusableView *)collectionView:(UICollectionView *)collectionView viewForSupplementaryElementOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath{
     if (kind == UICollectionElementKindSectionHeader){
         if (indexPath.section == 0) {
+            return nil;
         }else if (indexPath.section == 1) {
             YNHeaderBarView *headerView = [collectionView dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:@"barHeader" forIndexPath:indexPath];
+            [headerView.moreBtn removeFromSuperview];
             [headerView setWithTitle:kLocalizedString(@"purchasePlatform",@"代购平台") leftImg:[UIImage imageNamed:@"daigoupingtai_shouye"] moreImg:nil color:COLOR_FFFFFF moreClickBlock:nil];
             return headerView;
         }else if (indexPath.section == 2){
@@ -262,7 +259,7 @@
 -(void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath{
     if (indexPath.section == 4) {//特色惠购可以选择
         if (self.didSelectGoodImgClickBlock) {
-            self.didSelectGoodImgClickBlock([NSString stringWithFormat:@"%@",_featureArray[indexPath.row][@"id"]]);
+            self.didSelectGoodImgClickBlock([NSString stringWithFormat:@"%@",_dataArrayM[indexPath.row][@"id"]]);
         }
     }
 }
@@ -424,11 +421,9 @@
 
 -(void)setImageURLs:(NSArray *)imageURLs{
     _imageURLs = imageURLs;
-    if (imageURLs.count < 6) {
-        DLog(@"图片个数小于6张");
-    }
     CGFloat startX = (SCREEN_WIDTH-W_RATIO(243)*3-W_RATIO(2)*2)/2.0;
-    for (NSInteger i = 0; i < 6; i ++) {
+    NSInteger imgCount = imageURLs.count >= 6?6:imageURLs.count;
+    for (NSInteger i = 0; i < imgCount; i ++) {
         // 创建 imageView
         UIImageView * imageView = [[UIImageView alloc] init];
         imageView.userInteractionEnabled = YES;
@@ -529,8 +524,9 @@
     [self.bigImageView sd_setImageWithURL:[NSURL URLWithString:dict[@"img"]] placeholderImage:[UIImage imageNamed:@"zhanwei1"]];
     self.nameLabel.text = dict[@"name"];
     self.versionLabel.text = dict[@"note"];
-    self.priceLabel.text = [NSString stringWithFormat:@"%@",dict[@"salesprice"]];
-    self.markLabel.text = @"￥";
+    self.priceLabel.text = [NSString decimalNumberWithDouble:dict[@"salesprice"]];
+    self.markLabel.text = LocalMoneyMark;
+    [self layoutSubviews];
 }
 
 -(UIImageView *)bigImageView{
@@ -588,25 +584,25 @@
     [super layoutSubviews];
     _bigImageView.frame = CGRectMake(0, 0, WIDTHF(self.contentView),WIDTHF(self.contentView));
     
-    CGSize nameSize = [_nameLabel.text sizeWithAttributes:@{NSFontAttributeName:FONT(30)}];
+    CGSize nameSize = [_nameLabel.text calculateHightWithFont:_nameLabel.font maxWidth:0];
     _nameLabel.frame = CGRectMake(0,
                                   MaxYF(_bigImageView)+kMinSpace,
                                   WIDTHF(_bigImageView),
                                   nameSize.height);
     
-    CGSize versionSize = [_versionLabel.text sizeWithAttributes:@{NSFontAttributeName:_versionLabel.font}];
+    CGSize versionSize = [_versionLabel.text calculateHightWithFont:_versionLabel.font maxWidth:0];
     _versionLabel.frame = CGRectMake(0,
                                      MaxYF(_nameLabel)+kMinSpace,
                                      WIDTHF(_bigImageView),
                                      versionSize.height);
     
-    CGSize priceSize = [_priceLabel.text sizeWithAttributes:@{NSFontAttributeName:_priceLabel.font}];
+    CGSize priceSize = [_priceLabel.text calculateHightWithFont:_priceLabel.font maxWidth:0];
     _priceLabel.frame = CGRectMake((WIDTHF(self.contentView)-priceSize.width)/2.0,
                                    MaxYF(_versionLabel)+kMinSpace*2,
                                    priceSize.width,
                                    priceSize.height);
     
-    CGSize markSize = [_markLabel.text sizeWithAttributes:@{NSFontAttributeName:_markLabel.font}];
+    CGSize markSize = [_markLabel.text calculateHightWithFont:_markLabel.font maxWidth:0];
     _markLabel.frame = CGRectMake(MinXF(_priceLabel)-markSize.width,
                                   MaxYF(_priceLabel)-markSize.height,
                                   markSize.width,
@@ -670,7 +666,7 @@
     if (!_moreBtn) {
         UIButton *moreBtn = [UIButton buttonWithType:UIButtonTypeCustom];
         _moreBtn = moreBtn;
-        [moreBtn setTitle:kLocalizedString(@"more", @"更多") forState:UIControlStateNormal];
+        [moreBtn setTitle:LocalMore forState:UIControlStateNormal];
         moreBtn.titleLabel.font = FONT(24);
         moreBtn.hidden = YES;
         [moreBtn addTarget:self action:@selector(moreButtonClick) forControlEvents:UIControlEventTouchUpInside];

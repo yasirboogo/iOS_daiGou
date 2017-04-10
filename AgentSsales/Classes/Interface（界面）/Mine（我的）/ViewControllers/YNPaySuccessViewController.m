@@ -83,9 +83,9 @@
 
 #pragma mark - 函数、消息
 -(void)handleBottomButtonClickWithName:(NSString*)name{
-    if ([name isEqualToString:@"返回首页"]) {
+    if ([name isEqualToString:LocalBackPage]) {
         [self.navigationController popToRootViewControllerAnimated:NO];
-    }else if ([name isEqualToString:@"查看订单"]){
+    }else if ([name isEqualToString:LocalCheckOrder]){
         YNMineOrderViewController *pushVC = [[YNMineOrderViewController alloc] init];
         [self.navigationController pushViewController:pushVC animated:NO];
     }else if ([name isEqualToString:@"查看我的钱包"]){
@@ -100,7 +100,7 @@
 -(void)makeData{
     [super makeData];
     
-    if ([self.titleStr isEqualToString:@"充值成功"]) {
+    if (self.type == 1) {
         //第一部分
         self.topView.dict = @{@"image":@"chongzhichenggong",@"tips":@"恭喜你，充值成功!"};
         //第二部分
@@ -115,7 +115,7 @@
         self.msgView.dict = @{@"title":@"充值成功",@"msg":msgAttributedStrM};
         //第三部分
         self.btnsView.btnTitles = @[@"查看我的钱包",@"查看优惠劵"];
-    }else if ([self.titleStr isEqualToString:@"兑换成功"]){
+    }else if (self.type == 2){
         //第一部分
         self.topView.dict = @{@"image":@"duihuanchenggong",@"tips":@"恭喜你，兑换成功!"};
         //第二部分
@@ -129,7 +129,7 @@
         self.msgView.dict = @{@"title":@"兑换成功",@"msg":msgAttributedStrM};
         //第三部分
         self.btnsView.btnTitles = @[@"查看我的钱包"];
-    }else if ([self.titleStr isEqualToString:@"确认收货"]){
+    }else if (self.type == 3){
         //第一部分
         self.topView.dict = @{@"image":@"querenshouhuo",@"tips":@"你已确定收货！"};
         //第二部分
@@ -142,20 +142,20 @@
         self.msgView.dict = @{@"title":@"确认收货",@"msg":msgAttributedStrM};
         //第三部分
         self.btnsView.btnTitles = @[@"返回首页",@"查看订单"];
-    }else if ([self.titleStr isEqualToString:@"支付成功"]){
+    }else if (self.type == 4){
         //第一部分
-        self.topView.dict = @{@"image":@"zhifuchenggong",@"tips":@"恭喜你，支付成功！"};
+        self.topView.dict = @{@"image":@"zhifuchenggong",@"tips":[NSString stringWithFormat:@"%@,%@!",LocalCongratulations,LocalPaySuccess]};
         //第二部分
-        NSString *tips = @"我们将尽快安排发货，请买家保持手机通讯通畅，以便快递小哥能第一时间联系到你。";
+        NSString *tips = LocalDeliverTips;
         CGSize msgSize = [tips calculateHightWithWidth:WIDTHF(_topView)-kMidSpace*2 font:FONT(28)];
         
         NSMutableAttributedString *msgAttributedStrM = [[NSMutableAttributedString alloc] initWithString:tips];
         
         self.msgView.msgSize = msgSize;
-        self.msgView.dict = @{@"title":@"送货信息",@"msg":msgAttributedStrM};
+        self.msgView.dict = @{@"title":LocalDeliverGoods,@"msg":msgAttributedStrM};
         //第三部分
-        self.btnsView.btnTitles = @[@"返回首页",@"查看订单"];
-    }else if ([self.titleStr isEqualToString:@"订单提交成功"]){
+        self.btnsView.btnTitles = @[LocalBackPage,LocalCheckOrder];
+    }else if (self.type == 5){
         //第一部分
         self.topView.dict = @{@"image":@"dingdantijiaochengong",@"tips":@"恭喜你，订单提交成功！"};
         //第二部分
@@ -172,7 +172,17 @@
 }
 -(void)makeNavigationBar{
     [super makeNavigationBar];
-    self.titleLabel.text = self.titleStr;
+    if (self.type == 1) {
+        self.titleLabel.text = LocalRechargeSuccess;
+    }else if (self.type == 2){
+        self.titleLabel.text = @"兑换成功";
+    }else if (self.type == 3){
+        self.titleLabel.text = @"确认收货";
+    }else if (self.type == 4){
+        self.titleLabel.text = LocalPaySuccess;
+    }else if (self.type == 5){
+        self.titleLabel.text = @"订单提交成功";
+    }
 }
 -(void)makeUI{
     [super makeUI];

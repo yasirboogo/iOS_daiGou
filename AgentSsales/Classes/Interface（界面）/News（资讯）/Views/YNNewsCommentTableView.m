@@ -31,18 +31,11 @@
     }
     return self;
 }
-
--(void)setDataArray:(NSArray *)dataArray{
-    _dataArray = dataArray;
-    _dataArray = [YNNewsCommentCellFrame initWithFromDictionaries:dataArray];
-    [self reloadData];
-}
-
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
-    return _dataArray.count;
+    return _dataArrayM.count;
 }
 -(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
-    YNNewsCommentCellFrame *cellFrame = _dataArray[indexPath.row];
+    YNNewsCommentCellFrame *cellFrame = _dataArrayM[indexPath.row];
     return cellFrame.cellHeight;
 }
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
@@ -56,7 +49,7 @@
         lineView.frame = CGRectMake(0, 0, SCREEN_WIDTH, W_RATIO(2));
         [commentCell.contentView addSubview:lineView];
     }
-    commentCell.cellFrame = _dataArray[indexPath.row];
+    commentCell.cellFrame = _dataArrayM[indexPath.row];
     return commentCell;
 }
 
@@ -72,7 +65,7 @@
     self.timeF = CGRectMake(SCREEN_WIDTH-timeSize.width-kMidSpace, Y(_icoF), timeSize.width, timeSize.height);
     self.nameF = CGRectMake(MaxX(_icoF)+W_RATIO(30), Y(_icoF),X(_timeF)-MaxX(_icoF)-W_RATIO(30)*2 , HEIGHT(_icoF)/2.0);
     
-    CGSize contentSize = [dict[@"content"] calculateHightWithWidth:MaxX(_timeF)-X(_nameF) font:FONT(30)];
+    CGSize contentSize = [[dict[@"content"] stringByRemovingPercentEncoding] calculateHightWithWidth:MaxX(_timeF)-X(_nameF) font:FONT(30)];
     self.contentF = CGRectMake(X(_nameF), MaxY(_icoF), contentSize.width, contentSize.height);
     
     self.cellHeight = MaxY(_contentF)+kMidSpace;
@@ -126,7 +119,7 @@
     [self.icoImgView sd_setImageWithURL:[NSURL URLWithString:cellFrame.dict[@"headimg"]] placeholderImage:[UIImage imageNamed:@"zhanwei1"]];
     self.timeLabel.text = cellFrame.dict[@"createtime"];
     self.nameLabel.text = cellFrame.dict[@"nickname"];
-    self.contentLabel.text = cellFrame.dict[@"content"];
+    self.contentLabel.text = [cellFrame.dict[@"content"] stringByRemovingPercentEncoding];
 }
 
 -(UIImageView *)icoImgView{

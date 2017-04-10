@@ -70,7 +70,11 @@
 /** 设备是否为iPhone 6Plus/7Plus 分辨率414x736，像素1242x2208，@3x */
 #define iPhone_5_5 ([UIScreen instancesRespondToSelector:@selector(currentMode)] ? CGSizeEqualToSize(CGSizeMake(1242, 2208), [[UIScreen mainScreen] currentMode].size) : NO)
 
-
+#if TARGET_IPHONE_SIMULATOR
+#define SIMULATOR 1
+#elif TARGET_OS_IPHONE
+#define SIMULATOR 0
+#endif
 //----------------------ABOUT SYSTYM & VERSION 系统与版本
 /** 判断是否为iPhone */
 #define isiPhone (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
@@ -228,5 +232,4 @@ return self; \
 
 #define kUserLoginInfors  @"userLoginInfors"
 
-#define kKeychainService  @"daiGou"
-#define kKeychainDeviceId  @"KeyChainDeviceId"
+#define kKeychainService  @"com.daiGou"

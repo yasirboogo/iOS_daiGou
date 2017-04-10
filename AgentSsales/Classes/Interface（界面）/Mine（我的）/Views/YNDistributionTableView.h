@@ -10,7 +10,7 @@
 
 @interface YNDistributionTableView : UITableView
 
-@property (nonatomic,strong) NSArray *dataArray;
+@property (nonatomic,strong) NSMutableArray *dataArrayM;
 
 @end
 

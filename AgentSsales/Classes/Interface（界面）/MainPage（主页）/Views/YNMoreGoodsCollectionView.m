@@ -25,7 +25,7 @@
         //隐藏滑块
         self.showsHorizontalScrollIndicator = NO;
         self.showsVerticalScrollIndicator = NO;
-        
+        self.bounces = NO;
         self.delegate = self;
         self.dataSource = self;
         self.backgroundColor = COLOR_EDEDED;
@@ -47,6 +47,11 @@
     goodsCell.dict = _dataArray[indexPath.row];
     return goodsCell;
 }
-
+-(void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath{
+    [collectionView deselectItemAtIndexPath:indexPath animated:NO];
+    if (self.didSelectMoreGoodsCellBlock) {
+        self.didSelectMoreGoodsCellBlock(_dataArray[indexPath.row][@"goodsId"]);
+    }
+}
 
 @end

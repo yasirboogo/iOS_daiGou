@@ -12,6 +12,10 @@
 
 @property (nonatomic,strong) NSArray<NSDictionary*> *inforArray;
 
-@property (nonatomic,strong) NSMutableArray<NSString*> *textArrayM;
+@property (nonatomic,copy) NSString * oldPasswod;
+
+@property (nonatomic,copy) NSString * firPasswod;
+
+@property (nonatomic,copy) NSString * secPasswod;
 
 @end

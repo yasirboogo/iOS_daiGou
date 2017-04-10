@@ -33,7 +33,6 @@
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
     return _inforArray.count;
 }
-
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
     YNUserInforCell * inforCell = [tableView dequeueReusableCellWithIdentifier:@"inforCell"];
     if (inforCell == nil) {
@@ -46,31 +45,33 @@
     }
     
     if (indexPath.row == 0) {
+        inforCell.textFieldText = _loginphone;
         inforCell.keyboardType = UIKeyboardTypePhonePad;
     }else if (indexPath.row == 1){
+        inforCell.textFieldText = _password;
         inforCell.keyboardType = UIKeyboardTypeASCIICapable;
     }
     
     inforCell.inforDict = _inforArray[indexPath.row];
-    
+    void (^codeBtnEnable)(BOOL) = ^(BOOL isEnable){
+        inforCell.isEnableCodeBtn = isEnable;
+    };
     [inforCell setInforCellTextFieldBlock:^(NSString *str) {
-        
-        [self.textArrayM replaceObjectAtIndex:indexPath.row withObject:str];
+        if (indexPath.row == 0) {
+            self.loginphone = str;
+            codeBtnEnable(str.length);
+        }else if (indexPath.row == 1){
+            self.password = str;
+        }
     }];
     
     return inforCell;
 }
--(NSMutableArray<NSString *> *)textArrayM{
-    if (!_textArrayM) {
-        _textArrayM = [NSMutableArray arrayWithObjects:@"0",@"1", nil];
-    }
-    return _textArrayM;
-}
 -(NSArray<NSDictionary *> *)inforArray{
     if (!_inforArray) {
         _inforArray = @[
-                        @{@"item":@"账号",@"placeholder":@"输入注册手机号"},
-                        @{@"item":@"密码",@"placeholder":@"输入登录密码"}
+                        @{@"item":kLocalizedString(@"userID", @"账号"),@"placeholder":kLocalizedString(@"inputID", @"输入注册手机号")},
+                        @{@"item":kLocalizedString(@"userPwd", @"密码"),@"placeholder":kLocalizedString(@"inputPwd",@"输入登录密码")}
                         ];
     }
     return _inforArray;

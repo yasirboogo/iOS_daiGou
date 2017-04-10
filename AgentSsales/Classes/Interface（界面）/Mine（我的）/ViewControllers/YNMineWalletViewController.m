@@ -55,19 +55,31 @@
     NSDictionary *params = @{@"userId":[DEFAULTS valueForKey:kUserLoginInfors][@"userId"],
                              };
     [YNHttpManagers getUserWalletWithParams:params success:^(id response) {
-        self.allTypeMoneys = response;
-        self.headerView.topNumber = [NSString stringWithFormat:@"%.2f",[response[@"rmb"] floatValue]];
-        self.headerView.leftNumber = [NSString stringWithFormat:@"%.2f",[response[@"us"] floatValue]];
-        self.headerView.rightNumber = [NSString stringWithFormat:@"%.2f",[response[@"myr"] floatValue]];
+        if ([response[@"code"] isEqualToString:@"success"]) {
+            //do success things
+            self.allTypeMoneys = response;
+            self.headerView.topNumber = [NSString stringWithFormat:@"%.2f",[response[@"rmb"] floatValue]];
+            self.headerView.leftNumber = [NSString stringWithFormat:@"%.2f",[response[@"us"] floatValue]];
+            self.headerView.rightNumber = [NSString stringWithFormat:@"%.2f",[response[@"myr"] floatValue]];
+        }else{
+            //do failure things
+        }
     } failure:^(NSError *error) {
+        //do error things
     }];
 }
 -(void)startNetWorkingRequestWithExchangeRate{
     NSDictionary *params = @{@"type":@1
                              };
     [YNHttpManagers getExchangeRateWithParams:params success:^(id response) {
-        self.tableView.dataArray  = response;
+        if ([response[@"code"] isEqualToString:@"success"]) {
+            //do success things
+            self.tableView.dataArray  = response[@"parArray"];
+        }else{
+            //do failure things
+        }
     } failure:^(NSError *error) {
+        //do error things
     }];
 }
 #pragma mark - 视图加载
@@ -97,10 +109,10 @@
         [self.view addSubview:btnsView];
         btnsView.btnStyle = UIButtonStyle2;
         [btnsView setDidSelectBottomButtonClickBlock:^(NSString *str) {
-            if ([str isEqualToString:@"充值"]) {
+            if ([str isEqualToString:LocalRecharge]) {
                 YNWalletRechargeViewController *pushVC = [[YNWalletRechargeViewController alloc] init];
                 [self.navigationController pushViewController:pushVC animated:NO];
-            }else if ([str isEqualToString:@"兑换货币"]){
+            }else if ([str isEqualToString:LocalMoneyChanging]){
                 YNWalletExchangeViewController *pushVC = [[YNWalletExchangeViewController alloc] init];
                 pushVC.allTypeMoneys = self.allTypeMoneys;
                 [self.navigationController pushViewController:pushVC animated:NO];
@@ -115,19 +127,19 @@
 -(void)makeData{
     [super makeData];
     
-    self.headerView.topTitleLabel.text = @"人民币（元）";
-    self.headerView.leftTitleLabel.text = @"美元（美元）";
-    self.headerView.rightTitleLabel.text = @"马来西亚（令吉）";
+    self.headerView.topTitleLabel.text = [NSString stringWithFormat:@"%@ (%@)",LocalChineseMoney,LocalYuan];
+    self.headerView.leftTitleLabel.text = [NSString stringWithFormat:@"%@ (%@)",LocalAmericanMoney,LocalDollar];
+    self.headerView.rightTitleLabel.text = [NSString stringWithFormat:@"%@ (%@)",LocalMalayMoney,LocalRinggit];
     
-    self.tableView.itemTitles = @[kLocalizedString(@"exchangeRate", @"实时汇率"),@"买进",@"卖出"];
+    self.tableView.itemTitles = @[LocalExchangeRate,LocalBuyIn,LocalSellOut];
     
-    self.btnsView.btnTitles = @[@"充值",@"兑换货币"];
+    self.btnsView.btnTitles = @[LocalRecharge,LocalMoneyChanging];
 }
 -(void)makeNavigationBar{
     [super makeNavigationBar];
     self.navView.backgroundColor = COLOR_CLEAR;
 
-    self.titleLabel.text = kLocalizedString(@"myWallet",@"我的钱包");
+    self.titleLabel.text = LocalMyWallet;
 }
 -(void)makeUI{
     [super makeUI];

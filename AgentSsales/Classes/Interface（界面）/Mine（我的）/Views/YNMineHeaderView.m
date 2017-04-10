@@ -30,12 +30,13 @@
 }
 -(NSArray<NSDictionary *> *)btnInfors{
     if (!_btnInfors) {
-        _btnInfors = @[@{@"title":kLocalizedString(@"allOrder",@"全部订单"),@"image":@"quanbu_wode"},
-                      @{@"title":kLocalizedString(@"waitHandle",@"待处理"),@"image":@"daichuli_wode"},
-                      @{@"title":kLocalizedString(@"waitPay",@"待付款"),@"image":@"daifukuan_wode"},
-                      @{@"title":kLocalizedString(@"waitSend",@"待发货"),@"image":@"daifahuo_wode"},
-                      @{@"title":kLocalizedString(@"waitReceive",@"待收货"),@"image":@"daishouhuo_wode"},
-                      @{@"title":kLocalizedString(@"completed",@"已完成"),@"image":@"yiwancheng_wode"}];
+        _btnInfors = @[@{@"title":LocalAllOrder,@"image":@"quanbu_wode"},
+                       @{@"title":LocalWaitHandle,@"image":@"daifukuan_wode"},
+                       @{@"title":LocalWaitPay,@"image":@"daichuli_wode"},
+                       @{@"title":LocalWaitPPay,@"image":@"daifukuan_wode"},
+                       @{@"title":LocalWaitSend,@"image":@"daifahuo_wode"},
+                       @{@"title":LocalWaitReceive,@"image":@"daishouhuo_wode"},
+                       @{@"title":LocalCompleted,@"image":@"yiwancheng_wode"}];
     }
     return _btnInfors;
 }
@@ -73,14 +74,14 @@
     _nameLabel.frame = CGRectMake(MaxXF(ringView)+XF(ringView), YF(ringView), SCREEN_WIDTH-MaxXF(ringView)-XF(ringView)*2, WIDTHF(ringView)/2.0);
     _nameLabel.font = FONT(40);
     _nameLabel.textColor = COLOR_FFFFFF;
-    _nameLabel.text = @"hello,小哥";
+    _nameLabel.text = @"hello,frends";
     
     _moneyLabel = [[UILabel alloc] init];
     [topImgView addSubview:_moneyLabel];
     _moneyLabel.frame = CGRectMake(XF(_nameLabel), MaxYF(_nameLabel), WIDTHF(_nameLabel), WIDTHF(ringView)/3.0);
     _moneyLabel.font = FONT(30);
     _moneyLabel.textColor = COLOR_FFFFFF;
-    _moneyLabel.text = [NSString stringWithFormat:@"%@:%@ %@",kLocalizedString(@"accountBalances",@"账户余额"),@"0.00",kLocalizedString(@"yuan",@"元")];
+    _moneyLabel.text = [NSString stringWithFormat:@"%@%@ %@",LocalAccountLast,@"0.00",LocalMoneyType];
     
     //第二部分
     UIScrollView *btnScrView = [[UIScrollView alloc] init];
@@ -121,6 +122,6 @@
 }
 -(void)setRestMoney:(NSString *)restMoney{
     _restMoney = restMoney;
-    _moneyLabel.text = [NSString stringWithFormat:@"钱包余额：%.2f元",[restMoney floatValue]];
+    _moneyLabel.text = [NSString stringWithFormat:@"%@%@ %@",LocalAccountLast,restMoney,LocalMoneyType];
 }
 @end

@@ -25,7 +25,10 @@
 
 @property (nonatomic,copy) NSString *youhui;
 
+@property (nonatomic,copy) NSString * realprice;
+
 @property (nonatomic,copy) NSString *subMoney;
+
 
 @end
 
@@ -45,7 +48,11 @@
         weakSelf.youhui = youhui;
         weakSelf.collectionView.subMoney = subMoney;
     }];
-    [self startNetWorkingRequestWithStartSubmitOrder];
+    if (self.shoppingId.length) {
+        [self startNetWorkingRequestWithStartSubmitOrder];
+    }else if (self.goodsId.length){
+        [self startNetWorkingRequestWithBuyNowToSubmit];
+    }
 }
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -59,68 +66,140 @@
     [super viewDidDisappear:animated];
 }
 #pragma mark - 网路请求
+-(void)startNetWorkingRequestWithBuyNowToSubmit{
+    NSString *userId = [DEFAULTS valueForKey:kUserLoginInfors][@"userId"];
+    NSLog(@"%@",userId);
+    NSDictionary *params = @{@"userId":[DEFAULTS valueForKey:kUserLoginInfors][@"userId"],
+                             @"goodsId":_goodsId,
+                             @"type":[NSNumber numberWithInteger:_type],
+                             @"count":_count};
+    [YNHttpManagers buyNowToSubmitWithParams:params success:^(id response) {
+        if ([response[@"code"] isEqualToString:@"success"]) {
+            //do success things
+            self.collectionView.dataDict = response;
+        }else{
+            //do failure things
+        }
+    } failure:^(NSError *error) {
+        //do error things
+    }];
+}
 -(void)startNetWorkingRequestWithStartSubmitOrder{
     NSDictionary *params = @{@"userId":[DEFAULTS valueForKey:kUserLoginInfors][@"userId"],
                              @"shoppingId":_shoppingId,
                              @"type":[NSNumber numberWithInteger:_type],
                              @"status":[NSNumber numberWithInteger:_status]};
     [YNHttpManagers startSubmitOrderWithParams:params success:^(id response) {
-        self.collectionView.dataDict = response;
+        if ([response[@"code"] isEqualToString:@"success"]) {
+            //do success things
+            self.collectionView.dataDict = response;
+        }else{
+            //do failure things
+        }
     } failure:^(NSError *error) {
+        //do error things
+    }];
+}
+-(void)startNetWorkingRequestWithPayNowMoney{
+    
+    self.realprice = [NSString stringWithFormat:@"%.2f",[_collectionView.dataDict[@"totalprice"] floatValue] + [_youhui floatValue] - [_subMoney floatValue]];
+    NSMutableDictionary *params = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+                                   [DEFAULTS valueForKey:kUserLoginInfors][@"userId"],@"userId",
+                                   [NSString stringWithFormat:@"%@",_collectionView.dataDict[@"totalprice"]],@"totalprice",
+                                   [NSString stringWithFormat:@"%@",_collectionView.postMoney],@"postage",
+                                   [NSString stringWithFormat:@"%@",self.youhui],@"youhui",
+                                   _realprice,@"realprice",
+                                   _collectionView.postWay,@"delivery",
+                                   _collectionView.dataDict[@"name"],@"username",
+                                   _collectionView.dataDict[@"phone"],@"userphone",
+                                   [NSString stringWithFormat:@"%@%@",_collectionView.dataDict[@"region"],_collectionView.dataDict[@"detailed"]],@"address",
+                                   self.goodsId,@"goodsId",
+                                   //_style,@"style",
+                                   _count,@"count",
+                                   nil];
+    if (![self.style isEqualToString:@""]) {
+        [params setValue:_style forKey:@"style"];
+    }
+    [YNHttpManagers payNowMoneyWithParams:params success:^(id response) {
+        if ([response[@"code"] isEqualToString:@"success"]) {
+            //do success things
+            YNPayMoneyViewController *pushVC = [[YNPayMoneyViewController alloc] init];
+            pushVC.orderId = response[@"orderId"];
+            pushVC.postage = @"";
+            [self.navigationController pushViewController:pushVC animated:NO];
+        }else{
+            //do failure things
+        }
+    } failure:^(NSError *error) {
+        //do error things
     }];
 }
 -(void)startNetWorkingRequestWithGetFreightWays{
-    NSDictionary *params = @{@"goodsId":_shoppingId,
+    NSDictionary *params = @{@"goodsId":self.goodsId,
                              @"status":[NSNumber numberWithInteger:_status]};
     [YNHttpManagers getFreightWaysWithParams:params success:^(id response) {
-        self.wayView.dataArray = response;
-        [self.wayView showPopView:YES];
+        if ([response[@"code"] isEqualToString:@"success"]) {
+            //do success things
+            self.wayView.dataArray = response[@"postage"];
+            [self.wayView showPopView:YES];
+        }else{
+            //do failure things
+        }
     } failure:^(NSError *error) {
+        //do error things
     }];
 }
 -(void)startNetWorkingRequestWithStartPayMoneyParameterWithType:(NSInteger)type{
-    NSMutableString *goodsId = [NSMutableString string];
-    for (NSDictionary *dict in _collectionView.dataDict[@"goodsArray"]) {
-        [goodsId appendFormat:@",%@",dict[@"goodsId"]];
-    }
-    [goodsId deleteCharactersInRange:NSMakeRange(0,1)];
-    NSString *realprice = [NSString stringWithFormat:@"%.2f",[_collectionView.dataDict[@"totalprice"] floatValue] + [_youhui floatValue] - [_subMoney floatValue]];
+    self.realprice = [NSString stringWithFormat:@"%.2f",[_collectionView.dataDict[@"totalprice"] floatValue] + [_youhui floatValue] - [_subMoney floatValue]];
+    
+    NSMutableDictionary *params = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+                                   [DEFAULTS valueForKey:kUserLoginInfors][@"userId"],@"userId",
+                                   [NSString stringWithFormat:@"%@",_collectionView.dataDict[@"totalprice"]],@"totalprice",
+                                   [NSString stringWithFormat:@"%@",_collectionView.postMoney],@"postage",
+                                   //[NSString stringWithFormat:@"%@",self.youhui],@"youhui",
+                                   _realprice,@"realprice",
+                                   _collectionView.postWay,@"delivery",
+                                   _shoppingId,@"shoppingId",
+                                   _collectionView.dataDict[@"name"],@"username",
+                                   _collectionView.dataDict[@"phone"],@"userphone",
+                                   [NSString stringWithFormat:@"%@%@",_collectionView.dataDict[@"region"],_collectionView.dataDict[@"detailed"]],@"address",
+                                   //self.goodsId,@"goodsId",
+                                   [NSNumber numberWithInteger:_type+1],@"moneytype",
+                                   nil];
     if (type == 1) {
-        NSDictionary *params = @{@"userId":[DEFAULTS valueForKey:kUserLoginInfors][@"userId"],
-                                 @"realprice":[NSString stringWithFormat:@"%@",_collectionView.dataDict[@"totalprice"]],
-                                 @"delivery":_collectionView.postWay,
-                                 @"shoppingId":_shoppingId,
-                                 @"username":_collectionView.dataDict[@"name"],
-                                 @"userphone":_collectionView.dataDict[@"phone"],
-                                 @"address":
-                                     [NSString stringWithFormat:@"%@%@",_collectionView.dataDict[@"region"],_collectionView.dataDict[@"detailed"]],
-                                 @"goodsId":goodsId,
-                                 @"type":[NSNumber numberWithInteger:-1]};
+        [params setValue:@"0.00" forKey:@"postage"];
+        [params setValue:@0 forKey:@"youhui"];
         [YNHttpManagers startPayMoneyParameter1WithParams:params success:^(id response) {
-            YNPaySuccessViewController *pushVC = [[YNPaySuccessViewController alloc] init];
-            pushVC.titleStr = @"订单提交成功";
-            [self.navigationController pushViewController:pushVC animated:NO];
+            if ([response[@"code"] isEqualToString:@"success"]) {
+                //do success things
+                YNPayMoneyViewController *pushVC = [[YNPayMoneyViewController alloc] init];
+                pushVC.orderId = response[@"orderId"];
+                pushVC.postage = @"";
+                pushVC.index = 1;
+                [self.navigationController pushViewController:pushVC animated:NO];
+            }else{
+                //do failure things
+            }
         } failure:^(NSError *error) {
+            //do error things
         }];
     }else if (type == 2){
-        NSDictionary *params = @{@"userId":[DEFAULTS valueForKey:kUserLoginInfors][@"userId"],
-                                 @"totalprice":[NSString stringWithFormat:@"%@",_collectionView.dataDict[@"totalprice"]],
-                                 @"postage":[NSString stringWithFormat:@"%@",_collectionView.postMoney],
-                                 @"youhui":[NSString stringWithFormat:@"%@",_youhui],
-                                 @"realprice":[NSString stringWithFormat:@"%@",realprice],
-                                 @"delivery":_collectionView.postWay,
-                                 @"shoppingId":_shoppingId,
-                                 @"username":_collectionView.dataDict[@"name"],
-                                 @"userphone":_collectionView.dataDict[@"phone"],
-                                 @"address":
-                                     [NSString stringWithFormat:@"%@%@",_collectionView.dataDict[@"region"],_collectionView.dataDict[@"detailed"]],
-                                 @"goodsId":goodsId,
-                                 @"type":[NSNumber numberWithInteger:-1]};
+        [params setValue:[NSString stringWithFormat:@"%@",_collectionView.postMoney] forKey:@"postage"];
+        [params setValue:self.youhui forKey:@"youhui"];
+        [params setValue:self.goodsId forKey:@"goodsId"];
         [YNHttpManagers startPayMoneyParameter2WithParams:params success:^(id response) {
-            YNPayMoneyViewController *pushVC = [[YNPayMoneyViewController alloc] init];
-            pushVC.orderDict = _collectionView.dataDict;
-            [self.navigationController pushViewController:pushVC animated:NO];
+            if ([response[@"code"] isEqualToString:@"success"]) {
+                //do success things
+                YNPayMoneyViewController *pushVC = [[YNPayMoneyViewController alloc] init];
+                pushVC.orderId = response[@"orderId"];
+                pushVC.postage = @"";
+                pushVC.index = 2;
+                [self.navigationController pushViewController:pushVC animated:NO];
+            }else{
+                //do failure things
+            }
         } failure:^(NSError *error) {
+            //do error things
         }];
     }
 }
@@ -132,7 +211,7 @@
         _collectionView = collectionView;
         [self.view addSubview:collectionView];
         collectionView.status = self.status;
-        collectionView.postWay = @"请选择";
+        collectionView.postWay = LocalPleaseSelect;
         collectionView.postMoney = @"0.00";
         collectionView.subMoney = @"0.00";
         [collectionView setDidSelectPostWayBlock:^{
@@ -158,7 +237,7 @@
         submitBtn.frame = CGRectMake(0 ,SCREEN_HEIGHT-W_RATIO(100), SCREEN_WIDTH, W_RATIO(100));
         submitBtn.backgroundColor = COLOR_DF463E;
         submitBtn.titleLabel.font = FONT(36);
-        [submitBtn setTitle:@"提交订单" forState:UIControlStateNormal];
+        [submitBtn setTitle:LocalSubmitOrder forState:UIControlStateNormal];
         [submitBtn setTitleColor:COLOR_FFFFFF forState:UIControlStateNormal];
         [submitBtn addTarget:self action:@selector(handleFirmOrderSubmitButtonClick:) forControlEvents:UIControlEventTouchUpInside];
         [self.view addSubview:submitBtn];
@@ -181,7 +260,15 @@
 
 #pragma mark - 函数、消息
 -(void)handleFirmOrderSubmitButtonClick:(UIButton*)btn{
-    [self startNetWorkingRequestWithStartPayMoneyParameterWithType:self.status];
+    if ([_collectionView.postWay isEqualToString:LocalPleaseSelect]) {
+        [self startNetWorkingRequestWithGetFreightWays];
+    }else{
+        if (self.shoppingId.length) {
+            [self startNetWorkingRequestWithStartPayMoneyParameterWithType:self.status];
+        }else{
+            [self startNetWorkingRequestWithPayNowMoney];
+        }
+    }
 }
 -(void)makeData{
     [super makeData];
@@ -189,14 +276,30 @@
 }
 -(void)makeNavigationBar{
     [super makeNavigationBar];
-    self.titleLabel.text = @"确认订单";
+    self.titleLabel.text = LocalFirmOrder;
 }
 -(void)makeUI{
     [super makeUI];
     [self.view addSubview:self.collectionView];
 }
 #pragma mark - 数据懒加载
-
+-(NSString *)youhui{
+    if (!_youhui) {
+        _youhui = @"0";
+    }
+    return _youhui;
+}
+-(NSString *)goodsId{
+    if (!_goodsId) {
+        NSMutableString *goodsId = [NSMutableString string];
+        for (NSDictionary *dict in _collectionView.dataDict[@"goodsArray"]) {
+            [goodsId appendFormat:@",%@",dict[@"goodsId"]];
+        }
+        [goodsId deleteCharactersInRange:NSMakeRange(0,1)];
+        _goodsId = goodsId;
+    }
+    return _goodsId;
+}
 #pragma mark - 其他
 
 

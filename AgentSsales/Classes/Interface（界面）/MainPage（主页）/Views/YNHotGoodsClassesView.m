@@ -29,17 +29,13 @@
     }
     return self;
 }
--(void)setDataArray:(NSArray *)dataArray{
-    _dataArray = dataArray;
-    [self reloadData];
-}
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section{
-    return _dataArray.count;
+    return _dataArrayM.count;
 }
 - (__kindof UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath{
     YNHotGoodsClassesCell *classCell = [collectionView dequeueReusableCellWithReuseIdentifier:@"classCell" forIndexPath:indexPath];
     classCell.backgroundColor = COLOR_FFFFFF;
-    classCell.dict = _dataArray[indexPath.row];
+    classCell.dict = _dataArrayM[indexPath.row];
     return classCell;
 }
 -(void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath{

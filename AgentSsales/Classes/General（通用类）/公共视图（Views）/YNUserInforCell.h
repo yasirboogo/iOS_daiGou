@@ -19,6 +19,8 @@
 @property (nonatomic,weak) UILabel *titleLabel;
 /** 是否显示验证码按钮 */
 @property (nonatomic,assign) BOOL isShowCodeBtn;
+/** 验证码按钮可用 */
+@property (nonatomic,assign) BOOL isEnableCodeBtn;
 //输入框内容
 @property (nonatomic,copy) NSString *textFieldText;
 

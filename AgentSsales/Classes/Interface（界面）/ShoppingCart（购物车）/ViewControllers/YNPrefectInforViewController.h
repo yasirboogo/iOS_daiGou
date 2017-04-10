@@ -12,4 +12,12 @@
 
 @property (nonatomic,assign) NSInteger index;
 
+@property (nonatomic,copy) NSString* shoppingId;
+
+@property (nonatomic,copy) NSString* goodsId;
+
+@property (nonatomic,copy) NSString* count;
+
+@property (nonatomic,copy) NSString* style;
+
 @end

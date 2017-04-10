@@ -46,12 +46,7 @@
     return CGSizeMake(SCREEN_WIDTH, W_RATIO(170)+W_RATIO(20));
 }
 -(CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout referenceSizeForFooterInSection:(NSInteger)section{
-    if (self.status == 1) {
-        return CGSizeMake(SCREEN_WIDTH,  W_RATIO(100)+W_RATIO(20)*2);
-    }else if (self.status == 2){
-        return CGSizeMake(SCREEN_WIDTH, W_RATIO(100)+W_RATIO(20)*2+W_RATIO(300));
-    }
-    return CGSizeZero;
+    return CGSizeMake(SCREEN_WIDTH, W_RATIO(100)+W_RATIO(20)*2+W_RATIO(300));
 }
 -(UICollectionReusableView *)collectionView:(UICollectionView *)collectionView viewForSupplementaryElementOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath{
     if ([kind isEqualToString:UICollectionElementKindSectionHeader]) {
@@ -63,20 +58,23 @@
         return headerView;
     }else if ([kind isEqualToString:UICollectionElementKindSectionFooter]){
         YNFireOrderFooterView *footerView = [collectionView dequeueReusableSupplementaryViewOfKind:kind withReuseIdentifier:@"footerView" forIndexPath:indexPath];
-        if (self.status == 1) {
-            footerView.postWay = self.postWay;
-        }else if (self.status == 2){
-            footerView.postWay = [NSString stringWithFormat:@"%@%@元",self.postWay,self.postMoney];
-            footerView.allCount = [(NSArray*)_dataDict[@"goodsArray"] count];
-            footerView.allPrice = [NSString stringWithFormat:@"%@",_dataDict[@"totalprice"]];
-            footerView.postMoney = self.postMoney;
-            footerView.subMoney = self.subMoney;
-            [footerView setDidSelectDiscountBlock:^{
-                if (self.didSelectDiscountBlock) {
-                    self.didSelectDiscountBlock([NSString stringWithFormat:@"%@",_dataDict[@"totalprice"]]);
-                }
-            }];
+        footerView.postWay = self.postWay;
+        footerView.postMoney = self.postMoney;
+        footerView.statusIndex = self.status;
+        NSInteger count = 0;
+        for (NSDictionary *dict in _dataDict[@"goodsArray"]) {
+            count += [dict[@"count"] integerValue];
         }
+        footerView.allCount = count;
+        
+        footerView.allPrice = [NSString stringWithFormat:@"%@",_dataDict[@"totalprice"]];
+        footerView.postMoney = self.postMoney;
+        footerView.subMoney = self.subMoney;
+        [footerView setDidSelectDiscountBlock:^{
+            if (self.didSelectDiscountBlock) {
+                self.didSelectDiscountBlock([NSString stringWithFormat:@"%@",_dataDict[@"totalprice"]]);
+            }
+        }];
         [footerView setDidSelectPostWayBlock:^{
             self.didSelectPostWayBlock();
         }];
@@ -147,10 +145,11 @@
     _dict = dict;
     self.typeLabel.text = dict[@"type"];
     [self.leftImgView sd_setImageWithURL:[NSURL URLWithString:dict[@"img"]] placeholderImage:[UIImage imageNamed:@"zhanwei1"]];
+
     self.titleLabel.text = dict[@"name"];
     self.subTitleLabel.text = dict[@"note"];
-    self.markLabel.text = @"￥";
-    self.priceLabel.text = [NSString stringWithFormat:@"%@",dict[@"salesprice"]];
+    self.markLabel.text = LocalMoneyMark;
+    self.priceLabel.text = [NSString decimalNumberWithDouble:dict[@"salesprice"]];
     self.amountLabel.text = [NSString stringWithFormat:@"x%@",dict[@"count"]];
 }
 
@@ -171,7 +170,7 @@
         [self.bgView addSubview:typeLabel];
         typeLabel.font = FONT(26);
         typeLabel.textColor = COLOR_999999;
-        typeLabel.frame = CGRectMake(W_RATIO(20), W_RATIO(20), WIDTHF(_bgView), kMidSpace);
+        typeLabel.frame = CGRectMake(W_RATIO(20), W_RATIO(20), WIDTHF(_bgView)-W_RATIO(20)*2, kMidSpace);
     }
     return _typeLabel;
 }
@@ -259,9 +258,22 @@
     _dict = dict;
     self.mapImgView.image = [UIImage imageNamed:@"dingwei_gouwuche"];
     self.arrowImgView.image = [UIImage imageNamed:@"mianbaoxie_you_gouwuche"];
-    self.nameLabel.text = [NSString stringWithFormat:@"%@",dict[@"name"]];
-    self.phoneLabel.text = [NSString stringWithFormat:@"%@",dict[@"phone"]];
-    self.addressLabel.text = [NSString stringWithFormat:@"%@%@",dict[@"region"],dict[@"detailed"]];
+    
+    if (dict[@"name"]) {
+        self.nameLabel.text = [NSString stringWithFormat:@"%@",dict[@"name"]];
+    }else{
+        self.nameLabel.text = [NSString stringWithFormat:@"%@",@"请选择"];
+    }
+    if (dict[@"phone"]) {
+        self.phoneLabel.text = [NSString stringWithFormat:@"%@",dict[@"phone"]];
+    }else{
+        self.phoneLabel.text = [NSString stringWithFormat:@"%@",@"请选择"];
+    }
+    if (dict[@"region"]) {
+        self.addressLabel.text = [NSString stringWithFormat:@"%@%@",dict[@"region"],dict[@"detailed"]];
+    }else{
+        self.addressLabel.text = [NSString stringWithFormat:@"%@",@"请选择"];
+    }
 }
 -(void)layoutSubviews{
     [super layoutSubviews];
@@ -368,40 +380,51 @@
 @property (nonatomic,weak) UILabel * payRLabel;
 @end
 @implementation YNFireOrderFooterView
--(void)setPostWay:(NSString *)postWay{
-    _postWay = postWay;
-    self.wayLabel.text = @"配运方式";
+
+-(void)setStatusIndex:(NSInteger)statusIndex{
+    _statusIndex = statusIndex;
+    self.wayLabel.text = LocalPostWay;
     self.arrowImgView.image = [UIImage imageNamed:@"mianbaoxie_you_gouwuche"];
-    self.priceLabel.text = postWay;
+    if (statusIndex == 1) {
+        self.priceLabel.text = [NSString stringWithFormat:@"%@",self.postWay];
+    }else if (statusIndex == 2){
+        self.priceLabel.text = [NSString stringWithFormat:@"%@%@%@",self.postWay,self.postMoney,LocalMoneyType];
+    }
 }
+
 -(void)setAllCount:(NSInteger)allCount{
     _allCount = allCount;
-    self.totalLLabel.text = [NSString stringWithFormat:@"%ld件商品，共计:",allCount];
-    self.postageLLabel.text = @"邮费:";
+    self.totalLLabel.text = [NSString stringWithFormat:@"%ld%@",(long)allCount,LocalGoodsTotal];
+    self.postageLLabel.text = LocalPostMoney;
     
     UIFont *font = FONT(28);
     NSMutableAttributedString *attachText = [[NSMutableAttributedString alloc] init];
-    NSMutableAttributedString *str1 = [[NSMutableAttributedString alloc] initWithString:@"优惠券抵扣" attributes:@{NSForegroundColorAttributeName:COLOR_666666,NSFontAttributeName:font}];
+    NSMutableAttributedString *str1 = [[NSMutableAttributedString alloc] initWithString:LocalCouponDeduction attributes:@{NSForegroundColorAttributeName:COLOR_666666,NSFontAttributeName:font}];
     [attachText appendAttributedString:str1];
     
-    NSMutableAttributedString *str2 = [[NSMutableAttributedString alloc] initWithString:@"(选择我的优惠券)" attributes:@{NSForegroundColorAttributeName:COLOR_DF463E,NSFontAttributeName:font}];
-    YYTextHighlight *highlight = [YYTextHighlight new];
-    [str2 setTextHighlight:highlight range:str2.rangeOfAll];
-    [attachText appendAttributedString:str2];
-    highlight.tapAction = ^(UIView *containerView, NSAttributedString *text, NSRange range, CGRect rect) {
-        if (self.didSelectDiscountBlock) {
-            self.didSelectDiscountBlock();
-        }
-    };
+    if (self.statusIndex == 1) {
+        NSMutableAttributedString *str2 = [[NSMutableAttributedString alloc] initWithString:LocalNotSupportTips attributes:@{NSForegroundColorAttributeName:COLOR_DF463E,NSFontAttributeName:font}];
+        [attachText appendAttributedString:str2];
+    }else if (self.statusIndex == 2){
+        NSMutableAttributedString *str2 = [[NSMutableAttributedString alloc] initWithString:LocalSelectCoupon attributes:@{NSForegroundColorAttributeName:COLOR_DF463E,NSFontAttributeName:font}];
+        YYTextHighlight *highlight = [YYTextHighlight new];
+        [str2 setTextHighlight:highlight range:str2.rangeOfAll];
+        [attachText appendAttributedString:str2];
+        highlight.tapAction = ^(UIView *containerView, NSAttributedString *text, NSRange range, CGRect rect) {
+            if (self.didSelectDiscountBlock) {
+                self.didSelectDiscountBlock();
+            }
+        };
+    }
     NSMutableAttributedString *str3 = [[NSMutableAttributedString alloc] initWithString:@":" attributes:@{NSForegroundColorAttributeName:COLOR_666666,NSFontAttributeName:font}];
     [attachText appendAttributedString:str3];
     self.discountLLabel.attributedText = attachText;
     
-    self.payLLabel.text = @"应付总额:";
+    self.payLLabel.text = LocalPriceTotal;
 }
 -(void)setAllPrice:(NSString *)allPrice{
     _allPrice = allPrice;
-    self.markTotalLabel.text = @"￥";
+    self.markTotalLabel.text = LocalMoneyMark;
     self.markPostageLabel.text = _markTotalLabel.text;
     self.markDiscountLabel.text = [NSString stringWithFormat:@"-%@",_markTotalLabel.text];
     self.markPayLabel.text = _markTotalLabel.text;

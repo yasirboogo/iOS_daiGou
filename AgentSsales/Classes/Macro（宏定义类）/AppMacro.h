@@ -27,6 +27,7 @@
 #define COLOR_FFF6E0 kColorFromRGB(0xFFF6E0)
 #define COLOR_929292 kColorFromRGB(0x929292)
 #define COLOR_328FFF kColorFromRGB(0x328FFF)
+#define COLOR_B5B5B5 kColorFromRGB(0xB5B5B5)
 /** 背景色 */
 #define COLOR_EDEDED kColorFromRGB(0xEDEDED)
 /** 阴影 */

@@ -40,29 +40,33 @@
 - (void)viewDidDisappear:(BOOL)animated{
     [super viewDidDisappear:animated];
 }
-
 #pragma mark - 网路请求
 -(void)startNetWorkingRequestWithSaveNewAddress{
-    NSDictionary *params = [NSDictionary dictionary];
+    NSMutableDictionary *params = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+                                   _tableView.name,@"name",
+                                   _tableView.phone,@"phone",
+                                   _tableView.locality,@"region",
+                                   _tableView.details,@"detailed",
+                                   _tableView.email,@"email", nil];
     if (self.type == 0) {
-        params = @{@"name":_tableView.name,
-                   @"phone":_tableView.phone,
-                   @"region":_tableView.locality,
-                   @"detailed":_tableView.details,
-                   @"id":_address[@"addressId"],
-                   @"email":_tableView.email
-                   };
+        [params setValue:_address[@"addressId"] forKey:@"id"];
     }else if (self.type == 1){
-        params = @{@"userId":[DEFAULTS valueForKey:kUserLoginInfors][@"userId"],
-                   @"name":_tableView.name,
-                   @"phone":_tableView.phone,
-                   @"region":_tableView.locality,
-                   @"detailed":_tableView.details,
-                   @"email":_tableView.email
-                   };
+        [params setValue:[DEFAULTS valueForKey:kUserLoginInfors][@"userId"] forKey:@"userid"];
     }
     [YNHttpManagers saveNewAddressWithParams:params success:^(id response) {
+        if ([response[@"code"] isEqualToString:@"success"]) {
+            //do success things
+            [SVProgressHUD showImage:nil status:LocalSaveSuccess];
+            [SVProgressHUD dismissWithDelay:2.0f completion:^{
+                [self.navigationController popViewControllerAnimated:NO];
+            }];
+        }else{
+            //do failure things
+            [SVProgressHUD showImage:nil status:LocalSaveFailure];
+            [SVProgressHUD dismissWithDelay:2.0f];
+        }
     } failure:^(NSError *error) {
+        //do error things
     }];
 }
 #pragma mark - 视图加载
@@ -101,15 +105,26 @@
 -(void)makeNavigationBar{
     [super makeNavigationBar];
     __weak typeof(self) weakSelf = self;
-    [self addNavigationBarBtnWithTitle:@"保存" selectTitle:@"保存" font:FONT_15 isOnRight:YES btnClickBlock:^(BOOL isShow) {
-        [weakSelf startNetWorkingRequestWithSaveNewAddress];
+    [self addNavigationBarBtnWithTitle:LocalSave selectTitle:LocalSave font:FONT_15 isOnRight:YES btnClickBlock:^(BOOL isShow) {
+        BOOL isNotEmpty = _tableView.name.length
+        && _tableView.phone.length
+        && _tableView.locality.length
+        && _tableView.details.length
+        && _tableView.email.length;
+        if (isNotEmpty) {
+            [weakSelf startNetWorkingRequestWithSaveNewAddress];
+        }else{
+            [SVProgressHUD showImage:nil status:LocalInputIsEmpty];
+            [SVProgressHUD dismissWithDelay:2.0f];
+        }
     }];
     if (self.type == 0) {
-        self.titleLabel.text = @"修改收货地址";
+        self.titleLabel.text = LocalChangeAddress;
     }else if (self.type == 1){
-        self.titleLabel.text = @"新增收货地址";
+        self.titleLabel.text = LocalNewAddress;
     }
 }
+
 -(void)makeUI{
     [super makeUI];
     [self.view addSubview:self.tableView];

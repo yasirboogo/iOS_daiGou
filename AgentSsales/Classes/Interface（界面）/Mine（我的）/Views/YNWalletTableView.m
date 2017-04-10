@@ -90,10 +90,10 @@
     
     if (indexPath.row == 0) {
         walletCell.flagImgView.image = [UIImage imageNamed:@"malaixiya_guoqi"];
-        walletCell.countryLabel.text = @"马来西亚币";
+        walletCell.countryLabel.text = LocalMalayMoney;
     }else if (indexPath.row == 1){
         walletCell.flagImgView.image = [UIImage imageNamed:@"meiguo_guoqi"];
-        walletCell.countryLabel.text = @"美元";
+        walletCell.countryLabel.text = LocalAmericanMoney;
     }
     walletCell.buyInLabel.text = [NSString stringWithFormat:@"%@",_dataArray[indexPath.row][@"buyup"]];
     walletCell.sellOutLabel.text = [NSString stringWithFormat:@"%@",_dataArray[indexPath.row][@"sell"]];
@@ -131,6 +131,7 @@
         _countryLabel = countryLabel;
         [self.contentView addSubview:countryLabel];
         countryLabel.font = FONT(30);
+        countryLabel.adjustsFontSizeToFitWidth = YES;
         countryLabel.textColor = COLOR_333333;
         countryLabel.frame = CGRectMake(MaxXF(_flagImgView)+kMinSpace,
                                         0,

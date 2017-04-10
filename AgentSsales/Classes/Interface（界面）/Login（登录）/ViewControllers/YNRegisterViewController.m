@@ -9,10 +9,14 @@
 #import "YNRegisterViewController.h"
 #import "YNRegisterTableView.h"
 #import "YNPhoneAreaCodeView.h"
+#import "YNInputPhoneViewController.h"
+#import "YNLoginViewController.h"
+#import "YNDocumentExplainViewController.h"
 
 @interface YNRegisterViewController ()
 {
     NSString *_checkCode;
+    NSInteger _type;
 }
 @property (nonatomic,strong) YNPhoneAreaCodeView *areaCodeView;
 
@@ -54,38 +58,72 @@
 }
 
 #pragma mark - 网路请求
--(void)startNetWorkingRequestWithPhoneCode{
-    NSDictionary *params = @{
-                             @"loginphone":[NSString stringWithFormat:@"%@%@",_areaCodeView.dataArray[_index][@"code"],_tableView.textArrayM[1]]
+-(void)startNetWorkingRequestWithGetCountryCode{
+    NSDictionary *params = @{@"type":[NSNumber numberWithInteger:_type]
                              };
-    [YNHttpManagers getMsgCodeWithParams:params success:^(id response) {
-        _checkCode = response;
+    [YNHttpManagers getCountryCodeWithParams:params success:^(id response) {
+        if ([response[@"code"] isEqualToString:@"success"]) {
+            //do success things
+            self.areaCodeView.dataArray = response[@"countryArray"];
+        }else{
+            //do failure things
+        }
     } failure:^(NSError *error) {
-        NSLog(@"%@",error);
+        //do error things
+    }];
+}
+-(void)startNetWorkingRequestWithPhoneCode{
+    NSDictionary *params = @{@"loginphone":_tableView.loginphone,
+                             @"type":[NSNumber numberWithInteger:_index+1]};
+    [YNHttpManagers getMsgCodeWithParams:params success:^(id response) {
+        if ([response[@"code"] isEqualToString:@"success"]) {
+            //do success things
+            _checkCode = [NSString stringWithFormat:@"%@",response[@"yzm"]];
+            DLog(@"phone = %@,yzm = %@",_tableView.loginphone,_checkCode);
+        }else{
+            //do failure things
+        }
+    } failure:^(NSError *error) {
+        //do error things
     }];
 }
 -(void)startNetWorkingRequestWithSubmitButtonClick{
-    NSDictionary *params = @{
-                             @"loginphone":_tableView.textArrayM[1],
-                             @"password":_tableView.textArrayM[3],
-                             @"country":_areaCodeView.dataArray[_index][@"title"]
-                             };
-    
+    NSMutableDictionary *params = [NSMutableDictionary dictionaryWithObjectsAndKeys:_tableView.loginphone,@"loginphone",_tableView.password,@"password",_areaCodeView.dataArray[_index],@"country", nil];
+    if (self.parentId != nil) {
+        [params setValue:_parentId forKey:@"parentId"];
+    }
     [YNHttpManagers userRegisterInforWithParams:params success:^(id response) {
-        [self.navigationController popViewControllerAnimated:YES];
+        if ([response[@"code"] isEqualToString:@"success"]) {
+            //do success things
+            UICKeyChainStore *keychain = [UICKeyChainStore keyChainStoreWithService:kKeychainService];
+            if (keychain.allKeys) {
+                [keychain removeItemForKey:keychain.allKeys.firstObject];
+            }
+            [keychain setString:@"" forKey:_tableView.loginphone];
+            [DEFAULTS setObject:(NSDictionary*)response forKey:kUserLoginInfors];
+            [DEFAULTS synchronize];
+            [SVProgressHUD showImage:nil status:LocalRegisterSuccess];
+            [SVProgressHUD dismissWithDelay:2.0f completion:^{
+                YNLoginViewController *pushVC = [[YNLoginViewController alloc] init];
+                [self.navigationController pushViewController:pushVC animated:NO];
+            }];
+        }else{
+            //do failure things
+            [SVProgressHUD showImage:nil status:LocalRegisterFailure];
+            [SVProgressHUD dismissWithDelay:2.0f ];
+        }
     } failure:^(NSError *error) {
-        NSLog(@"%@",error);
+        //do error things
     }];
 }
 #pragma mark - 视图加载
 -(YNPhoneAreaCodeView *)areaCodeView{
     if (!_areaCodeView) {
-        CGRect frame = CGRectMake(kMidSpace, (SCREEN_HEIGHT-(W_RATIO(120)*3))/2.0, SCREEN_WIDTH-kMidSpace*2, W_RATIO(120)*3);
-        YNPhoneAreaCodeView *areaCodeView = [[YNPhoneAreaCodeView alloc] initWithFrame:frame];
+        YNPhoneAreaCodeView *areaCodeView = [[YNPhoneAreaCodeView alloc] init];
         _areaCodeView = areaCodeView;
         [areaCodeView setDidSelectCodeCellBlock:^(NSInteger index) {
             self.index = index;
-            self.tableView.code = self.areaCodeView.dataArray[_index][@"code"];
+            self.tableView.country = self.areaCodeView.dataArray[_index];
         }];
     }
     return _areaCodeView;
@@ -96,7 +134,7 @@
         _tableView  = tableView;
         [self.view addSubview:tableView];
         [tableView setDidSelectAreaCellBlock:^{
-            [self.areaCodeView showPopView:YES];
+            [self startNetWorkingRequestWithGetCountryCode];
         }];
         [tableView setDidSelectSendPhoneCodeBlock:^{
             
@@ -114,7 +152,7 @@
         submitBtn.layer.masksToBounds = YES;
         submitBtn.layer.cornerRadius = kViewRadius;
         submitBtn.titleLabel.font = FONT(36);
-        [submitBtn setTitle:@"注册" forState:UIControlStateNormal];
+        [submitBtn setTitle:LocalRegister forState:UIControlStateNormal];
         [submitBtn setTitleColor:COLOR_FFFFFF forState:UIControlStateNormal];
         [submitBtn addTarget:self action:@selector(handleRegisterSubmitButtonClick:) forControlEvents:UIControlEventTouchUpInside];
         [self.view addSubview:submitBtn];
@@ -136,8 +174,8 @@
 }
 -(YYLabel *)procotolLabel{
     if (!_procotolLabel) {
-        NSString *str1 = @"I have read and agreed to";
-        NSString *str2 = @" user agreement ";
+        NSString *str1 = LocalReadOK;
+        NSString *str2 = [NSString stringWithFormat:@"《%@》",LocalAgreement];
         NSMutableAttributedString *attachText = [NSMutableAttributedString new];
         UIFont *font = FONT(32);
         NSMutableAttributedString *attributedStr1 = [[NSMutableAttributedString alloc] initWithString:str1 attributes:@{NSForegroundColorAttributeName:COLOR_999999,NSFontAttributeName:font}];
@@ -153,7 +191,9 @@
         [attributedStr2 setTextHighlight:highlight2 range:attributedStr2.rangeOfAll];
         [attachText appendAttributedString:attributedStr2];
         highlight2.tapAction = ^(UIView *containerView, NSAttributedString *text, NSRange range, CGRect rect) {
-            NSLog(@"全部兑换");
+            YNDocumentExplainViewController *pushVC = [[YNDocumentExplainViewController alloc] init];
+            pushVC.status = 5;
+            [self.navigationController pushViewController:pushVC animated:NO];
         };
         YYLabel *procotolLabel = [[YYLabel alloc] init];
         _procotolLabel = procotolLabel;
@@ -173,19 +213,17 @@
 #pragma mark - 函数、消息
 -(void)makeData{
     [super makeData];
-    self.areaCodeView.dataArray =@[
-  @{@"image":@"zhongguo_yuan",@"title":@"中国",@"code":@"86"},
-  @{@"image":@"malaixiya_yuan",@"title":@"马来西亚",@"code":@"60"}
-                                   ];
+    _type = [LanguageManager currentLanguageIndex];
 }
 -(void)makeNavigationBar{
     [super makeNavigationBar];
     __weak typeof(self) weakSelf = self;
-    [self addNavigationBarBtnWithTitle:@"登录" selectTitle:@"登录" font:FONT_15 isOnRight:YES btnClickBlock:^(BOOL isShow) {
-        [weakSelf.navigationController popViewControllerAnimated:NO];
+    [self addNavigationBarBtnWithTitle:LocalLogin selectTitle:LocalLogin font:FONT_15 isOnRight:YES btnClickBlock:^(BOOL isShow) {
+        YNLoginViewController *pushVC = [[YNLoginViewController alloc] init];
+        [weakSelf.navigationController pushViewController:pushVC animated:NO];
     }];
     self.backButton.hidden = YES;
-    self.titleLabel.text = @"注册";
+    self.titleLabel.text = LocalRegister;
 }
 -(void)makeUI{
     [super makeUI];
@@ -198,15 +236,18 @@
     
 }
 -(void)handleRegisterSubmitButtonClick:(UIButton*)btn{
-    BOOL isEmpty = [_tableView.textArrayM[0] isEqualToString:kZeroStr]||[_tableView.textArrayM[1] isEqualToString:kZeroStr]||[_tableView.textArrayM[2]isEqualToString:kZeroStr]||[_tableView.textArrayM[3] isEqualToString:kZeroStr];
-    BOOL isCode = [_tableView.textArrayM[2] isEqualToString:_checkCode];
+    [self.view endEditing:YES];
+    BOOL isEmpty = !_tableView.country.length||!_tableView.loginphone.length||!_tableView.checkCode.length||!_tableView.password.length;
+    BOOL isCheckCode = [_tableView.checkCode isEqualToString:_checkCode];
     if (isEmpty) {
-        NSLog(@"输入为空");
+        [SVProgressHUD showImage:nil status:LocalInputIsEmpty];
+        [SVProgressHUD dismissWithDelay:2.0f];
+    }else if (!isCheckCode) {
+        [SVProgressHUD showImage:nil status:LocalCCodeError];
+        [SVProgressHUD dismissWithDelay:2.0f];
+    }else{
+        [self startNetWorkingRequestWithSubmitButtonClick];
     }
-    if (isCode) {
-        NSLog(@"输入正确的验证码");
-    }
-    [self startNetWorkingRequestWithSubmitButtonClick];
 }
 -(void)handleCheckButtonClick:(UIButton*)btn{
     btn.selected = !btn.selected;

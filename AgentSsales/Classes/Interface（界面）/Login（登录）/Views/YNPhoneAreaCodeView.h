@@ -10,7 +10,6 @@
 
 @interface YNPhoneAreaCodeView : UIView
 
--(instancetype)initWithFrame:(CGRect)frame img:(UIImage*)img title:(NSString*)title tips:(NSString*)tips btnTitle:(NSString*)btnTitle;
 
 @property (nonatomic, assign) BOOL isTapGesture;
 
@@ -26,7 +25,7 @@
 @end
 @interface YNPhoneAreaCodeCell : UITableViewCell
 
-@property (nonatomic,strong) NSDictionary * dict;
+@property (nonatomic,copy) NSString * country;
 
 @property (nonatomic,assign) BOOL isSelect;
 

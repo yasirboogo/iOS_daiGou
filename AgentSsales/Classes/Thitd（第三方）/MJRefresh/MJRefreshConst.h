@@ -30,6 +30,7 @@
 #define MJRefreshLabelFont [UIFont boldSystemFontOfSize:14]
 
 // 常量
+
 UIKIT_EXTERN const CGFloat MJRefreshLabelLeftInset;
 UIKIT_EXTERN const CGFloat MJRefreshHeaderHeight;
 UIKIT_EXTERN const CGFloat MJRefreshFooterHeight;
@@ -41,8 +42,9 @@ UIKIT_EXTERN NSString *const MJRefreshKeyPathContentSize;
 UIKIT_EXTERN NSString *const MJRefreshKeyPathContentInset;
 UIKIT_EXTERN NSString *const MJRefreshKeyPathPanState;
 
-UIKIT_EXTERN NSString *const MJRefreshHeaderLastUpdatedTimeKey;
 
+UIKIT_EXTERN NSString *const MJRefreshHeaderLastUpdatedTimeKey;
+/*
 UIKIT_EXTERN NSString *const MJRefreshHeaderIdleText;
 UIKIT_EXTERN NSString *const MJRefreshHeaderPullingText;
 UIKIT_EXTERN NSString *const MJRefreshHeaderRefreshingText;
@@ -59,7 +61,7 @@ UIKIT_EXTERN NSString *const MJRefreshBackFooterNoMoreDataText;
 UIKIT_EXTERN NSString *const MJRefreshHeaderLastTimeText;
 UIKIT_EXTERN NSString *const MJRefreshHeaderDateTodayText;
 UIKIT_EXTERN NSString *const MJRefreshHeaderNoneLastDateText;
-
+*/
 // 状态检查
 #define MJRefreshCheckState \
 MJRefreshState oldState = self.state; \

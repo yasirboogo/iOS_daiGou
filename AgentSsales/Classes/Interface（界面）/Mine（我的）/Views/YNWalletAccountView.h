@@ -16,4 +16,12 @@
 
 @property (nonatomic,copy) void(^tipsLabelClickBlock)(void);
 
+@property (nonatomic,copy) NSString *leftMomeyType;
+
+@property (nonatomic,copy) void(^didSelectLeftShowButtonBlock)(BOOL);
+
+@property (nonatomic,copy) NSString *rightMarkType;
+
+@property (nonatomic,assign) BOOL isShow;
+
 @end

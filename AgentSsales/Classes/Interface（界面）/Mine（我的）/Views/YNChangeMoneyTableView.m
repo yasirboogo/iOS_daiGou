@@ -18,9 +18,9 @@
 
 -(instancetype)init{
     self = [super init];
-    self.frame = CGRectMake(W_RATIO(20),kUINavHeight+W_RATIO(20), SCREEN_WIDTH-W_RATIO(20)*2, W_RATIO(224)*2+W_RATIO(150));
+    self.frame = CGRectMake(W_RATIO(20),kUINavHeight+W_RATIO(20), SCREEN_WIDTH-W_RATIO(20)*2, W_RATIO(200)*3+W_RATIO(150));
     if (self) {
-        self.rowHeight = W_RATIO(224);
+        self.rowHeight = W_RATIO(200);
         self.showsVerticalScrollIndicator = NO;
         self.bounces = NO;
         self.backgroundColor = COLOR_CLEAR;
@@ -45,37 +45,42 @@
     return _footerView;
 }
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
-    return 2;
+    return 3;
 }
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
     YNChangeMoneyCell * moneyCell = [tableView dequeueReusableCellWithIdentifier:@"moneyCell"];
     if (moneyCell == nil) {
         moneyCell = [[YNChangeMoneyCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"cell"];
+        moneyCell.layer.borderWidth = W_RATIO(2);
+        moneyCell.layer.borderColor = COLOR_E9E9E9.CGColor;
         moneyCell.selectionStyle = UITableViewCellSelectionStyleNone;
         moneyCell.layer.cornerRadius = W_RATIO(20);
         moneyCell.layer.masksToBounds = YES;
     }
     if (indexPath.row == 0) {
-        moneyCell.name = @"持有货币";
-        moneyCell.type = self.type1;
+        moneyCell.nameType = 0;
+        moneyCell.moneyType = self.type1;
         moneyCell.money = self.money1;
         [moneyCell setDidSelectMoneyNumClickBlock:^{
             if (self.didSelectMoneyNumClickBlock) {
                 self.didSelectMoneyNumClickBlock();
             }
         }];
-
+        [moneyCell setDidSelectMoneyTypeClickBlock:^{
+            if (self.didSelectMoneyTypeClickBlock) {
+                self.didSelectMoneyTypeClickBlock();
+            }
+        }];
     }else if (indexPath.row == 1){
-        moneyCell.name = @"兑换货币";
-        moneyCell.type = self.type2;
+        moneyCell.nameType = 1;
+        moneyCell.moneyType = self.type2;
         moneyCell.money = self.money2;
     }
-    [moneyCell setDidSelectMoneyTypeClickBlock:^{
-        if (self.didSelectMoneyTypeClickBlock) {
-            self.didSelectMoneyTypeClickBlock(indexPath.row);
-        }
-    }];
-    
+    else if (indexPath.row == 2){
+        moneyCell.nameType = 1;
+        moneyCell.moneyType = self.type3;
+        moneyCell.money = self.money3;
+    }
     return moneyCell;
 }
 -(void)setType1:(NSInteger)type1{
@@ -84,46 +89,33 @@
     self.footerView.type1 = type1;
     [self reloadData];
 }
--(void)setType2:(NSInteger)type2{
-    _type2 = type2;
-    [self startChangeExchange];
-    [self reloadData];
-}
 -(void)setMoney1:(NSString *)money1{
     _money1 = money1;
     [self startChangeExchange];
     [self reloadData];
 }
 -(void)startChangeExchange{
-    if (_type1 == 0) {
+    if (_type1 == 0) {//人民币
         self.footerView.lastMoney = [NSString stringWithFormat:@"%.2f",[self.allTypeMoneys[@"rmb"] floatValue]];
-        if (_type2 == 0) {
-            self.rateId = @"1.00";
-        }else if (_type2 == 1){
-            self.rateId = _dataArray[1][@"buyup"];
-        }else if (_type2 == 2){
-            self.rateId = _dataArray[0][@"buyup"];
-        }
-    }else if (_type1 == 1){
+        self.type2 = 1;//马来币
+        self.rate2Id = _dataArray[0][@"buyup"];
+        self.type3 = 2;//美元
+        self.rate3Id = _dataArray[1][@"buyup"];
+    }else if (_type1 == 1){//马来币
         self.footerView.lastMoney = [NSString stringWithFormat:@"%.2f",[self.allTypeMoneys[@"us"] floatValue]];
-        if (_type2 == 0) {
-            self.rateId = _dataArray[1][@"sell"];
-        }else if (_type2 == 1){
-            self.rateId = @"1.00";
-        }else if (_type2 == 2){
-            self.rateId = _dataArray[2][@"sell"];
-        }
-    }else if (_type1 == 2){
+        self.type2 = 2;//美元
+        self.rate2Id = _dataArray[2][@"buyup"];
+        self.type3 = 0;//人民币
+        self.rate3Id = _dataArray[0][@"sell"];
+    }else if (_type1 == 2){//美元
         self.footerView.lastMoney = [NSString stringWithFormat:@"%.2f",[self.allTypeMoneys[@"myr"] floatValue]];
-        if (_type2 == 0) {
-            self.rateId = _dataArray[0][@"sell"];
-        }else if (_type2 == 1){
-            self.rateId = _dataArray[2][@"buyup"];
-        }else if (_type2 == 2){
-            self.rateId = @"1.00";
-        }
+        self.type2 = 0;//人民币
+        self.rate2Id = _dataArray[1][@"sell"];
+        self.type3 = 1;//马来币
+        self.rate3Id = _dataArray[2][@"sell"];
     }
-    _money2 = [NSString stringWithFormat:@"%.2f",[_money1 floatValue] *[self.rateId floatValue]];
+    _money2 = [NSString stringWithFormat:@"%.2f",[_money1 floatValue] *[self.rate2Id floatValue]];
+    _money3 = [NSString stringWithFormat:@"%.2f",[_money1 floatValue] *[self.rate3Id floatValue]];
 }
 @end
 @interface YNChangeMoneyFooterView ()
@@ -145,27 +137,26 @@
 }
 -(void)setType1:(NSInteger )type1{
     _type1 = type1;
-    NSArray *types = @[@"人民币",@"美元",@"马来西亚币"];
     NSMutableAttributedString *attachText = [NSMutableAttributedString new];
     UIFont *font = FONT(26);
     UIImage *image = [UIImage imageNamed:@"tanhao_kui"];
     image = [UIImage imageWithCGImage:image.CGImage scale:2 orientation:UIImageOrientationUp];
     
     attachText = [NSMutableAttributedString attachmentStringWithContent:image contentMode:UIViewContentModeCenter attachmentSize:image.size alignToFont:font alignment:YYTextVerticalAlignmentCenter];
-    NSMutableAttributedString *str1 = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@" 当前%@余额为%@，",types[type1],_lastMoney] attributes:@{NSForegroundColorAttributeName:COLOR_999999,NSFontAttributeName:font}];
+    NSMutableAttributedString *str1 = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@" %@ %@ %@%@，",@[LocalChineseMoney,LocalMalayMoney,LocalAmericanMoney][type1],LocalCurrentLast,_lastMoney,@[@"￥",@"M.＄",@"$"][type1]] attributes:@{NSForegroundColorAttributeName:COLOR_999999,NSFontAttributeName:font}];
     [attachText appendAttributedString:str1];
     
-    NSMutableAttributedString *str2 = [[NSMutableAttributedString alloc] initWithString:@"全部兑换" attributes:@{NSForegroundColorAttributeName:COLOR_DF463E,NSFontAttributeName:font}];
+    NSMutableAttributedString *str2 = [[NSMutableAttributedString alloc] initWithString:LocalFullConver attributes:@{NSForegroundColorAttributeName:COLOR_DF463E,NSFontAttributeName:font}];
     YYTextHighlight *highlight = [YYTextHighlight new];
     [str2 setTextHighlight:highlight range:str2.rangeOfAll];
     [attachText appendAttributedString:str2];
     highlight.tapAction = ^(UIView *containerView, NSAttributedString *text, NSRange range, CGRect rect) {
-        if (![[NSString stringWithFormat:@"%@",self.lastMoney] isEqualToString:@"0.00"]) {
+        //if (![[NSString stringWithFormat:@"%@",self.lastMoney] isEqualToString:@"0.00"]) {
             if (self.didSelectAllChangeMoneyBlock) {
                 self.didSelectAllChangeMoneyBlock([NSString stringWithFormat:@"%@",self.lastMoney]);
             }
-            self.lastMoney = @"0.00";
-        }
+            //self.lastMoney = @"0.00";
+        //}
     };
     self.changeLabel.attributedText = attachText;
 }
@@ -187,13 +178,13 @@
 @end
 @implementation YNChangeMoneyCell
 
--(void)setName:(NSString *)name{
-    _name = name;
+-(void)setNameType:(NSInteger)nameType{
+    _nameType = nameType;
     
-    if ([name isEqualToString:@"持有货币"]) {
+    if (nameType == 0) {
         self.backgroundColor = COLOR_DF463E;
         
-        self.nameLabel.text = @"持有货币";
+        self.nameLabel.text = LocalHoldCurrency;
         self.nameLabel.textColor = COLOR_F6D3D2;
         
         self.typeLabel.textColor = COLOR_FFFFFF;
@@ -204,10 +195,10 @@
         
         self.moneyLabel.textColor = COLOR_FFFFFF;
         
-    }else if ([name isEqualToString:@"兑换货币"]){
+    }else if (nameType == 1){
         self.backgroundColor = COLOR_FFFFFF;
         
-        self.nameLabel.text = @"兑换货币";
+        self.nameLabel.text = LocalMoneyChanging;
         self.nameLabel.textColor = COLOR_333333;
         
         self.typeLabel.textColor = COLOR_000000;
@@ -220,40 +211,39 @@
         
     }
 }
--(void)setType:(NSInteger)type{
-    _type = type;
-    NSArray *types = @[@"人民币",@"美元",@"马来西亚币"];
-    self.typeLabel.text = types[type];
-    if (type == 0) {
+-(void)setMoneyType:(NSInteger)moneyType{
+    _moneyType = moneyType;
+    NSArray *moneyTypes = @[LocalChineseMoney,LocalMalayMoney,LocalAmericanMoney];
+    self.typeLabel.text = moneyTypes[moneyType];
+    if (moneyType == 0) {
         self.symbolLabel.text = @"MCY";
-    }else if (type == 1){
-        self.symbolLabel.text = @"USD";
-    }else if (type == 2){
+    }else if (moneyType == 1){
         self.symbolLabel.text = @"RM";
+    }else if (moneyType == 2){
+        self.symbolLabel.text = @"USD";
     }
 }
 -(void)setMoney:(NSString *)money{
     _money = money;
-    
     self.moneyLabel.text = [NSString stringWithFormat:@"%0.2f",[money floatValue]];
 }
 
 -(void)layoutSubviews{
     [super layoutSubviews];
     
-    CGSize typeSize = [_typeLabel.text calculateHightWithFont:_typeLabel.font maxWidth:W_RATIO(200)];
+    CGSize typeSize = [_typeLabel.text calculateHightWithFont:_typeLabel.font maxWidth:W_RATIO(250)];
     self.typeLabel.frame = CGRectMake(XF(_nameLabel),MaxYF(_nameLabel)+kMinSpace*3, typeSize.width, typeSize.height);
     
     self.arrowBtn.frame = CGRectMake(MaxXF(_typeLabel)+kMinSpace,YF(_typeLabel),HEIGHTF(_typeLabel), HEIGHTF(_typeLabel));
     
     
-    CGSize symbolSize = [_symbolLabel.text calculateHightWithFont:_symbolLabel.font maxWidth:WIDTHF(_nameLabel)/2.0-MaxXF(_arrowBtn)];
-    self.symbolLabel.frame = CGRectMake(MaxXF(_arrowBtn), YF(_typeLabel),kMidSpace+WIDTHF(_nameLabel)/2.0-MaxXF(_arrowBtn),symbolSize.height);
+    CGSize symbolSize = [_symbolLabel.text calculateHightWithFont:_symbolLabel.font maxWidth:W_RATIO(80)];
+    self.symbolLabel.frame = CGRectMake(MaxXF(_arrowBtn), YF(_typeLabel),W_RATIO(100),symbolSize.height);
     
     CGSize moneySize = [_moneyLabel.text calculateHightWithFont:_moneyLabel.font maxWidth:0];
     self.moneyLabel.frame = CGRectMake(0, 0,moneySize.width, moneySize.height);
     
-    self.moneyScrollView.frame = CGRectMake(MaxXF(_symbolLabel)+kMinSpace, YF(_symbolLabel), WIDTHF(_nameLabel)/2.0-kMinSpace, moneySize.height);
+    self.moneyScrollView.frame = CGRectMake(MaxXF(_symbolLabel)+kMinSpace, YF(_symbolLabel),MaxXF(_nameLabel) -MaxXF(_symbolLabel), moneySize.height);
     self.moneyScrollView.contentSize = CGSizeMake(WIDTHF(_moneyLabel), HEIGHTF(_moneyLabel));
     
 }
@@ -264,8 +254,8 @@
         UILabel *nameLabel = [[UILabel alloc] init];
         _nameLabel = nameLabel;
         [self.contentView addSubview:nameLabel];
-        nameLabel.frame = CGRectMake(kMidSpace, kMinSpace*3, SCREEN_WIDTH-kMidSpace*2-W_RATIO(20)*2, W_RATIO(30));
-        nameLabel.font = FONT(26);
+        nameLabel.frame = CGRectMake(kMidSpace, kMinSpace*3, SCREEN_WIDTH-kMidSpace*2-W_RATIO(20)*2, W_RATIO(40));
+        nameLabel.font = FONT(30);
     }
     return _nameLabel;
 }
@@ -276,6 +266,7 @@
         _typeLabel = typeLabel;
         [self.contentView addSubview:typeLabel];
         typeLabel.font = FONT(36);
+        typeLabel.adjustsFontSizeToFitWidth = YES;
         typeLabel.userInteractionEnabled = YES;
         UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleArrowButtonSelectClick)];
         [typeLabel addGestureRecognizer:tap];
@@ -301,6 +292,7 @@
         UILabel *symbolLabel =[[UILabel alloc] init];
         _symbolLabel = symbolLabel;
         [self.contentView addSubview:symbolLabel];
+        symbolLabel.adjustsFontSizeToFitWidth = YES;
         symbolLabel.font = FONT(32);
         symbolLabel.textAlignment = NSTextAlignmentRight;
     }
@@ -311,7 +303,7 @@
         UILabel *moneyLabel =[[UILabel alloc] init];
         _moneyLabel = moneyLabel;
         moneyLabel.text = @"0.00";
-        moneyLabel.font = FONT(66);
+        moneyLabel.font = FONT(60);
         [self.moneyScrollView addSubview:moneyLabel];
     }
     return _moneyLabel;

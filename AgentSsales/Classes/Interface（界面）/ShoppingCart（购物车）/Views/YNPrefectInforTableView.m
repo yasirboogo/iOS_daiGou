@@ -69,6 +69,8 @@
         }else if (indexPath.row == 3){
             self.details = str;
         }else if (indexPath.row == 4){
+            self.emial = str;
+        }else if (indexPath.row == 5){
             self.numberID = str;
         }
     }];
@@ -84,11 +86,12 @@
 -(NSArray<NSDictionary *> *)inforArray{
     if (!_inforArray) {
         _inforArray = @[
-                        @{@"item":@"姓名",@"placeholder":@"请输入收货人姓名"},
-                        @{@"item":@"手机号码",@"placeholder":@"请输入收货人的手机号码"},
-                        @{@"item":@"所在地区",@"placeholder":@"请选择所在地区"},
-                        @{@"item":@"详细地址",@"placeholder":@"请输入详细地址"},
-                        @{@"item":@"身份证",@"placeholder":@"请输入身份证号码（选填）"},
+                        @{@"item":LocalRecName,@"placeholder":LocalInputRecName},
+                        @{@"item":LocalRecPhone,@"placeholder":LocalInputRecName},
+                        @{@"item":LocalArea,@"placeholder":LocalSelectArea},
+                        @{@"item":LocalDetailArea,@"placeholder":LocalInputDeatilArea},
+                        @{@"item":LocalEmail,@"placeholder":LocalInputEmail},
+                        @{@"item":LocalCardID,@"placeholder":LocalInputCardID},
                         ];
     }
     return _inforArray;

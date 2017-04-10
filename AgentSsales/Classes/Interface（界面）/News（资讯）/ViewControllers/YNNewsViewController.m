@@ -51,9 +51,15 @@
 -(void)startNetWorkingRequestWithAllNewsClass{
     NSDictionary *params = @{@"type":[NSNumber numberWithInteger:_type]};
     [YNHttpManagers getAllNewsClassWithParams:params success:^(id response) {
-        self.dataArray = response;
-        [self.pagerController reloadData];
+        if ([response[@"code"] isEqualToString:@"success"]) {
+            //do success things
+            self.dataArray = response[@"informationArray"];
+            [self.pagerController reloadData];
+        }else{
+            //do failure things
+        }
     } failure:^(NSError *error) {
+        //do error things
     }];
 }
 #pragma mark - 视图加载
@@ -103,7 +109,7 @@
 }
 -(void)makeNavigationBar{
     [super makeNavigationBar];
-    self.titleLabel.text = kLocalizedString(@"newsCenter",@"资讯中心");
+    self.titleLabel.text = LocalNewsCenter;
 }
 -(void)makeUI{
     [super makeUI];

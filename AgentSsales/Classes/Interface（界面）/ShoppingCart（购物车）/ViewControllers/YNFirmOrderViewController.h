@@ -14,6 +14,12 @@
 
 @property (nonatomic,copy) NSString *shoppingId;
 
+@property (nonatomic,copy) NSString *style;
+
+@property (nonatomic,copy) NSString *count;
+
+@property (nonatomic,copy) NSString *goodsId;
+
 @property (nonatomic,copy) void(^didSelectCouponBlock)(NSString*,NSString*);
 
 @end

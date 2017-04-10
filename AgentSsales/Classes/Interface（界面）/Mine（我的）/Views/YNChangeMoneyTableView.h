@@ -9,13 +9,16 @@
 #import <UIKit/UIKit.h>
 
 @interface YNChangeMoneyTableView : UITableView
-@property (nonatomic,strong) NSString *rateId;
+
+@property (nonatomic,strong) NSString *rate2Id;
+
+@property (nonatomic,strong) NSString *rate3Id;
 
 @property (nonatomic,strong) NSArray * dataArray;
 
 @property (nonatomic,strong) NSDictionary * allTypeMoneys;
 
-@property (nonatomic,copy) void(^didSelectMoneyTypeClickBlock)(NSInteger);
+@property (nonatomic,copy) void(^didSelectMoneyTypeClickBlock)(void);
 
 @property (nonatomic,copy) void(^didSelectMoneyNumClickBlock)();
 
@@ -26,6 +29,10 @@
 @property (nonatomic,assign) NSInteger type2;
 
 @property (nonatomic,copy) NSString * money2;
+
+@property (nonatomic,assign) NSInteger type3;
+
+@property (nonatomic,copy) NSString * money3;
 
 @end
 
@@ -41,9 +48,9 @@
 
 @property (nonatomic,copy) void(^didSelectMoneyNumClickBlock)();
 
-@property (nonatomic,copy) NSString * name;
+@property (nonatomic,assign) NSInteger nameType;
 
-@property (nonatomic,assign) NSInteger type;
+@property (nonatomic,assign) NSInteger moneyType;
 
 @property (nonatomic,copy) NSString * money;
 

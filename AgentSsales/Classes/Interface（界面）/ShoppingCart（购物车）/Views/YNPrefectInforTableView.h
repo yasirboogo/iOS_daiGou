@@ -18,6 +18,8 @@
 
 @property (nonatomic,copy) NSString * details;
 
+@property (nonatomic,copy) NSString * emial;
+
 @property (nonatomic,copy) NSString * numberID;
 
 @property (nonatomic,copy) void(^didSelectAddressCellBlock)();

@@ -14,10 +14,13 @@
 
 @property (nonatomic,copy) void(^didSelectSendPhoneCodeBlock)();
 
-@property (nonatomic,copy) NSString * code;
+@property (nonatomic,copy) NSString * country;
+
+@property (nonatomic,copy) NSString * checkCode;
+
+@property (nonatomic,copy) NSString * loginphone;
 
 @property (nonatomic,strong) NSArray<NSDictionary*> *inforArray;
 
-@property (nonatomic,strong) NSMutableArray<NSString*> *textArrayM;
 
 @end

@@ -58,7 +58,7 @@
         wayCell = [[YNOrderWayCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"wayCell"];
         wayCell.selectionStyle = UITableViewCellSelectionStyleNone;
     }
-    wayCell.isSelect = (self.indexPath == indexPath) ? YES : NO;
+    wayCell.isSelect = ([indexPath compare:self.indexPath] == NSOrderedSame) ? YES : NO;
     wayCell.dict = _dataArray[indexPath.row];
     return wayCell;
 }
@@ -113,7 +113,6 @@
         [baseView setFrame:[UIScreen mainScreen].bounds];
         [baseView setBackgroundColor:[UIColor colorWithWhite:0 alpha:0.5]];
         [baseView setUserInteractionEnabled:YES];
-        
     }
     return _baseView;
 }
@@ -147,7 +146,7 @@
     if (dict[@"money"] == NULL) {
         self.titleLabel.text = [NSString stringWithFormat:@"%@",dict[@"name"]];
     }else{
-        self.titleLabel.text = [NSString stringWithFormat:@"%@%@元",dict[@"name"],dict[@"money"]];
+        self.titleLabel.text = [NSString stringWithFormat:@"%@%@%@",dict[@"name"],dict[@"money"],LocalMoneyType];
     }
     self.subTitleLabel.text = dict[@"code"];
 }

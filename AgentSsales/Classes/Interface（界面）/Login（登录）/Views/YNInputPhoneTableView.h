@@ -12,10 +12,10 @@
 @property (nonatomic,copy) void(^didSelectAreaCellBlock)();
 
 
-@property (nonatomic,strong) NSString *code;
+@property (nonatomic,strong) NSString *country;
 
 @property (nonatomic,strong) NSArray<NSDictionary*> *inforArray;
 
-@property (nonatomic,strong) NSMutableArray<NSString*> *textArrayM;
+@property (nonatomic,copy) NSString * loginphone;
 
 @end

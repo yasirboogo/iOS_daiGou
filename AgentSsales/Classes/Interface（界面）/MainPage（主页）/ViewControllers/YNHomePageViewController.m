@@ -23,6 +23,7 @@
 @property (nonatomic,weak) YNHomePageCollectionView* collectionView;
 
 @property (nonatomic,weak) YNSelectLanguageView* selectLanguageView;
+
 @end
 
 @implementation YNHomePageViewController
@@ -41,10 +42,6 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self startNetWorkingRequestWithGetAdvertise];
-    [self startNetWorkingRequestWithGetHotClass];
-    [self startNetWorkingRequestWithGetSpecialPurchase];
-    
-    [self.view bringSubviewToFront:self.selectLanguageView];
 }
 
 - (void)viewWillDisappear:(BOOL)animated{
@@ -57,18 +54,49 @@
 
 #pragma mark - 网路请求
 -(void)startNetWorkingRequestWithGetAdvertise{
-    NSDictionary *params = @{@"status":@1};
+    NSDictionary *params = @{@"status":[NSNumber numberWithInteger:1]};
     [YNHttpManagers getAdvertiseWithParams:params success:^(id response) {
-        self.collectionView.adArray = response[@"adArray"];
+        if ([response[@"code"] isEqualToString:@"success"]) {
+            //do success things
+            self.collectionView.adArray = response[@"adArray"];
+            [self startNetWorkingRequestWithGetHotClass];
+        }else{
+            //do failure things
+        }
     } failure:^(NSError *error) {
+        //do error things
+        [self handleEndMJRefresh];
+    }];
+}
+-(void)startNetWorkingRequestWithExchangeRate{
+    NSDictionary *params = @{@"type":[NSNumber numberWithInteger:1]};
+    [YNHttpManagers getExchangeRateWithParams:params success:^(id response) {
+        if ([response[@"code"] isEqualToString:@"success"]) {
+            //do success things
+            self.collectionView.rateArray = response[@"parArray"];
+            [self startNetWorkingRequestWithGetSpecialPurchase];
+        }else{
+            //do failure things
+        }
+    } failure:^(NSError *error) {
+        //do error things
+        [self handleEndMJRefresh];
     }];
 }
 -(void)startNetWorkingRequestWithGetHotClass{
     NSDictionary *params = @{@"type":[NSNumber numberWithInteger:_type],
-                             @"status":@1};
+                             @"status":[NSNumber numberWithInteger:1]};
     [YNHttpManagers getHotClassWithParams:params success:^(id response) {
-        self.collectionView.hotArray = response;
+        if ([response[@"code"] isEqualToString:@"success"]) {
+            //do success things
+            self.collectionView.hotArray = response[@"imgArray"];
+            [self startNetWorkingRequestWithExchangeRate];
+        }else{
+            //do failure things
+        }
     } failure:^(NSError *error) {
+        //do error things
+        [self handleEndMJRefresh];
     }];
 }
 -(void)startNetWorkingRequestWithGetSpecialPurchase{
@@ -76,20 +104,32 @@
                              @"pageIndex":[NSNumber numberWithInteger:self.pageIndex],
                              @"pageSize":[NSNumber numberWithInteger:self.pageSize]};
     [YNHttpManagers getSpecialPurchaseWithParams:params success:^(id response) {
-        self.collectionView.featureArray = response;
+        [self handleEndMJRefresh];
+        if ([response[@"code"] isEqualToString:@"success"]) {
+            //do success things
+            [self handleMJRefreshComplateWithResponse:response[@"goodsArray"]];
+        }else{
+            //do failure things
+        }
     } failure:^(NSError *error) {
+        //do error things
+        [self handleEndMJRefresh];
     }];
 }
 #pragma mark - 视图加载
 -(YNSelectLanguageView *)selectLanguageView{
     if (!_selectLanguageView) {
-        CGRect frame = CGRectMake(kMinSpace, kUINavHeight,W_RATIO(220),W_RATIO(270));
+        CGRect frame = CGRectMake(kMinSpace, kUINavHeight,W_RATIO(250),W_RATIO(270));
         YNSelectLanguageView *selectLanguageView = [[YNSelectLanguageView alloc] initWithFrame:frame];
         _selectLanguageView = selectLanguageView;
         selectLanguageView.hidden = YES;
         selectLanguageView.index = [LanguageManager currentLanguageIndex];
         [selectLanguageView setDidSelectLanguageCellBlock:^(NSInteger index) {
-            [kLanguageManager setUserlanguage:index type:0];
+            _selectLanguageView.hidden = YES;
+            [SVProgressHUD showWithStatus:LocalLoading];
+            [SVProgressHUD dismissWithDelay:2.0f completion:^{
+                [kLanguageManager setUserlanguage:index type:0];
+            }];
         }];
     }
     return _selectLanguageView;
@@ -136,6 +176,19 @@
                 [self.navigationController pushViewController:pushVC animated:NO];
             }
         }];
+        
+        collectionView.mj_header= [MJRefreshNormalHeader headerWithRefreshingBlock:^{
+            self.pageIndex = 1;
+            [collectionView.mj_footer endRefreshing];
+            [self startNetWorkingRequestWithGetAdvertise];
+        }];
+        // 设置自动切换透明度(在导航栏下面自动隐藏)
+        collectionView.mj_header.automaticallyChangeAlpha = YES;
+        collectionView.mj_footer = [MJRefreshBackNormalFooter footerWithRefreshingBlock:^{
+            self.pageIndex += 1;
+            [collectionView.mj_header endRefreshing];
+            [self startNetWorkingRequestWithGetSpecialPurchase];
+        }];
     }
     return _collectionView;
 }
@@ -146,24 +199,41 @@
     return NO;
 }
 #pragma mark - 函数、消息
+-(void)handleMJRefreshComplateWithResponse:(NSArray*)response{
+    if (self.pageIndex == 1) {
+        _collectionView.dataArrayM = [NSMutableArray arrayWithArray:response];
+    }else{
+        [_collectionView.dataArrayM addObjectsFromArray:response];
+    }
+    [_collectionView reloadData];
+    if (response.count == 0) {
+        [_collectionView.mj_footer endRefreshingWithNoMoreData];
+    }
+}
+-(void)handleEndMJRefresh{
+    if (self.pageIndex == 1) {
+        [self.collectionView.mj_header endRefreshing];
+    }else{
+        [self.collectionView.mj_footer endRefreshing];
+    }
+}
 -(void)makeData{
     [super makeData];
     _type = [LanguageManager currentLanguageIndex];
 
-    self.selectLanguageView.dataArray = @[@"中文",@"马来语",@"英语"];
+    self.selectLanguageView.dataArray = @[LocalChinese,LocalMalay,LocalEnglish];
 }
 -(void)makeNavigationBar{
     [super makeNavigationBar];
     __weak typeof(self) weakSelf = self;
-    UIButton *leftLanguageBtn = [self addNavigationBarBtnWithTitle:kLocalizedString(@"language", @"语言") selectTitle:kLocalizedString(@"language", @"语言") font:FONT_15 img:[UIImage imageNamed:@"xiala_shouye"] selectImg:[UIImage imageNamed:@"xiala_shouye"] imgWidth:W_RATIO(20) isOnRight:NO btnClickBlock:^(BOOL isShow) {
-        weakSelf.selectLanguageView.hidden = !isShow;
+    UIButton *leftLanguageBtn = [self addNavigationBarBtnWithTitle:LocalLanguage selectTitle:LocalLanguage font:FONT_15 img:[UIImage imageNamed:@"xiala_shouye"] selectImg:[UIImage imageNamed:@"xiala_shouye"] imgWidth:W_RATIO(20) isOnRight:NO btnClickBlock:^(BOOL isShow) {
+        weakSelf.selectLanguageView.hidden = NO;
         
     }];
     // 右边扫一扫按钮
     UIButton *rightScanBtn = [self addNavigationBarBtnWithImg:[UIImage imageNamed:@"saoyisao_shouye"] selectImg:[UIImage imageNamed:@"saoyisao_shouye"] isOnRight:YES btnClickBlock:^(BOOL isShow) {
         YNYNCameraScanCodeViewController *scanVC = [[YNYNCameraScanCodeViewController alloc] init];
         [weakSelf presentViewController:scanVC animated:NO completion:nil];
-
     }];
      //搜索条
     UITextField *searchBar = [[UITextField alloc] init];
@@ -172,7 +242,7 @@
                                  MinYF(leftLanguageBtn),
                                  MinXF(rightScanBtn)- MaxXF(leftLanguageBtn)-kUINavBtnHorSpace*2,
                                  kUINavBtnWidth);
-    searchBar.attributedPlaceholder = [[NSAttributedString alloc] initWithString:kLocalizedString(@"searchContent",@"请输入搜索内容")
+    searchBar.attributedPlaceholder = [[NSAttributedString alloc] initWithString:LocalSearchContent
         attributes:@{NSFontAttributeName:FONT_11,
                      NSForegroundColorAttributeName:COLOR_999999}];
     searchBar.font = FONT_11;

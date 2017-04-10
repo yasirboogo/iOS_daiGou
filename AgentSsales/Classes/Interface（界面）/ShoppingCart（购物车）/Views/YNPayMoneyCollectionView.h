@@ -10,11 +10,15 @@
 
 @interface YNPayMoneyCollectionView : UICollectionView
 
+@property (nonatomic,copy) NSString *payMoney;
+
 @property (nonatomic,strong) NSDictionary * orderDict;
+
+@property (nonatomic,assign) NSInteger typeIndex;
 
 @property (nonatomic,strong) NSArray<NSDictionary*> * payArray;
 
-@property (nonatomic,copy) void(^didSelectPayWayCellBlock)(NSString*);
+@property (nonatomic,copy) void(^didSelectPayWayCellBlock)(NSInteger);
 
 @end
 @interface YNPayOrderCell : UICollectionViewCell
@@ -28,6 +32,8 @@
 
 @property (nonatomic,assign) BOOL isSelect;
 
+@property (nonatomic,assign) BOOL isEnable;
+
 @end
 @interface YNPayHeaderView : UICollectionReusableView
 
@@ -36,6 +42,6 @@
 @end
 @interface YNPayFooterView : UICollectionReusableView
 
-@property (nonatomic,strong) NSString * price;
+@property (nonatomic,copy) NSString * realprice;
 
 @end

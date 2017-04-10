@@ -29,11 +29,11 @@
 }
 -(void)setInforDict:(NSDictionary *)inforDict{
     _inforDict = inforDict;
-    _inforArray = @[@{@"title":@"头像",@"content":inforDict[@"headimg"]},
-                    @{@"title":@"昵称",@"content":inforDict[@"nickname"]},
-                    @{@"title":@"手机号码",@"content":inforDict[@"loginphone"]},
-                    @{@"title":@"身份证号码（选填）",@"content":inforDict[@"idcardId"]},
-                    @{@"title":@"账户安全",@"content":@"密码修改"},
+    _inforArray = @[@{@"title":LocalHeadImg,@"content":inforDict[@"headimg"]},
+                    @{@"title":LocalNickName,@"content":inforDict[@"nickname"]},
+                    @{@"title":LocalRecPhone,@"content":inforDict[@"loginphone"]},
+                    @{@"title":LocalCardID,@"content":inforDict[@"idcardId"]},
+                    @{@"title":LocalAccountSafe,@"content":LocalChangePwd},
                     ];
     [self reloadData];
     
@@ -86,7 +86,7 @@
     [tableView deselectRowAtIndexPath:indexPath animated:NO];
     if (indexPath.row == 2||indexPath.row == 4) {
         if (self.didSelectUpdateInforClickBlock) {
-            self.didSelectUpdateInforClickBlock(_inforArray[indexPath.row][@"title"]);
+            self.didSelectUpdateInforClickBlock(indexPath.row);
         }
     }
 }

@@ -10,7 +10,7 @@
 
 @interface YNCouponTableView : UITableView
 
-@property (nonatomic,strong) NSArray * dataArray;
+@property (nonatomic,strong) NSMutableArray * dataArrayM;
 
 @property (nonatomic,assign) BOOL isInvalid;
 

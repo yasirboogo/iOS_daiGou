@@ -12,7 +12,7 @@
 
 @property (nonatomic,strong) NSMutableArray<NSNumber*> * selectArrayM;
 
-@property (nonatomic,strong) NSArray<NSDictionary*> * dataArray;
+@property (nonatomic,strong) NSMutableArray * dataArrayM;
 /** 是否编辑 */
 @property (nonatomic,assign) BOOL isEdit;
 
@@ -30,14 +30,14 @@
 /** 是否无效 */
 @property (nonatomic,assign) BOOL isInvalid;
 /** 数据模型 */
-@property (nonatomic,strong) NSDictionary *cellDict;
+@property (nonatomic,weak) NSDictionary *cellDict;
 /** 左边图片 */
-@property (nonatomic,strong) UIImageView * leftImgView;
+@property (nonatomic,weak) UIImageView * leftImgView;
 /** 标题 */
-@property (nonatomic,strong) UILabel * titleLabel;
+@property (nonatomic,weak) UILabel * titleLabel;
 /** 版本号 */
-@property (nonatomic,strong) UILabel * versionLabel;
+@property (nonatomic,weak) UILabel * versionLabel;
 /** 价格 */
-@property (nonatomic,strong) UILabel * priceLabel;
+@property (nonatomic,weak) UILabel * priceLabel;
 
 @end

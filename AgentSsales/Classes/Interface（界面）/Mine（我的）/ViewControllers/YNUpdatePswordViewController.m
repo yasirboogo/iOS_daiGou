@@ -43,11 +43,22 @@
 #pragma mark - 网路请求
 -(void)startNetWorkingRequestWithUpdateUserPwd{
     NSDictionary *params = @{@"userId":[DEFAULTS valueForKey:kUserLoginInfors][@"userId"],
-                             @"oldPassword":_tableView.textArrayM[0],
-                             @"newPassword":_tableView.textArrayM[1]};
+                             @"oldPassword":_tableView.oldPasswod,
+                             @"newPassword":_tableView.firPasswod};
     [YNHttpManagers updateUserPwdWithParams:params success:^(id response) {
-        [self.navigationController popViewControllerAnimated:NO];
+        if ([response[@"code"] isEqualToString:@"success"]) {
+            //do success things
+            [SVProgressHUD showImage:nil status:LocalChangeSuccess];
+            [SVProgressHUD dismissWithDelay:2.0f completion:^{
+                [self.navigationController popViewControllerAnimated:NO];
+            }];
+        }else{
+            //do failure things
+            [SVProgressHUD showImage:nil status:LocalChangeFailure];
+            [SVProgressHUD dismissWithDelay:2.0f ];
+        }
     } failure:^(NSError *error) {
+        //do error things
     }];
 }
 #pragma mark - 视图加载
@@ -66,7 +77,7 @@
         submitBtn.frame = CGRectMake(0 ,SCREEN_HEIGHT-W_RATIO(100), SCREEN_WIDTH, W_RATIO(100));
         submitBtn.backgroundColor = COLOR_DF463E;
         submitBtn.titleLabel.font = FONT(36);
-        [submitBtn setTitle:@"确认修改" forState:UIControlStateNormal];
+        [submitBtn setTitle:LocalConfirmChange forState:UIControlStateNormal];
         [submitBtn setTitleColor:COLOR_FFFFFF forState:UIControlStateNormal];
         [submitBtn addTarget:self action:@selector(handleUpdatePswordSubmitButtonClick:) forControlEvents:UIControlEventTouchUpInside];
         [self.view addSubview:submitBtn];
@@ -77,12 +88,23 @@
 
 #pragma mark - 函数、消息
 -(void)handleUpdatePswordSubmitButtonClick:(UIButton*)btn{
-    BOOL isPwdEqual = [_tableView.textArrayM[1] isEqualToString:_tableView.textArrayM[2]];
-    BOOL isPwdRight = YES;
-    if (!isPwdRight) {
-        NSLog(@"密码不正确");
+    
+    BOOL isEmpty = !_tableView.oldPasswod.length || !_tableView.firPasswod.length || !_tableView.secPasswod.length;
+    
+    UICKeyChainStore *keychain = [UICKeyChainStore keyChainStoreWithService:kKeychainService];
+    
+    BOOL isPwdRight = [_tableView.oldPasswod isEqualToString:keychain.allItems[0][@"value"]];
+    
+    BOOL isPwdEqual = [_tableView.firPasswod isEqualToString:_tableView.secPasswod];
+    if (isEmpty) {
+        [SVProgressHUD showImage:nil status:LocalInputIsEmpty];
+        [SVProgressHUD dismissWithDelay:2.0f];
+    }else if (!isPwdRight) {
+        [SVProgressHUD showImage:nil status:LocalOldPwdError];
+        [SVProgressHUD dismissWithDelay:2.0f];
     }else if(!isPwdEqual) {
-        NSLog(@"两次密码不一样");
+        [SVProgressHUD showImage:nil status:LocalPwdDifferent];
+        [SVProgressHUD dismissWithDelay:2.0f];
     }else{
         [self startNetWorkingRequestWithUpdateUserPwd];
     }
@@ -92,7 +114,7 @@
 }
 -(void)makeNavigationBar{
     [super makeNavigationBar];
-    self.titleLabel.text = @"修改密码";
+    self.titleLabel.text = LocalChangePwd;
 }
 -(void)makeUI{
     [super makeUI];

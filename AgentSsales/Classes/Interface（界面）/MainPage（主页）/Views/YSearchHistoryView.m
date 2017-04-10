@@ -31,7 +31,7 @@
     if (self) {
         [self.delectBtn setImage:[UIImage imageNamed:@"shanchujilui_fanhu"] forState:UIControlStateNormal];
         
-        self.nameLabel.text = @"搜索历史";
+        self.nameLabel.text = LocalSearchHistory;
         
         self.collectionView.backgroundColor = COLOR_EDEDED;
         NSString *path = NSHomeDirectory();//主目录

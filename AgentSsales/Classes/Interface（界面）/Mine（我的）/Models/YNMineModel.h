@@ -19,6 +19,8 @@
 
 @property (nonatomic,copy) NSString<Optional> * totalprice;
 
+@property (nonatomic,copy) NSString<Optional> * postage;
+
 @property (nonatomic,strong) NSArray<Optional,MyOrderGoodsModel> * goodsArray;
 
 @end

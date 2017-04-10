@@ -35,8 +35,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self makeData];
-    [self makeUI];
-    [self startNetWorkingRequestWithGetOneNewsList];
+    [self.tableView.mj_header beginRefreshing];
 }
 
 - (void)viewWillDisappear:(BOOL)animated{
@@ -50,23 +49,45 @@
 -(void)startNetWorkingRequestWithGetAdvertise{
     NSDictionary *params = @{@"status":@2};
     [YNHttpManagers getAdvertiseWithParams:params success:^(id response) {
-        if (_pageIndex == 1) {
-            _tableView.adArrayM = [NSMutableArray arrayWithObject:response];
+        if ([response[@"code"] isEqualToString:@"success"]) {
+            //do success things
+            if (_pageIndex == 1) {
+                _tableView.adArrayM = [NSMutableArray arrayWithObject:response];
+            }else{
+                [_tableView.adArrayM appendObject:response];
+            }
+            [_tableView reloadData];
         }else{
-            [_tableView.adArrayM appendObject:response];
+            //do failure things
         }
-        [_tableView reloadData];
     } failure:^(NSError *error) {
+        //do error things
     }];
 }
 -(void)startNetWorkingRequestWithGetOneNewsList{
+    /*
     NSDictionary *params = @{@"infoId":[NSString stringWithFormat:@"%@",self.imgInfor[@"infoId"]],
                              @"type":[NSNumber numberWithInteger:_type],
                              @"pageIndex":[NSNumber numberWithInteger:_pageIndex],
                              @"pageSize":[NSNumber numberWithInteger:_pageSize]};
+*/
+    NSString *infoId = [NSString stringWithFormat:@"%@",self.imgInfor[@"infoId"]];
+    NSNumber *type = [NSNumber numberWithInteger:_type];
+    NSNumber *pageIndex = [NSNumber numberWithInteger:_pageIndex];
+    NSNumber *pageSize = [NSNumber numberWithInteger:_pageSize];
+    
+    NSDictionary *params = NSDictionaryOfVariableBindings(infoId,type,pageIndex,pageSize);
     [YNHttpManagers getOneNewsListWithParams:params success:^(id response) {
-        [self handleMJRefreshComplateWithResponse:response];
+        [self handleEndMJRefresh];
+        if ([response[@"code"] isEqualToString:@"success"]) {
+            //do success things
+            [self handleMJRefreshComplateWithResponse:response[@"infoArray"]];
+        }else{
+            //do failure things
+        }
     } failure:^(NSError *error) {
+        //do error things
+        [self handleEndMJRefresh];
     }];
 }
 #pragma mark - 视图加载
@@ -92,14 +113,16 @@
                 [self.navigationController pushViewController:pushVC animated:NO];
             }
         }];
-        _tableView.mj_header= [MJRefreshNormalHeader headerWithRefreshingBlock:^{
+        tableView.mj_header= [MJRefreshNormalHeader headerWithRefreshingBlock:^{
             _pageIndex = 1;
+            [tableView.mj_footer endRefreshing];
             [self startNetWorkingRequestWithGetOneNewsList];
         }];
         // 设置自动切换透明度(在导航栏下面自动隐藏)
-        _tableView.mj_header.automaticallyChangeAlpha = YES;
-        _tableView.mj_footer = [MJRefreshBackNormalFooter footerWithRefreshingBlock:^{
+        tableView.mj_header.automaticallyChangeAlpha = YES;
+        tableView.mj_footer = [MJRefreshBackNormalFooter footerWithRefreshingBlock:^{
             _pageIndex += 1;
+            [tableView.mj_header endRefreshing];
             [self startNetWorkingRequestWithGetOneNewsList];
         }];
     }
@@ -123,14 +146,22 @@
 -(void)handleMJRefreshComplateWithResponse:(NSArray*)response{
     self.tableView.imgInfor = self.imgInfor;
     if (_pageIndex == 1) {
-        [_tableView.mj_header endRefreshing];
         _tableView.dataArrayM = [NSMutableArray arrayWithArray:response];
     }else{
-        [_tableView.mj_footer endRefreshing];
         [_tableView.dataArrayM addObjectsFromArray:response];
     }
     if (response.count) {
         [self startNetWorkingRequestWithGetAdvertise];
+    }else{
+        
+        [_tableView.mj_footer endRefreshingWithNoMoreData];
+    }
+}
+-(void)handleEndMJRefresh{
+    if (_pageIndex == 1) {
+        [self.tableView.mj_header endRefreshing];
+    }else{
+        [self.tableView.mj_footer endRefreshing];
     }
 }
 #pragma mark - 数据懒加载

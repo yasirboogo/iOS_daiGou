@@ -6,6 +6,39 @@
   Copyright © 2016年 inno. All rights reserved.
 */
 
+/** --------------------------login-------------------------- */
+"login" = "登录";
+"language" = "语言";
+"langSeting" = "语言正在设置,请稍后...";
+"chinese" = "中文";
+"malay" = "马来语";
+"english" = "英语";
+"userID" = "账号";
+"inputID" = "输入注册手机号";
+"userPwd" = "密码";
+"inputPwd" = "输入登录密码";
+"rememberPwd" = "记住密码";
+"fogetPwd" = "忘记密码";
+"visterIn" = "使用游客登录";
+
+"register" = "注册";
+"country" = "国家";
+"countryID" = "选择您所在的国家";
+"phoneID" = "手机号";
+"codeID" = "验证码";
+"inputCodeID" = "输入验证码";
+"readOK" = "我已阅读并同意";
+"agreement" = "用户协议";
+"sendCodeID" = "发送验证码";
+"codeLast" = "已发送";
+
+"next" = "下一步";
+
+"newPwd" = "新密码";
+"inputNewPwd" = "请输入新密码，6-20位数";
+"confirmPwd" = "确认密码";
+"againInputPwd" = "再次输入";
+"confirmChange" = "确认修改";
 /** --------------------------home-------------------------- */
 "home" = "首页";
 "language" = "语言";
@@ -16,43 +49,208 @@
 "specialPurchase" = "特色惠购";
 "more" = "更多";
 "hot" = "热";
+"goodsDetail" = "商品详情";
+"imageDetail" = "图文详情";
+"goodsPara" = "商品参数";
+"joinCart" = "加入购物车";
+"nowBuy" = "立即购买";
+"select" = "选择";
+"selectNum" = "选择数量";
+
+"search" = "搜索";
+"searchHistory" = "搜索历史";
+"noSearchTips" = "暂无搜索内容";
 /** --------------------------news-------------------------- */
 "news" = "资讯";
 "newsCenter" = "资讯中心";
-/*
- 
- NSNumberFormatter *numberFormatter = [[NSNumberFormatter alloc] init];
- 
- [numberFormatter setNumberStyle:NSNumberFormatterDecimalStyle];
- 
- NSString *numberString = [numberFormatter stringFromNumber:@(10000)];
- 
- testLabel.text = [NSString stringWithFormat:NSLocalizedString(@"testNum:%@", nil), numberString];
- 
- */
-
-
+"newsDetail" = "资讯详情";
+"comment" = "评论";
+"sayThing" = "说点什么吧";
+"publish" = "发布";
+"" = "commentSuccess";
+"" = "commentFailure";
 
 /** --------------------------shop-------------------------- */
 "shopCart" = "购物车";
+"allSelect" = "全选";
+"cancel" = "取消";
+"purchasingGoods" = "代购商品";
+"platformGoods" = "平台商品";
+"cartNoGoods" = "当前购物车没有商品";
+"edit" = "编辑";
+"stock" = "库存不足";
+"shelf" = "已下架";
+"nothing" = "暂无";
+"totalCost" = "总计(不含邮费)";
+"balance" = "结算";
+
+"perfectInfor" = "完善个人资料";
+"perfectTips" = "需要完善个人资料才能购买哦~";
+"goPerfect" = "去完善";
+"recName" = "姓名";
+"inputRecName" = "请输入收货人的姓名";
+"recPhone" = "手机号码";
+"inputRecPhone" = "请输入收货人的手机号码";
+"area" = "所在地区";
+"selectArea" = "请选择所在地区";
+"detailArea" = "详细地址";
+"inputDeatilArea" = "请输入详细地址";
+"email" = "邮箱";
+"inputEmail" = "请输入邮箱地址";
+"cardID" = "身份证";
+"inputCardID" = "请输入身份证号码（选填）";
+"save" = "保存";
+
+"firmOrder" = "确认订单";
+"postWay" = "配送方式";
+"pleaseSelect" = "请选择";
+"moneyType" = "元";
+"moneyMark" = "￥";
+"yuan" = "元";
+"chineseMoney" = "人民币";
+"malayMoney" = "马来西亚币";
+"americanMoney" = "美元";
+"dollar" = "美元";
+"ringgit" = "林吉特";
+"goodsTotal" = "件商品，共计:";
+"postMoney" = "邮费:";
+"couponDeduction" = "优惠券抵扣";
+"selectCoupon" = "（选择我的优惠券）";
+"notSupportTips" = "（代购商品不支持）";
+"priceTotal" = "应付总额:";
+"submitOrder" = "提交订单";
+
+"payMoney" = "付款";
+"payPostage" = "付邮费";
+"orderInfor" = "订单信息";
+"payWay" = "支付方式";
+"alipay" = "支付宝";
+"weichat" = "微信";
+"bankcard" = "借记卡/信用卡";
+"noSupport" = "（暂不支持）";
+"finishPay" = "完成付款";
+
+"paySuccess" = "支付成功";
+"congratulations" = "恭喜你";
+"deliverGoods" = "送货信息";
+"deliverTips" = "我们将尽快安排发货，请买家保持手机畅通，以便快递小哥能第一时间联系到你";
+"backPage" = "返回首页";
+"checkOrder" = "查看订单";
+
 /** --------------------------mine-------------------------- */
 "mine" = "我的";
-"accountBalances" = "账户余额";
-"yuan" = "元";
+"accountLast" = "账户余额：";
 "allOrder" = "全部订单";
 "waitHandle" = "待处理";
 "waitPay" = "待付款";
+"waitPPay" = "待付邮费";
 "waitSend" = "待发货";
 "waitReceive" = "待收货";
 "completed" = "已完成";
+
 "myCollection" = "我的收藏";
+"invalid" = "已失效";
+"delete" = "删除";
+"selectAll" = "全选";
+"done" = "完成";
+
 "myDistribution" = "我的分销";
+"regular" = "规则";
+"totalCommiss" = "佣金总额";
+"histCommiss" = "历史佣金";
+"myFans" = "我的粉丝";
+"people" = "人";
+"time" = "时间";
+"source" = "来源";
+"commission" = "佣金";
+
 "myWallet" = "我的钱包";
+
+"buyIn" = "买进";
+"sellOut" = "卖出";
+"recharge" = "充值";
+"walletRecharge" = "钱包充值";
+"note" = "说明";
+"account" = "账户";
+"inputMoney" = "请输入金额";
+"completeRecharge" = "完成充值";
+"rechargeSuccess" = "充值成功";
+"moneyChanging" = "兑换货币";
+"currencyExchange" = "货币兑换";
+"holdCurrency" = "持有货币";
+"currentLast" = "当前余额为";
+"fullConver" = "全部兑换";
+
 "myCoupon" = "我的优惠券";
+"workability" = "可使用";
+"noCouponTisp" = "当前没有优惠券信息";
+
+"myOrder" = "我的订单";
+"noOrderTisp" = "当前没有订单信息";
+"cancelOrder" = "取消订单";
+"payment" = "马上付款";
+"whyNotPay" = "为何不能马上付款？";
+"prompt" = "提醒发货";
+"viewLogistics" = "查看物流";
+"conReceipt" = "确认收货";
+"anotherOne" = "再来一单";
+"orderDetails" = "订单详情";
+"consignee" = "收货人信息";
+"orderInfor" = "订单信息";
+"goodsInfor" = "商品信息";
+"orderNumber" = "订单编号:";
+"orderTime" = "下单时间:";
+"payTime" = "付款时间:";
+"postAddress" = "发货地址:";
+"orderStatus" = "订单状态:";
+"noLogisticsTips" = "当前没有物流信息";
+"logisticsInfor" = "物流信息";
+
 "addressManagement" = "收货地址管理";
+"newOne" = "新建";
+"defaultAddress" = "设为默认地址";
+"noAddressTips" = "暂无收货地址";
+"changeAddress" = "修改收货地址";
+"newAddress" = "新增收货地址";
+
 "myTwoCode" = "我的二维码";
+"share" = "分享";
+"shareCode" = "分享我的二维码";
+"shareTips" = "让朋友扫一扫，即可成为我的粉丝";
+
 "settings" = "设置";
+"pushSwitch" = "推送开关";
+"clearCache" = "清除缓存";
+"suggestions" = "意见反馈";
+"suggestTips" = "有意见或建议都可以写一下哦~";
+"submit" = "提交";
+"commonQuestions" = "常见问题";
+"distributionRules" = "分销规则";
+"exchangeNote" = "兑换说明";
+"rechargeInstructions" = "充值说明";
+
+"contactSerVice" = "联系客服";
+
+"exit" = "退出登录";
+
+"inforChange" = "个人资料修改";
+"headImg" = "头像";
+"nickName" = "昵称";
+"accountSafe" = "账户安全";
+"changePwd" = "修改密码";
+"changePhone" = "修改手机";
+"inputNewPhone" = "请输入新号码";
+"newPhone" = "新号码";
+"oldPwd" = "旧密码";
+"inputOldPwd" = "请输入旧密码";
+
+"selectYouCountry" = "选择国";
+"selectYouProvinces" = "选择省";
+"selectYouCity" = "选择市";
+"selectYouArea" = "选择区";
 /** --------------------------imagePicker-------------------------- */
+//"takePhoto" = "拍照";
+//"selectImgAlbum" = "去相册选择";
 "OK" = "确定";
 "Back" = "返回";
 "Done" = "完成";
@@ -75,3 +273,73 @@
 "Select a minimum of %zd photos" = "请至少选择%zd张照片";
 "Allow %@ to access your album in \"Settings -> Privacy -> Photos\"" = "请在iPhone的\"设置-隐私-照片\"选项中，\r允许%@访问你的手机相册";
 "Please allow %@ to access your camera in \"Settings -> Privacy -> Camera\"" = "请在iPhone的\"设置-隐私-相机\"中允许%@访问相机";
+
+/** --------------------------MJRefres-------------------------- */
+"MJRefreshHeaderIdleText" = "下拉可以刷新";
+"MJRefreshHeaderPullingText" = "松开立即刷新";
+"MJRefreshHeaderRefreshingText" = "正在刷新数据中...";
+
+"MJRefreshAutoFooterIdleText" = "点击或上拉加载更多";
+"MJRefreshAutoFooterRefreshingText" = "正在加载更多的数据...";
+"MJRefreshAutoFooterNoMoreDataText" = "已经全部加载完毕";
+
+"MJRefreshBackFooterIdleText" = "上拉可以加载更多";
+"MJRefreshBackFooterPullingText" = "松开立即加载更多";
+"MJRefreshBackFooterRefreshingText" = "正在加载更多的数据...";
+"MJRefreshBackFooterNoMoreDataText" = "已经全部加载完毕";
+
+"MJRefreshHeaderLastTimeText" = "最后更新：";
+"MJRefreshHeaderDateTodayText" = "今天";
+"MJRefreshHeaderNoneLastDateText" = "无记录";
+/** --------------------------common-------------------------- */
+
+"loading" = "加载中...";
+
+"inputIsEmpty" = "输入不能为空";
+"cCodeError" = "验证码输入错误";
+"inputIsError" = "输入有误，请重新输入";
+"userNameIsError" = "账号或密码输入有误";
+"selectGoods" = "请选择商品";
+
+"changeSuccess" = "修改成功";
+"changeFailure" = "修改失败";
+
+"delectSuccess" = "删除成功";
+"delectFailure" = "删除失败";
+
+"likeSuccess" = "点赞成功";
+"likeFailure" = "你已经点过赞，不能再点了";
+
+"addSuccess" = "添加成功";
+"addFailure" = "添加失败";
+
+"saveSuccess" = "保存成功";
+"saveFailure" = "保存失败";
+
+"commentSuccess" = "评论成功";
+"commentFailure" = "评论失败";
+
+"submitSuccess" = "提交成功";
+"submitFailure" = "提交失败";
+
+"setSuccess" = "设置成功";
+"setFailure" = "设置失败";
+
+"paySuccess" = "支付成功";
+"payFailure" = "支付失败";
+
+"registerSuccess" = "注册成功";
+"registerFailure" = "注册失败";
+
+"lowStocks" = "库存不足";
+"lowStocks" = "请先保存";
+
+"appUnInstall" = "此设备未安装相应App";
+
+"oldPwdError" = "原密码输入错误";
+"pwdDifferent" = "两次密码输入不一样";
+
+"loadSuccess" = "加载成功";
+"loadFailure" = "加载失败";
+"loadError" = "未知错误";
+

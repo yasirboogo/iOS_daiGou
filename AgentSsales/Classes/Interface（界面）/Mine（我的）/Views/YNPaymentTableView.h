@@ -12,7 +12,7 @@
 
 @property (nonatomic,strong) NSArray * dataArray;
 
-@property (nonatomic,copy) void(^didSelectPaymentCellBlock)(NSString*);
+@property (nonatomic,copy) void(^didSelectPaymentCellBlock)(NSInteger);
 
 @end
 @interface YNPaymentCell : UITableViewCell

@@ -50,8 +50,6 @@
 }
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
     YNSettingCell * setCell = [tableView dequeueReusableCellWithIdentifier:@"setCell"];
-    
-    
     if (setCell == nil) {
         setCell = [[YNSettingCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:@"setCell"];
         setCell.selectionStyle = UITableViewCellSelectionStyleNone;
@@ -78,8 +76,11 @@
     [tableView deselectRowAtIndexPath:indexPath animated:NO];
     if (indexPath.section == 0 && indexPath.row == 0) {
     }else if (indexPath.section == 1 && indexPath.row == 0){
-        [YNClearCache clearCacheFile];
-        [self reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationBottom];
+        [SVProgressHUD showWithStatus:LocalLoading];
+        [SVProgressHUD dismissWithDelay:2.0f completion:^{
+            [YNClearCache clearCacheFile];
+            [self reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationBottom];
+        }];
     }else{
         self.didSelectSettingCellBlock(indexPath.row);
     }
@@ -87,8 +88,8 @@
 -(NSArray<NSArray *> *)items{
     if (!_items) {
         _items = @[
-                   @[@"推送开关"],
-                   @[@"清除缓存",@"意见反馈",@"常见问题"]
+                   @[LocalPushSwitch],
+                   @[LocalClearCache,LocalSuggestions,LocalCommonQuestions,LocalContactSerVice]
                    ];
     }
     return _items;

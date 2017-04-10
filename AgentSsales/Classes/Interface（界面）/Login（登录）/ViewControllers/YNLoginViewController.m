@@ -58,35 +58,67 @@
 }
 
 #pragma mark - 网路请求
-//登录
 -(void)startNetWorkingRequestWithLoginButtonClick{
-    NSDictionary *params = @{
-                             @"loginphone":_tableView.textArrayM[0],
-                             @"password":_tableView.textArrayM[1]
-                             };
-    
+    NSDictionary *params = @{@"loginphone":_tableView.loginphone,
+                             @"password":_tableView.password};
     [YNHttpManagers userLoginInforWithParams:params success:^(id response) {
-        //保存起来
-        [DEFAULTS setObject:(NSDictionary*)response forKey:kUserLoginInfors];
-        [DEFAULTS synchronize];
-        
-        UIWindow *window = [UIApplication sharedApplication].keyWindow;
-        window.rootViewController = [[YNTabBarController alloc]init];
-        
+        if ([response[@"code"] isEqualToString:@"success"]) {
+            //do success things
+            UICKeyChainStore *keychain = [UICKeyChainStore keyChainStoreWithService:kKeychainService];
+            if (keychain.allKeys) {
+                [keychain removeItemForKey:keychain.allKeys.firstObject];
+            }
+            if (_rememberBtn.selected) {
+                [keychain setString:_tableView.password forKey:_tableView.loginphone];
+            }else{
+                [keychain setString:@"" forKey:_tableView.loginphone];
+            }
+            [DEFAULTS setObject:(NSDictionary*)response forKey:kUserLoginInfors];
+            [DEFAULTS synchronize];
+
+            if (TARGET_IPHONE_SIMULATOR) {//模拟器不需要设置推送
+                UIWindow *window = [UIApplication sharedApplication].keyWindow;
+                window.rootViewController = [[YNTabBarController alloc]init];
+            }else{
+                [self startNetWorkingRequestPushToUserWithParams];
+            }
+        }else{
+            //do failure things
+            [SVProgressHUD showImage:nil status:LocalUserNameIsError];
+            [SVProgressHUD dismissWithDelay:2.0f];
+        }
     } failure:^(NSError *error) {
-        NSLog(@"%@",error);
+        //do error things
+    }];
+}
+-(void)startNetWorkingRequestPushToUserWithParams{
+    NSDictionary *params = @{@"ispush":[JPUSHService registrationID],
+                             @"userId":[DEFAULTS valueForKey:kUserLoginInfors][@"userId"]};
+    [YNHttpManagers pushToUserWithParams:params success:^(id response) {
+        if ([response[@"code"] isEqualToString:@"success"]) {
+            UIWindow *window = [UIApplication sharedApplication].keyWindow;
+            window.rootViewController = [[YNTabBarController alloc]init];
+        }else{
+            //do failure things
+        }
+    } failure:^(NSError *error) {
+        //do error things
     }];
 }
 #pragma mark - 视图加载
 -(YNSelectLanguageView *)selectLanguageView{
     if (!_selectLanguageView) {
-        CGRect frame = CGRectMake(kMinSpace, kUINavHeight,W_RATIO(220),W_RATIO(270));
+        CGRect frame = CGRectMake(kMinSpace, kUINavHeight,W_RATIO(250),W_RATIO(270));
         YNSelectLanguageView *selectLanguageView = [[YNSelectLanguageView alloc] initWithFrame:frame];
         _selectLanguageView = selectLanguageView;
         selectLanguageView.hidden = YES;
         selectLanguageView.index = [LanguageManager currentLanguageIndex];
         [selectLanguageView setDidSelectLanguageCellBlock:^(NSInteger index) {
-            [kLanguageManager setUserlanguage:index type:1];
+            _selectLanguageView.hidden = YES;
+            [SVProgressHUD showWithStatus:LocalLanguageSeting];
+            [SVProgressHUD dismissWithDelay:2.0f completion:^{
+                [kLanguageManager setUserlanguage:index type:1];
+            }];
         }];
     }
     return _selectLanguageView;
@@ -96,6 +128,11 @@
         YNLoginTableView *tableView = [[YNLoginTableView alloc] init];
         _tableView  = tableView;
         [self.view addSubview:tableView];
+        UICKeyChainStore *keychain = [UICKeyChainStore keyChainStoreWithService:kKeychainService];
+        if (keychain.allKeys) {
+            tableView.loginphone = keychain.allKeys.firstObject;
+            tableView.password = [keychain stringForKey:tableView.loginphone];
+        }
     }
     return _tableView;
 }
@@ -105,7 +142,7 @@
         _rememberBtn = rememberBtn;
         [self.view addSubview:rememberBtn];
         rememberBtn.titleLabel.font = FONT(26);
-        [rememberBtn setTitle:@"记住密码" forState:UIControlStateNormal];
+        [rememberBtn setTitle:LocalRememberPwd forState:UIControlStateNormal];
         rememberBtn.imageEdgeInsets = UIEdgeInsetsMake(0, -W_RATIO(20), 0, 0);
         [rememberBtn setTitleColor:COLOR_999999 forState:UIControlStateNormal];
         [rememberBtn setImage:[UIImage imageNamed:@"denglu_kuang"] forState:UIControlStateNormal];
@@ -113,6 +150,8 @@
         [rememberBtn addTarget:self action:@selector(handleRememberButtonClick:) forControlEvents:UIControlEventTouchUpInside];
         CGSize forgetBtnSize = [rememberBtn.titleLabel.text calculateHightWithFont:rememberBtn.titleLabel.font maxWidth:0];
         rememberBtn.frame = CGRectMake(W_RATIO(20) ,MaxYF(_tableView)+kMinSpace,forgetBtnSize.width+kMidSpace*2, W_RATIO(80));
+        UICKeyChainStore *keychain = [UICKeyChainStore keyChainStoreWithService:kKeychainService];
+        rememberBtn.selected = keychain.allKeys && [keychain stringForKey:keychain.allKeys.firstObject].length;
     }
     return _rememberBtn;
 }
@@ -122,7 +161,7 @@
         _forgetBtn = forgetBtn;
         [self.view addSubview:forgetBtn];
         forgetBtn.titleLabel.font = FONT(26);
-        [forgetBtn setTitle:@"忘记密码" forState:UIControlStateNormal];
+        [forgetBtn setTitle:LocalFogetPwd forState:UIControlStateNormal];
         forgetBtn.imageEdgeInsets = UIEdgeInsetsMake(0, -W_RATIO(20), 0, 0);
         [forgetBtn setTitleColor:COLOR_999999 forState:UIControlStateNormal];
         [forgetBtn setImage:[UIImage imageNamed:@"wenhao_hong"] forState:UIControlStateNormal];
@@ -141,7 +180,7 @@
         submitBtn.layer.masksToBounds = YES;
         submitBtn.layer.cornerRadius = kViewRadius;
         submitBtn.titleLabel.font = FONT(36);
-        [submitBtn setTitle:@"登录" forState:UIControlStateNormal];
+        [submitBtn setTitle:LocalLogin forState:UIControlStateNormal];
         [submitBtn setTitleColor:COLOR_FFFFFF forState:UIControlStateNormal];
         [submitBtn addTarget:self action:@selector(handleLoginSubmitButtonClick:) forControlEvents:UIControlEventTouchUpInside];
         [self.view addSubview:submitBtn];
@@ -154,7 +193,7 @@
         _visitorBtn = visitorBtn;
         [self.view addSubview:visitorBtn];
         visitorBtn.titleLabel.font = FONT(26);
-        [visitorBtn setTitle:@"使用游客登录" forState:UIControlStateNormal];
+        [visitorBtn setTitle:LocalVisterIn forState:UIControlStateNormal];
         [visitorBtn setTitleColor:COLOR_999999 forState:UIControlStateNormal];
         [visitorBtn addTarget:self action:@selector(handleVisitorButtonClick:) forControlEvents:UIControlEventTouchUpInside];
         CGSize visitorBtnSize = [visitorBtn.titleLabel.text calculateHightWithFont:visitorBtn.titleLabel.font maxWidth:0];
@@ -167,22 +206,22 @@
 #pragma mark - 函数、消息
 -(void)makeData{
     [super makeData];
-    self.selectLanguageView.dataArray = @[@"中文",@"马来语",@"英语"];
+    self.selectLanguageView.dataArray = @[LocalChinese,LocalMalay,LocalEnglish];
 }
 -(void)makeNavigationBar{
     [super makeNavigationBar];
     __weak typeof(self) weakSelf = self;
     self.backButton.hidden = YES;
-    [self addNavigationBarBtnWithTitle:kLocalizedString(@"language", @"语言") selectTitle:kLocalizedString(@"language", @"语言") font:FONT_15 img:[UIImage imageNamed:@"xiala_shouye"] selectImg:[UIImage imageNamed:@"xiala_shouye"] imgWidth:W_RATIO(20) isOnRight:NO btnClickBlock:^(BOOL isShow) {
-        weakSelf.selectLanguageView.hidden = !isShow;
+    [self addNavigationBarBtnWithTitle:LocalLanguage selectTitle:LocalLanguage font:FONT_15 img:[UIImage imageNamed:@"xiala_shouye"] selectImg:[UIImage imageNamed:@"xiala_shouye"] imgWidth:W_RATIO(20) isOnRight:NO btnClickBlock:^(BOOL isShow) {
+        weakSelf.selectLanguageView.hidden = NO;
         
     }];
-    [self addNavigationBarBtnWithTitle:@"注册" selectTitle:@"注册" font:FONT_15 isOnRight:YES btnClickBlock:^(BOOL isShow) {
+    [self addNavigationBarBtnWithTitle:LocalRegister selectTitle:LocalRegister font:FONT_15 isOnRight:YES btnClickBlock:^(BOOL isShow) {
         YNRegisterViewController *pushVC = [[YNRegisterViewController alloc] init];
         [weakSelf.navigationController pushViewController:pushVC animated:NO];
     }];
     self.backButton.hidden = YES;
-    self.titleLabel.text = @"登录";
+    self.titleLabel.text = LocalLogin;
 }
 -(void)makeUI{
     [super makeUI];
@@ -201,10 +240,16 @@
     [self.navigationController pushViewController:pushVC animated:NO];
 }
 -(void)handleLoginSubmitButtonClick:(UIButton*)btn{
-    [self startNetWorkingRequestWithLoginButtonClick];
+    if (_tableView.loginphone.length && _tableView.password.length) {
+        [self startNetWorkingRequestWithLoginButtonClick];
+    }else{
+        [SVProgressHUD showImage:nil status:LocalInputIsEmpty];
+        [SVProgressHUD dismissWithDelay:2.0f];
+    }
 }
 -(void)handleVisitorButtonClick:(UIButton*)btn{
-    
+    [DEFAULTS setObject:nil forKey:kUserLoginInfors];
+    [DEFAULTS synchronize];
     YNTabBarController *tab = [[YNTabBarController alloc] init];
     AppDelegate *appDelegate =
     (AppDelegate *)[[UIApplication sharedApplication] delegate];

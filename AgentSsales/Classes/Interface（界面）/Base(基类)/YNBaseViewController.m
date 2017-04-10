@@ -28,12 +28,11 @@
     
     self.view.backgroundColor = COLOR_EDEDED;
     self.automaticallyAdjustsScrollViewInsets = NO;
-    
+
     self.navigationController.navigationBarHidden = YES;
     self.navigationController.interactivePopGestureRecognizer.enabled = YES;
     self.navigationController.interactivePopGestureRecognizer.delegate = self;
     
-    [self.view bringSubviewToFront:_navView];
 }
 
 - (void)viewDidAppear:(BOOL)animated{
@@ -47,12 +46,6 @@
     [self makeUI];
     
 }
-/*
--(void)loadView{
-    UIScrollView *scrollView = [[UIScrollView alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
-    self.view = scrollView;
-}
- */
 - (void)viewWillDisappear:(BOOL)animated{
     [super viewWillDisappear:animated];
     
@@ -117,6 +110,7 @@
     }
     return _rightButtons;
 }
+
 #pragma mark -- 函数
 -(void)makeNavigationBar{
     [self.view addSubview:self.navView];

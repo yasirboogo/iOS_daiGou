@@ -45,9 +45,15 @@
 -(void)startNetWorkingRequestWithViewLogistics{
     NSDictionary *params = @{@"orderId":[NSNumber numberWithInteger:_orderId]};
     [YNHttpManagers viewLogisticsWithParams:params success:^(id response) {
-        self.tableView.dataArray = response;
-        self.emptyView.hidden = self.tableView.dataArray.count;
+        if ([response[@"code"] isEqualToString:@"success"]) {
+            //do success things
+            self.tableView.dataArray = response[@"info"];
+            self.emptyView.hidden = self.tableView.dataArray.count;
+        }else{
+            //do failure things
+        }
     } failure:^(NSError *error) {
+        //do error things
     }];
 }
 #pragma mark - 视图加载
@@ -62,12 +68,12 @@
 }
 -(YNShowEmptyView *)emptyView{
     if (!_emptyView) {
-        CGRect frame = CGRectMake(0,kUINavHeight, SCREEN_WIDTH, SCREEN_HEIGHT-kUINavHeight);
+        CGRect frame = CGRectMake(0,kUINavHeight+W_RATIO(2), SCREEN_WIDTH, SCREEN_HEIGHT-kUINavHeight-W_RATIO(2));
         YNShowEmptyView *emptyView = [[YNShowEmptyView alloc] initWithFrame:frame];
         _emptyView = emptyView;
         [self.view addSubview:emptyView];
         emptyView.tipImg = [UIImage imageNamed:@"wuwuliu"];
-        emptyView.tips = @"当前没有物流信息";
+        emptyView.tips = LocalNoLogisticsTips;
     }
     return _emptyView;
 }
@@ -76,18 +82,10 @@
 #pragma mark - 函数、消息
 -(void)makeData{
     [super makeData];
-    /*
-    self.tableView.dataArray = @[
-                                 @{@"msg":@"卖家已签收，感谢使用EMS快递",@"time":@"2016-11-12 09:48"},
-                                 @{@"msg":@"广州市集散中心 已发出",@"time":@"2016-11-12 09:48"},
-                                 @{@"msg":@"顺丰快递 佛山市长城区新明二路营业点收件员 已揽件",@"time":@"2016-11-12 09:48"},
-                                 @{@"msg":@"你的快递由佛山门店安排发货",@"time":@"2016-11-12 09:48"}
-                                 ];
-     */
 }
 -(void)makeNavigationBar{
     [super makeNavigationBar];
-    self.titleLabel.text = @"物流信息";
+    self.titleLabel.text = LocalLogisticsInfor;
 }
 -(void)makeUI{
     [super makeUI];

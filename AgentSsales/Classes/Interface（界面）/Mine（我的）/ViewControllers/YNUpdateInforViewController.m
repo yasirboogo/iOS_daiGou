@@ -18,7 +18,7 @@
     NSMutableArray *_selectedAssets;
     BOOL _isSelectOriginalPhoto;
 }
-@property (nonatomic, weak) UIImagePickerController *imagePickerVc;
+@property (nonatomic, strong) UIImagePickerController *imagePickerVc;
 
 @property (nonatomic,weak) YNUpdateInforTableView * tableView;
 
@@ -43,17 +43,21 @@
 - (void)viewWillDisappear:(BOOL)animated{
     [super viewWillDisappear:animated];
 }
-
 - (void)viewDidDisappear:(BOOL)animated{
     [super viewDidDisappear:animated];
 }
-
 #pragma mark - 网路请求
 -(void)startNetWorkingRequestWithUserInfors{
     NSDictionary *params = @{@"userId":[DEFAULTS valueForKey:kUserLoginInfors][@"userId"]};
     [YNHttpManagers getUserInforsWithParams:params success:^(id response) {
-        self.tableView.inforDict = response;
+        if ([response[@"code"] isEqualToString:@"success"]) {
+            //do success things
+            self.tableView.inforDict = response;
+        }else{
+            //do failure things
+        }
     } failure:^(NSError *error) {
+        //do error things
     }];
 }
 -(void)startNetWorkingRequestWithupdateUserInfors{
@@ -61,15 +65,31 @@
                              @"idcardId":_tableView.idcardId,
                              @"nickname":_tableView.nickname};
     [YNHttpManagers updateUserInforsWithParams:params success:^(id response) {
-        
+        if ([response[@"code"] isEqualToString:@"success"]) {
+            //do success things
+            [SVProgressHUD showImage:nil status:LocalChangeSuccess];
+            [SVProgressHUD dismissWithDelay:2.0f completion:^{
+                [self.navigationController popViewControllerAnimated:NO];
+            }];
+        }else{
+            //do failure things
+            [SVProgressHUD showImage:nil status:LocalChangeFailure];
+            [SVProgressHUD dismissWithDelay:2.0f ];
+        }
     } failure:^(NSError *error) {
+        //do error things
     }];
 }
 -(void)startNetWorkingRequestWithChangeUserImageWithImage:(UIImage*)image{
     NSDictionary *params = @{@"userId":[DEFAULTS valueForKey:kUserLoginInfors][@"userId"]};
     [YNHttpManagers changeUserImageWithImage:image Params:params success:^(id response) {
-        [self startNetWorkingRequestWithUserInfors];
+        if ([response[@"code"] isEqualToString:@"success"]) {
+            //do success things
+        }else{
+            //do failure things
+        }
     } failure:^(NSError *error) {
+        //do error things
     }];
 }
 #pragma mark - 视图加载
@@ -77,11 +97,11 @@
     if (!_tableView) {
         YNUpdateInforTableView *tableView = [[YNUpdateInforTableView alloc] init];
         _tableView = tableView;
-        [tableView setDidSelectUpdateInforClickBlock:^(NSString *str) {
-            if ([str isEqualToString:@"手机号码"]) {
+        [tableView setDidSelectUpdateInforClickBlock:^(NSInteger index) {
+            if (index == 2) {
                 YNUpdatePhoneViewController *pushVC = [[YNUpdatePhoneViewController alloc] init];
                 [self.navigationController pushViewController:pushVC animated:NO];
-            }else if ([str isEqualToString:@"账户安全"]){
+            }else if (index == 4){
                 YNUpdatePswordViewController *pushVC = [[YNUpdatePswordViewController alloc] init];
                 [self.navigationController pushViewController:pushVC animated:NO];
             }
@@ -99,10 +119,10 @@
     if (!_imagePickerVc) {
          UIImagePickerController *imagePickerVc = [[UIImagePickerController alloc] init];
         _imagePickerVc  = imagePickerVc;
-        _imagePickerVc.delegate = self;
+        imagePickerVc.delegate = self;
         // set appearance / 改变相册选择页的导航栏外观
-        _imagePickerVc.navigationBar.barTintColor = self.navigationController.navigationBar.barTintColor;
-        _imagePickerVc.navigationBar.tintColor = self.navigationController.navigationBar.tintColor;
+        imagePickerVc.navigationBar.barTintColor = self.navigationController.navigationBar.barTintColor;
+        imagePickerVc.navigationBar.tintColor = self.navigationController.navigationBar.tintColor;
         UIBarButtonItem *tzBarItem, *BarItem;
         if (iOS9Later) {
             tzBarItem = [UIBarButtonItem appearanceWhenContainedInInstancesOfClasses:@[[TZImagePickerController class]]];
@@ -125,10 +145,16 @@
 -(void)makeNavigationBar{
     [super makeNavigationBar];
     __weak typeof(self) weakSelf = self;
-    [self addNavigationBarBtnWithTitle:@"保存" selectTitle:@"保存" font:FONT_15 isOnRight:YES btnClickBlock:^(BOOL isSelect) {
-        [weakSelf startNetWorkingRequestWithupdateUserInfors];
+    [self addNavigationBarBtnWithTitle:LocalSave selectTitle:LocalSave font:FONT_15 isOnRight:YES btnClickBlock:^(BOOL isSelect) {
+        [weakSelf.view endEditing:YES];
+        if (weakSelf.tableView.nickname.length) {
+            [weakSelf startNetWorkingRequestWithupdateUserInfors];
+        }else{
+            [SVProgressHUD showImage:nil status:LocalInputIsEmpty];
+            [SVProgressHUD dismissWithDelay:2.0f];
+        }
     }];
-    self.titleLabel.text = @"个人资料修改";
+    self.titleLabel.text = LocalInforChange;
 }
 -(void)makeUI{
     [super makeUI];
@@ -167,7 +193,7 @@
             if(iOS8Later) {
                 _imagePickerVc.modalPresentationStyle = UIModalPresentationOverCurrentContext;
             }
-            [self presentViewController:_imagePickerVc animated:YES completion:nil];
+            [self presentViewController:self.imagePickerVc animated:YES completion:nil];
         } else {
             NSLog(@"模拟器中无法打开照相机,请在真机中使用");
         }
@@ -186,7 +212,8 @@
     imagePickerVc.allowPickingGif = NO;
     imagePickerVc.allowPickingImage = YES;
 
-    /// 5. Single selection mode, valid when maxImagesCount = 1
+    // 5. Single selection mode, valid when maxImagesCount = 1
+    /*
     imagePickerVc.allowCrop = YES;
     imagePickerVc.needCircleCrop = YES;
     imagePickerVc.circleCropRadius = W_RATIO(200);
@@ -194,6 +221,7 @@
         cropView.layer.borderColor = [UIColor whiteColor].CGColor;
         cropView.layer.borderWidth = W_RATIO(10);
     }];
+     */
 #pragma mark - 到这里为止
     // You can get the photos by block, the same as by delegate.
     [imagePickerVc setDidFinishPickingPhotosHandle:^(NSArray<UIImage *> *photos, NSArray *assets, BOOL isSelectOriginalPhoto) {
@@ -237,11 +265,13 @@
                     TZImagePickerController *imagePicker = [[TZImagePickerController alloc] initCropTypeWithAsset:assetModel.asset photo:image completion:^(UIImage *cropImage, id asset) {
                         [self startNetWorkingRequestWithChangeUserImageWithImage:cropImage];
                     }];
+                    /*
                     imagePicker.circleCropRadius = W_RATIO(200);
                     [imagePicker setCropViewSettingBlock:^(UIView *cropView) {
                         cropView.layer.borderColor = [UIColor whiteColor].CGColor;
                         cropView.layer.borderWidth = W_RATIO(10);
                     }];
+                     */
                     [self presentViewController:imagePicker animated:YES completion:nil];
                 }];
             }];

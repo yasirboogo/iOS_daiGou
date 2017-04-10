@@ -10,11 +10,12 @@
 #import "YNShareThirdSelectView.h"
 #import "YNCodeImgView.h"
 #import "YNCodeImageOperation.h"
+#import <UMSocialCore/UMSocialCore.h>
 @interface YNMineCodeViewController ()
 
 @property (nonatomic,weak) YNCodeImgView * codeImgView;
 
-@property (nonatomic,weak) YNShareThirdSelectView * selectShareView;
+@property (nonatomic,strong) YNShareThirdSelectView * selectShareView;
 
 @end
 
@@ -70,7 +71,7 @@
 #pragma mark - 函数、消息
 -(void)makeData{
     [super makeData];
-    self.codeImgView.codeImg = [YNCodeImageOperation getCodeImageWithContent:@"111" width:W_RATIO(400)];
+    self.codeImgView.codeImg = [YNCodeImageOperation getCodeImageWithContent:[NSString stringWithFormat:@"%@",[DEFAULTS valueForKey:kUserLoginInfors][@"loginphone"]] width:W_RATIO(400)];
     
 }
 -(void)makeNavigationBar{
@@ -80,12 +81,36 @@
         [weakSelf.selectShareView showPopView:YES];
     }];
     
-    self.titleLabel.text = kLocalizedString(@"myTwoCode",@"我的二维码");
+    self.titleLabel.text = LocalMyTwoCode;
 }
 -(void)makeUI{
     [super makeUI];
 }
 -(void)thirdShareWithIndex:(NSInteger)index{
-    
+    if (index == 0) {
+        [self shareTextToPlatformType:UMSocialPlatformType_WechatSession];
+    }else if (index == 1){
+        [self shareTextToPlatformType:UMSocialPlatformType_WechatTimeLine];
+    }else if (index == 2){
+        [self shareTextToPlatformType:UMSocialPlatformType_QQ];
+    }else if (index == 3){
+        [self shareTextToPlatformType:UMSocialPlatformType_Facebook];
+    }else if (index == 4){
+        [self shareTextToPlatformType:UMSocialPlatformType_GooglePlus];
+    }else if (index == 5){
+        [self shareTextToPlatformType:UMSocialPlatformType_FaceBookMessenger];
+    }
+}
+-(void)shareTextToPlatformType:(UMSocialPlatformType)platformType{
+    UMSocialMessageObject *messageObject = [UMSocialMessageObject messageObject];
+    messageObject.title = @"分享标题";
+    messageObject.text = @"分享内容";
+    [[UMSocialManager defaultManager] shareToPlatform:platformType messageObject:messageObject currentViewController:self completion:^(id data, NSError *error) {
+        if (error) {
+            NSLog(@"************Share fail with error %@*********",error);
+        }else{
+            NSLog(@"response data is %@",data);
+        }
+    }];
 }
 @end

@@ -30,9 +30,8 @@
     }
     return self;
 }
--(void)setCode:(NSString *)code{
-    [self.textArrayM replaceObjectAtIndex:0 withObject:code];
-    _code = [NSString stringWithFormat:@"+%@",code];
+-(void)setCountry:(NSString *)country{
+    _country = country;
     [self reloadData];
 }
 
@@ -52,17 +51,22 @@
     }
     inforCell.textFieldText = nil;
     if (indexPath.row == 0) {
-        inforCell.textFieldText = _code;
+        inforCell.textFieldText = _country;
         inforCell.isShowArrowImg = YES;
         inforCell.isForbidClick = YES;
     }else if (indexPath.row == 1){
         inforCell.keyboardType = UIKeyboardTypePhonePad;
     }
     inforCell.inforDict = _inforArray[indexPath.row];
+    void (^codeBtnEnable)(BOOL) = ^(BOOL isEnable){
+        inforCell.isEnableCodeBtn = isEnable;
+    };
     
     [inforCell setInforCellTextFieldBlock:^(NSString *str) {
-        
-        [self.textArrayM replaceObjectAtIndex:indexPath.row withObject:str];
+        if (indexPath.row == 1) {
+            self.loginphone = str;
+            codeBtnEnable(str.length && _country.length);
+        }
     }];
     
     return inforCell;
@@ -75,17 +79,11 @@
         }
     }
 }
--(NSMutableArray<NSString *> *)textArrayM{
-    if (!_textArrayM) {
-        _textArrayM = [NSMutableArray arrayWithObjects:kZeroStr,kZeroStr, nil];
-    }
-    return _textArrayM;
-}
 -(NSArray<NSDictionary *> *)inforArray{
     if (!_inforArray) {
         _inforArray = @[
-                        @{@"item":@"国家(区号)",@"placeholder":@"选择您所在的国家(区号)"},
-                        @{@"item":@"手机号",@"placeholder":@"输入您的手机号"}
+                        @{@"item":LocalCountry,@"placeholder":LocalCountryID},
+                        @{@"item":LocalPhoneID,@"placeholder":LocalInputID}
                         ];
     }
     return _inforArray;

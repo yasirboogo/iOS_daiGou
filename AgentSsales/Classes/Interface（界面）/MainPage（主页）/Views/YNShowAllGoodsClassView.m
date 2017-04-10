@@ -29,10 +29,9 @@
 -(UICollectionView *)collectionView{
     if (!_collectionView) {
         UICollectionViewFlowLayout *flowLayout = [[UICollectionViewFlowLayout alloc] init];
-        flowLayout.minimumLineSpacing = 0;
-        flowLayout.minimumInteritemSpacing = 0;
         flowLayout.sectionInset = UIEdgeInsetsMake(0, kMidSpace, 0, kMidSpace);
-        flowLayout.itemSize = CGSizeMake((SCREEN_WIDTH-kMidSpace*2)/3, W_RATIO(90));
+        flowLayout.itemSize = CGSizeMake(W_RATIO(200), W_RATIO(90));
+        flowLayout.minimumLineSpacing = 0;
         CGRect frame = CGRectMake(0,0,SCREEN_WIDTH,flowLayout.itemSize.height*4);
         UICollectionView *collectionView = [[UICollectionView alloc] initWithFrame:frame collectionViewLayout:flowLayout];
         _collectionView = collectionView;

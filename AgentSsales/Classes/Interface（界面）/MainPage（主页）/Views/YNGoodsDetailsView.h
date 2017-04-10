@@ -31,3 +31,8 @@
 @property (nonatomic,copy) YNDetailImgCellFrame * cellFrame;
 
 @end
+@interface YNDetailVideoCell : UITableViewCell
+
+@property (nonatomic,copy) NSString * videoUrl;
+
+@end

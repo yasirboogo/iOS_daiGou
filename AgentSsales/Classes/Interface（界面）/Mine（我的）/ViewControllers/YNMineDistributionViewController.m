@@ -34,7 +34,6 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self startNetWorkingRequestWithUserDistribution];
-    [self startNetWorkingRequestWithDistributionRecord];
 }
 
 - (void)viewWillDisappear:(BOOL)animated{
@@ -49,10 +48,17 @@
 -(void)startNetWorkingRequestWithUserDistribution{
     NSDictionary *params = @{@"userId":[DEFAULTS valueForKey:kUserLoginInfors][@"userId"]};
     [YNHttpManagers getUserDistributionWithParams:params success:^(id response) {
-        self.headerView.topNumber = [NSString stringWithFormat:@"%.2f",[response[@"commission"] floatValue]];
-        self.headerView.leftNumber = [NSString stringWithFormat:@"%.2f",[response[@"history"] floatValue]];
-        self.headerView.rightNumber = [NSString stringWithFormat:@"%@",response[@"fans"]];
+        if ([response[@"code"] isEqualToString:@"success"]) {
+            //do success things
+            self.headerView.topNumber = [NSString stringWithFormat:@"%.2f",[response[@"commission"] floatValue]];
+            self.headerView.leftNumber = [NSString stringWithFormat:@"%.2f",[response[@"history"] floatValue]];
+            self.headerView.rightNumber = [NSString stringWithFormat:@"%@",response[@"fans"]];
+            [self startNetWorkingRequestWithDistributionRecord];
+        }else{
+            //do failure things
+        }
     } failure:^(NSError *error) {
+        //do error things
     }];
 }
 -(void)startNetWorkingRequestWithDistributionRecord{
@@ -60,8 +66,16 @@
                              @"pageIndex":[NSNumber numberWithInteger:self.pageIndex],
                              @"pageSize":[NSNumber numberWithInteger:self.pageSize]};
     [YNHttpManagers getDistributionRecordWithParams:params success:^(id response) {
-        self.tableView.dataArray = response;
+        [self handleEndMJRefresh];
+        if ([response[@"code"] isEqualToString:@"success"]) {
+            //do success things
+            [self handleMJRefreshComplateWithResponse:response[@"commissionArray"]];
+        }else{
+            //do failure things
+        }
     } failure:^(NSError *error) {
+        //do error things
+        [self handleEndMJRefresh];
     }];
 }
 #pragma mark - 视图加载
@@ -79,6 +93,19 @@
         YNDistributionTableView *tableView = [[YNDistributionTableView alloc] init];
         _tableView = tableView;
         [self.view addSubview:tableView];
+        
+        tableView.mj_header= [MJRefreshNormalHeader headerWithRefreshingBlock:^{
+            self.pageIndex = 1;
+            [tableView.mj_footer endRefreshing];
+            [self startNetWorkingRequestWithDistributionRecord];
+        }];
+        // 设置自动切换透明度(在导航栏下面自动隐藏)
+        tableView.mj_header.automaticallyChangeAlpha = YES;
+        tableView.mj_footer = [MJRefreshBackNormalFooter footerWithRefreshingBlock:^{
+            self.pageIndex += 1;
+            [tableView.mj_header endRefreshing];
+            [self startNetWorkingRequestWithDistributionRecord];
+        }];
     }
     return _tableView;
 }
@@ -86,24 +113,42 @@
 #pragma mark - 代理实现
 
 #pragma mark - 函数、消息
+-(void)handleMJRefreshComplateWithResponse:(NSArray*)response{
+    if (self.pageIndex == 1) {
+        _tableView.dataArrayM = [NSMutableArray arrayWithArray:response];
+    }else{
+        [_tableView.dataArrayM addObjectsFromArray:response];
+    }
+    [_tableView reloadData];
+    if (response.count == 0) {
+        [_tableView.mj_footer endRefreshingWithNoMoreData];
+    }
+}
+-(void)handleEndMJRefresh{
+    if (self.pageIndex == 1) {
+        [self.tableView.mj_header endRefreshing];
+    }else{
+        [self.tableView.mj_footer endRefreshing];
+    }
+}
 -(void)makeData{
     [super makeData];
     
-    self.headerView.topTitleLabel.text = @"佣金总额（元）";
-    self.headerView.leftTitleLabel.text = @"历史佣金（元）";
-    self.headerView.rightTitleLabel.text = @"我的粉丝（人）";
+    self.headerView.topTitleLabel.text = [NSString stringWithFormat:@"%@ (%@) ",LocalTotalCommiss,LocalMoneyType];
+    self.headerView.leftTitleLabel.text = [NSString stringWithFormat:@"%@ (%@)",LocalHistCommiss,LocalMoneyType];
+    self.headerView.rightTitleLabel.text = [NSString stringWithFormat:@"%@ (%@)",LocalMyFans,LocalPeople];
 }
 -(void)makeNavigationBar{
     [super makeNavigationBar];
     self.navView.backgroundColor = COLOR_CLEAR;
     __weak typeof(self) weakSelf = self;
-    [self addNavigationBarBtnWithTitle:@"规则" selectTitle:@"规则" font:FONT_15 isOnRight:YES btnClickBlock:^(BOOL isSelect) {
+    [self addNavigationBarBtnWithTitle:LocalRegular selectTitle:LocalRegular font:FONT_15 isOnRight:YES btnClickBlock:^(BOOL isSelect) {
         YNDocumentExplainViewController *pushVC = [[YNDocumentExplainViewController alloc] init];
         pushVC.status = 2;
         [weakSelf.navigationController pushViewController:pushVC animated:NO];
         
     }];
-    self.titleLabel.text = kLocalizedString(@"myDistribution",@"我的分销");
+    self.titleLabel.text = LocalMyDistribution;
 }
 -(void)makeUI{
     [super makeUI];

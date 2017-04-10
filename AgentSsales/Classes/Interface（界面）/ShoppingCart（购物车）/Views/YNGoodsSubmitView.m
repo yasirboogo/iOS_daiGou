@@ -33,16 +33,16 @@
 -(void)setDict:(NSDictionary *)dict{
     _dict = dict;
     
-    self.tipsLabel.text = @"总计(不含邮费):";
-    self.markLabel.text = @"￥";
+    self.tipsLabel.text = LocalTotalCost;
+    self.markLabel.text = LocalMoneyMark;
     self.priceLabel.text = dict[@"allPrice"];
-    [self.submitBtn setTitle:[NSString stringWithFormat:@"结算(%d)",[dict[@"allNum"] intValue]] forState:UIControlStateNormal];
+    [self.submitBtn setTitle:[NSString stringWithFormat:@"%@(%d)",LocalBalance,[dict[@"allNum"] intValue]] forState:UIControlStateNormal];
 }
 
 -(void)layoutSubviews{
     [super layoutSubviews];
     
-    CGSize tipsSize =[_tipsLabel.text calculateHightWithFont:_tipsLabel.font maxWidth:WIDTHF(self)/3.0];
+    CGSize tipsSize =[_tipsLabel.text calculateHightWithFont:_tipsLabel.font maxWidth:WIDTHF(self)/2.0];
     self.tipsLabel.frame = CGRectMake(W_RATIO(20),(HEIGHTF(self)-tipsSize.height)/2.0, tipsSize.width, tipsSize.height);
     
     CGSize markSize =[_markLabel.text calculateHightWithFont:_markLabel.font maxWidth:0];
@@ -76,6 +76,7 @@
     if (!_priceLabel) {
         UILabel *priceLabel = [[UILabel alloc] init];
         _priceLabel = priceLabel;
+        priceLabel.adjustsFontSizeToFitWidth = YES;
         [self addSubview:priceLabel];
         priceLabel.font = FONT(38);
         priceLabel.textColor = COLOR_DF463E;

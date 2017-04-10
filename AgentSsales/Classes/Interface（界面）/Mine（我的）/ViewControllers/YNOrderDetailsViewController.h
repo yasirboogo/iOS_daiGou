@@ -10,4 +10,10 @@
 
 @interface YNOrderDetailsViewController : YNBaseViewController
 
+@property (nonatomic,assign) NSInteger orderId;
+
+@property (nonatomic,copy) NSString * postage;
+
+@property (nonatomic,assign) MyOrderListModel * myOrderListModel;
+
 @end

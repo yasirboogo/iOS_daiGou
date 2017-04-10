@@ -47,26 +47,25 @@
 
 #pragma mark - 网路请求
 -(void)startNetWorkingRequestWithPrefectUserInfor{
-    NSDictionary *params = [NSDictionary dictionary];
+    NSMutableDictionary *params = [NSMutableDictionary dictionaryWithObjectsAndKeys:[DEFAULTS valueForKey:kUserLoginInfors][@"userId"],@"userId",_tableView.name,@"username",_tableView.phone,@"phone",_tableView.locality,@"region",_tableView.details,@"detailed",_tableView.emial,@"emial", nil];
+    
     if (_tableView.numberID.length) {
-        params = @{@"userId":[DEFAULTS valueForKey:kUserLoginInfors][@"userId"],
-                   @"username":_tableView.name,
-                   @"phone":_tableView.phone,
-                   @"region":_tableView.locality,
-                   @"detailed":_tableView.details,
-                   @"idCard":_tableView.numberID};
-    }else{
-        params = @{@"userId":[DEFAULTS valueForKey:kUserLoginInfors][@"userId"],
-                   @"username":_tableView.name,
-                   @"phone":_tableView.phone,
-                   @"region":_tableView.locality,
-                   @"detailed":_tableView.details};
+        [params setValue:_tableView.numberID forKey:@"idCard"];
     }
     [YNHttpManagers prefectUserInforWithParams:params success:^(id response) {
-        YNFirmOrderViewController *pushCV = [[YNFirmOrderViewController alloc] init];
-        pushCV.status = self.index+1;
-        [self.navigationController pushViewController:pushCV animated:NO];
+        if ([response[@"code"] isEqualToString:@"success"]) {
+            //do success things
+            YNFirmOrderViewController *pushCV = [[YNFirmOrderViewController alloc] init];
+            pushCV.status = _index+1;
+            pushCV.shoppingId = _shoppingId;
+            pushCV.goodsId = _goodsId;
+            pushCV.count = _count;
+            [self.navigationController pushViewController:pushCV animated:NO];
+        }else{
+            //do failure things
+        }
     } failure:^(NSError *error) {
+        //do error things
     }];
 }
 #pragma mark - 视图加载
@@ -100,7 +99,7 @@
         submitBtn.frame = CGRectMake(0 ,SCREEN_HEIGHT-W_RATIO(100), SCREEN_WIDTH, W_RATIO(100));
         submitBtn.backgroundColor = COLOR_DF463E;
         submitBtn.titleLabel.font = FONT(36);
-        [submitBtn setTitle:@"保存" forState:UIControlStateNormal];
+        [submitBtn setTitle:LocalSave forState:UIControlStateNormal];
         [submitBtn setTitleColor:COLOR_FFFFFF forState:UIControlStateNormal];
         [submitBtn addTarget:self action:@selector(handlePrefectInforSubmitButtonClick:) forControlEvents:UIControlEventTouchUpInside];
         [self.view addSubview:submitBtn];
@@ -119,7 +118,7 @@
 }
 -(void)makeNavigationBar{
     [super makeNavigationBar];
-    self.titleLabel.text = @"完善资料";
+    self.titleLabel.text = LocalPerfectInfor;
 }
 -(void)makeUI{
     [super makeUI];

@@ -5,8 +5,39 @@
   Created by innofive on 16/12/15.
   Copyright © 2016年 inno. All rights reserved.
 */
+/** --------------------------login-------------------------- */
+"login" = "Login";
+"language" = "Language";
+"langSeting" = "Language is seting,waiting...";
+"chinese" = "Chinese";
+"malay" = "Malay";
+"english" = "English";
+"userID" = "Username";
+"inputID" = "Input phone number";
+"userPwd" = "Password";
+"inputPwd" = "Input password";
+"rememberPwd" = "Remember password";
+"fogetPwd" = "Forget password";
+"visterIn" = "Visitor login";
 
+"register" = "Register";
+"country" = "Country";
+"countryID" = "Choose your country";
+"phoneID" = "Phone";
+"codeID" = "Code";
+"inputCodeID" = "Input verify code";
+"readOK" = "I have read and agree";
+"agreement" = "User Agreement";
+"sendCodeID" = "Send code";
+"codeLast" = "Sent to";
 
+"next" = "Next";
+
+"newPwd" = "New Password";
+"inputNewPwd" = "A new password, 6-20 number";
+"confirmPwd" = "Confirm Password";
+"againInputPwd" = "Input your passwords again";
+"confirmChange" = "Confirm Change";
 /** --------------------------home-------------------------- */
 "home" = "Home";
 "language" = "Language";
@@ -17,33 +48,202 @@
 "hotClasses" = "Popular classification";
 "more" = "More";
 "hot" = "Hot";
-"moneySymbol" = "$";
+"goodsDetail" = "Goods Details";
+"imageDetail" = "Details";
+"goodsPara" = "Parameter";
+"joinCart" = "Join Cart";
+"nowBuy" = "Buy Now";
+"select" = "Select";
+"select" = "Select";
+"selectNum" = "Select num";
+
+"search" = "search";
+"searchHistory" = "Search History";
+"noSearchTips" = "No search content";
 /** --------------------------news-------------------------- */
-"news" = "News";
-"newsCenter" = "News Center";
-
-
-
-
+"news" = "Information";
+"newsCenter" = "Information Center";
+"newsDetail" = "Information details";
+"comment" = "Comment";
+"sayThing" = "Say something";
+"publish" = "Publish";
 /** --------------------------shop-------------------------- */
-"shopCart" = "ShoppingCart";
+"shopCart" = "Shopping Cart";
+"allSelect" = "Select";
+"cancel" = "Cancel";
+"purchasingGoods" = "Purchase";
+"platformGoods" = "Platform";
+"cartNoGoods" = "Current shopping cart no merchandise";
+"edit" = "Edit";
+"stock" = "Low stocks";
+"shelf" = "undercarriage";
+"nothing" = "Nothing";
+"totalCost" = "Total (excluding postage)";
+"balance" = "Balance";
+
+"perfectInfor" = "Perfect personal data";
+"perfectTips" = " Oh ~,Need to perfect personal data to buy";
+"goPerfect" = "Go Perfect";
+"recName" = "Name";
+"inputRecName" = "The name of the consignee";
+"recPhone" = "Phone";
+"inputRecPhone" = "The consignee's phone number";
+"area" = "Area";
+"selectArea" = "Please select the area";
+"detailArea" = "Detail";
+"inputDeatilArea" = "Please enter a detailed address";
+"email" = "Email";
+"inputEmail" = "Please enter your email address";
+"cardID" = "ID card";
+"inputCardID" = "Your ID card number (optional)";
+"save" = "Save";
+
+"firmOrder" = "Firm Order";
+"postWay" = "Post Way";
+"pleaseSelect" = "Please select ";
+"moneyType" = "dollars";
+"chineseMoney" = "Chinese money";
+"malayMoney" = "Ringgit Malaysia";
+"americanMoney" = "American dollar";
+"moneyMark" = "$";
+"yuan" = "yuan";
+"dollar" = "dollars";
+"ringgit" = "ringgit";
+"goodsTotal" = " pieces of goods:";
+"postMoney" = "Postage:";
+"couponDeduction" = "Coupon deduction";
+"selectCoupon" = "(choose my coupon)";
+"notSupportTips" = "(purchase do not support)";
+"priceTotal" = "Total payable:";
+"submitOrder" = "Submit Order";
+
+"payMoney" = "Pay Money";
+"payPostage" = "Pay postage";
+"orderInfor" = "Order Information";
+"payWay" = "mode of payment";
+"alipay" = "Alipay";
+"weichat" = "WeChat";
+"bankcard" = "Debit/Credit Card";
+"noSupport" = "(No Support)";
+"finishPay" = "Complete payment";
+
+"paySuccess" = "Pay Success";
+"congratulations" = "Congratulations";
+"deliverGoods" = "Delivery Information";
+"deliverTips" = "We will arrange shipment as soon as possible, please keep mobile phone open, so that can express little brother the first time to contact you";
+"backPage" = "Return Home";
+"checkOrder" = "View Order";
+
 /** --------------------------mine-------------------------- */
 "mine" = "Mine";
-"accountBalances" = "The account balance";
-"yuan" = "yuan";
+"accountLast" = "Account：";
 "allOrder" = "AllOrders";
 "waitHandle" = "Treatment";
 "waitPay" = "Payment";
+"waitPPay" = "Postage";
 "waitSend" = "Delivery";
 "waitReceive" = "Recipient";
 "completed" = "Completed";
+
 "myCollection" = "My Collection";
+"invalid" = "Invalid";
+"delete" = "Delete";
+"selectAll" = "Select All";
+"done" = "Done";
+
 "myDistribution" = "My Distribution";
+"regular" = "Regular";
+"totalCommiss" = "Total Commission";
+"histCommiss" = "Historical Commission";
+"myFans" = "My fans";
+"people" = "people";
+"time" = "time";
+"source" = "source";
+"commission" = "commission";
+
 "myWallet" = "My Wallet";
+
+"buyIn" = "Buy In";
+"sellOut" = "Sell Out";
+"recharge" = "Recharge";
+"walletRecharge" = "Wallet Recharge";
+"note" = "Note";
+"account" = "account";
+"inputMoney" = "Please input the amount";
+"completeRecharge" = "Complete recharge";
+"rechargeSuccess" = "Recharge Success";
+"moneyChanging" = "Money Changing";
+"currencyExchange" = "Currency Exchange";
+"holdCurrency" = "Hold Currency";
+"currentLast" = "The current balance of";
+"fullConver" = "full Conver";
+"noLogisticsTips" = "There is no logistics information";
+"logisticsInfor" = "Logistics Information";
+
 "myCoupon" = "My Coupon";
-"addressManagement" = "Receiving Address Management";
+"workability" = "workability";
+"noCouponTisp" = "No coupon information currently available";
+
+"myOrder" = "My Order";
+"noOrderTisp" = "No order information currently available";
+"cancelOrder" = "Cancel";
+"payment" = "Pay";
+"whyNotPay" = "Why not pay at once?";
+"prompt" = "Remind";
+"viewLogistics" = "Logistics";
+"conReceipt" = "Receipt";
+"anotherOne" = "Another";
+"orderDetails" = "Order details";
+"consignee" = "consignee";
+"orderInfor" = "Order information";
+"goodsInfor" = "Goods information";
+"orderNumber" = "Order Number:";
+"orderTime" = "Order Time:";
+"payTime" = "Pay Time:";
+"postAddress" = "Delivery Dddress:";
+"orderStatus" = "Order Status:";
+
+"addressManagement" = "Address Management";
+"newOne" = "New";
+"defaultAddress" = "Set as default";
+"noAddressTips" = "No Available receiving address";
+"changeAddress" = "Modify address";
+"newAddress" = "Add address";
+
 "myTwoCode" = "My Two-dimensional Code";
+"share" = "Share";
+"shareCode" = "Share two-dimensional code";
+"shareTips" = "Let friends sweep, you can become my fans";
+
 "settings" = "Settings";
+"pushSwitch" = "Push Switch";
+"clearCache" = "Clear Cache";
+"suggestions" = "Complaint Feedback";
+"suggestTips" = "Opinions or suggestions can be written Oh~";
+"submit" = "Submit";
+"commonQuestions" = "Common Problem";
+"distributionRules" = "Distribution Rules";
+"exchangeNote" = "Exchange Note";
+"rechargeInstructions" = "Recharge Instructions";
+"contactSerVice" = "Contact Service";
+
+"exit" = "Exit";
+
+"inforChange" = "Update Personal Data";
+"headImg" = "Image";
+"nickName" = "Nickname";
+"accountSafe" = "Security";
+"changePwd" = "Password Update";
+"changePhone" = "Modify Phone";
+"newPhone" = "New";
+"inputNewPhone" = "A new phone number";
+"oldPwd" = "Old Password";
+"inputOldPwd" = "Input old password";
+
+"selectYouCountry" = "Select Country";
+"selectYouProvinces" = "Select Provinces";
+"selectYouCity" = "Select City";
+"selectYouArea" = "Select Area";
 /** --------------------------imagePicker-------------------------- */
 "OK" = "OK";
 "Back" = "Back";
@@ -67,3 +267,74 @@
 "Select a minimum of %zd photos" = "Select a minimum of %zd photos";
 "Allow %@ to access your album in \"Settings -> Privacy -> Photos\"" = "Allow %@ to access your album in \"Settings -> Privacy -> Photos\"";
 "Please allow %@ to access your camera in \"Settings -> Privacy -> Camera\"" = "Please allow %@ to access your camera in \"Settings -> Privacy -> Camera\"";
+
+/** --------------------------MJRefres-------------------------- */
+
+"MJRefreshHeaderIdleText" = "Pull down to refresh";
+"MJRefreshHeaderPullingText" = "Release to refresh";
+"MJRefreshHeaderRefreshingText" = "Loading...";
+
+"MJRefreshAutoFooterIdleText" = "Tap or pull up to load more";
+"MJRefreshAutoFooterRefreshingText" = "Loading...";
+"MJRefreshAutoFooterNoMoreDataText" = "No more data";
+
+"MJRefreshBackFooterIdleText" = "Pull up to load more";
+"MJRefreshBackFooterPullingText" = "Release to load more.";
+"MJRefreshBackFooterRefreshingText" = "Loading...";
+"MJRefreshBackFooterNoMoreDataText" = "No more data";
+
+"MJRefreshHeaderLastTimeText" = "Last update:";
+"MJRefreshHeaderDateTodayText" = "Today";
+"MJRefreshHeaderNoneLastDateText" = "No record";
+
+/** --------------------------common-------------------------- */
+"loading" = "loading...";
+
+"inputIsEmpty" = "Input couldn't be Empty";
+"cCodeError" = "Verification Code is error";
+"inputIsError" = "Input error, please re-input";
+"userNameIsError" = "Account or password input error";
+"selectGoods" = "Please select goods";
+
+"changeSuccess" = "Modify success";
+"changeFailure" = "Modify failed";
+
+"delectSuccess" = "Delect success";
+"delectFailure" = "Delect failed";
+
+"likeSuccess" = "Praise success";
+"likeFailure" = "You've praised,can't do anything";
+
+"addSuccess" = "Add success";
+"addFailure" = "Add failed";
+
+"saveSuccess" = "Save success";
+"saveFailure" = "Save failed";
+
+"commentSuccess" = "Comment success";
+"commentFailure" = "Comment failed";
+
+"submitSuccess" = "Submit success";
+"submitFailure" = "Submit failed";
+
+"setSuccess" = "Set success";
+"setFailure" = "Set failed";
+
+"paySuccess" = "Pay success";
+"payFailure" = "Pay failed";
+
+"registerSuccess" = "Register success";
+"registerFailure" = "Register failed";
+
+"lowStocks" = "Low stocks";
+"saveFirst" = "Please Save first";
+
+"appUnInstall" = "This device is not installed App";
+
+"oldPwdError" = "Old password is error";
+"pwdDifferent" = "Two passwords are different";
+
+"loadSuccess" = "Load success";
+"loadFailure" = "Load failed";
+"loadError" = "Load error";
+

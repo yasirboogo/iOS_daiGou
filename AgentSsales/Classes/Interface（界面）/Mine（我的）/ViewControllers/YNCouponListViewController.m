@@ -15,6 +15,7 @@
     NSInteger _pageIndex;
     NSInteger _pageSize;
     NSString *_status;
+    NSInteger _type;
 }
 @property (nonatomic,weak) YNCouponTableView * tableView;
 
@@ -33,13 +34,11 @@
 
 - (void)viewDidAppear:(BOOL)animated{
     [super viewDidAppear:animated];
+    [self startNetWorkingRequestWithUserCoupon];
 }
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self makeData];
-    [self makeNavigationBar];
-    [self makeUI];
-    [self startNetWorkingRequestWithUserCoupon];
 }
 
 - (void)viewWillDisappear:(BOOL)animated{
@@ -56,11 +55,20 @@
                              @"pageIndex":[NSNumber numberWithInteger:_pageIndex],
                              @"pageSize":[NSNumber numberWithInteger:_pageSize],
                              @"status":_status,
+                             @"type":[NSNumber numberWithInteger:_type+1]
                              };
+    
     [YNHttpManagers getUserCouponWithParams:params success:^(id response) {
-        self.tableView.dataArray = response;
-        self.emptyView.hidden = self.tableView.dataArray.count;
+        [self handleEndMJRefresh];
+        if ([response[@"code"] isEqualToString:@"success"]) {
+            //do success things
+            [self handleMJRefreshComplateWithResponse:response[@"couponsArray"]];
+        }else{
+            //do failure things
+        }
     } failure:^(NSError *error) {
+        //do error things
+        [self handleEndMJRefresh];
     }];
 }
 #pragma mark - 视图加载
@@ -79,28 +87,60 @@
             }
             [self.parentViewController.navigationController popViewControllerAnimated:NO];
         }];
+        tableView.mj_header= [MJRefreshNormalHeader headerWithRefreshingBlock:^{
+            _pageIndex = 1;
+            [tableView.mj_footer endRefreshing];
+            [self startNetWorkingRequestWithUserCoupon];
+        }];
+        // 设置自动切换透明度(在导航栏下面自动隐藏)
+        tableView.mj_header.automaticallyChangeAlpha = YES;
+        tableView.mj_footer = [MJRefreshBackNormalFooter footerWithRefreshingBlock:^{
+            _pageIndex += 1;
+            [tableView.mj_header endRefreshing];
+            [self startNetWorkingRequestWithUserCoupon];
+        }];
     }
     return _tableView;
 }
 -(YNShowEmptyView *)emptyView{
     if (!_emptyView) {
-        CGRect frame = CGRectMake(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT-kUINavHeight-W_RATIO(90));
+        CGRect frame = CGRectMake(0, W_RATIO(2), SCREEN_WIDTH, SCREEN_HEIGHT-kUINavHeight-W_RATIO(90)-W_RATIO(2));
         YNShowEmptyView *emptyView = [[YNShowEmptyView alloc] initWithFrame:frame];
         _emptyView = emptyView;
         [self.view addSubview:emptyView];
         emptyView.tipImg = [UIImage imageNamed:@"wudizhi"];
-        emptyView.tips = @"当前没有优惠券信息";
+        emptyView.tips = LocalNoCouponTisp;
     }
     return _emptyView;
 }
 #pragma mark - 代理实现
 
 #pragma mark - 函数、消息
+-(void)handleMJRefreshComplateWithResponse:(NSArray*)response{
+    if (_pageIndex == 1) {
+        _tableView.dataArrayM = [NSMutableArray arrayWithArray:response];
+        self.emptyView.hidden = _tableView.dataArrayM.count;
+    }else{
+        [_tableView.dataArrayM addObjectsFromArray:response];
+    }
+    [_tableView reloadData];
+    if (response.count == 0) {
+        [_tableView.mj_footer endRefreshingWithNoMoreData];
+    }
+}
+-(void)handleEndMJRefresh{
+    if (_pageIndex == 1) {
+        [self.tableView.mj_header endRefreshing];
+    }else{
+        [self.tableView.mj_footer endRefreshing];
+    }
+}
 -(void)makeData{
     _pageIndex = 1;
     _pageSize = 10;
     NSArray *stasus = @[@"1",@"2,3"];
     _status = stasus[_index];
+    _type = [LanguageManager currentLanguageIndex];
 }
 -(void)makeNavigationBar{
 

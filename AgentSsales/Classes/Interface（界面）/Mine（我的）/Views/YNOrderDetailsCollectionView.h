@@ -10,7 +10,9 @@
 
 @interface YNOrderDetailsCollectionView : UICollectionView
 
-@property (nonatomic,strong) NSDictionary *dict;
+@property (nonatomic,strong) NSDictionary *detailDict;
+
+@property (nonatomic,strong) MyOrderListModel *myOrderListModel;
 
 @property (nonatomic,strong) void(^viewScrollBlock)(CGFloat alpha);
 
@@ -71,6 +73,6 @@
 @end
 @interface YNOrderDetailsFooterView : UICollectionReusableView
 
-@property (nonatomic,strong) NSDictionary *dict;
+@property (nonatomic,strong) NSString *allPrice;
 
 @end

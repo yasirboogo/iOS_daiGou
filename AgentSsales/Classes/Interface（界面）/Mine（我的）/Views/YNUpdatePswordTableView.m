@@ -48,23 +48,23 @@
     
     [inforCell setInforCellTextFieldBlock:^(NSString *str) {
         
-        [self.textArrayM replaceObjectAtIndex:indexPath.row withObject:str];
+        if (indexPath.row == 0) {
+            self.oldPasswod = str;
+        }else if (indexPath.row == 1){
+            self.firPasswod = str;
+        }else if (indexPath.row == 2){
+            self.secPasswod = str;
+        }
     }];
     
     return inforCell;
 }
--(NSMutableArray<NSString *> *)textArrayM{
-    if (!_textArrayM) {
-        _textArrayM = [NSMutableArray arrayWithObjects:@"0",@"0",@"0", nil];
-    }
-    return _textArrayM;
-}
 -(NSArray<NSDictionary *> *)inforArray{
     if (!_inforArray) {
         _inforArray = @[
-                        @{@"item":@"旧密码",@"placeholder":@"请输入旧密码"},
-                        @{@"item":@"新密码",@"placeholder":@"请输入新密码，6-20位数"},
-                        @{@"item":@"确认密码",@"placeholder":@"请再次输入密码"}
+                        @{@"item":LocalOldPwd,@"placeholder":LocalInputOldPwd},
+                        @{@"item":LocalNewPwd,@"placeholder":LocalInputNewPwd},
+                        @{@"item":LocalConfirmPwd,@"placeholder":LocalAgainPwd}
                         ];
     }
     return _inforArray;

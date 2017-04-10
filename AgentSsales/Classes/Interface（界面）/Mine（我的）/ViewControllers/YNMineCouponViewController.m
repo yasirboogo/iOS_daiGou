@@ -49,7 +49,7 @@
         _pagerController = pagerController;
         pagerController.dataSource = self;
         pagerController.cellSpacing = W_RATIO(100);
-        pagerController.cellWidth = pagerController.cellSpacing*1.5;
+        pagerController.cellWidth = pagerController.cellSpacing*2;
         pagerController.collectionLayoutEdging = (SCREEN_WIDTH-pagerController.cellSpacing-pagerController.cellWidth*2)/2.0;
         pagerController.normalTextColor = COLOR_666666;
         pagerController.selectedTextColor = COLOR_DF463E;
@@ -76,7 +76,7 @@
 
 - (NSString *)pagerController:(TYPagerController *)pagerController titleForIndex:(NSInteger)index
 {
-    NSArray * titles = @[@"可使用",@"已失效"];
+    NSArray * titles = @[LocalWorkability,LocalInvalid];
     return titles[index];
 }
 
@@ -100,7 +100,7 @@
 -(void)makeNavigationBar{
     [super makeNavigationBar];
 
-    self.titleLabel.text = kLocalizedString(@"myCoupon",@"我的优惠券");
+    self.titleLabel.text = LocalMyCoupon;
 }
 -(void)makeUI{
     [super makeUI];

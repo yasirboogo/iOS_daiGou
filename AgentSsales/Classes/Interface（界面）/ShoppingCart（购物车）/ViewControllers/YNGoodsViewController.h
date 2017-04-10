@@ -17,4 +17,8 @@
 
 @property (nonatomic,weak) YNGoodsCartTableView * tableView;
 
+-(void)startNetWorkingRequestWithGetShoppingCartList;
+
+-(void)sendNotificationCenterPriceAndCountWithStatus:(BOOL)status;
+
 @end

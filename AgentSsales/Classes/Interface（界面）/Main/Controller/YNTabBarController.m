@@ -44,7 +44,6 @@
                        selectedImage:[UIImage imageNamed:selectedImages[i]]];
         
     }
-
     [[UITabBar appearance] setTranslucent:NO];
     [[UITabBar appearance] setTintColor:COLOR_DF463E];
     

@@ -33,6 +33,7 @@
 "allOrder" = "Semua";
 "waitHandle" = "Memproses";
 "waitPay" = "Pembayaran";
+"waitPPay" = "Postage";
 "waitSend" = "menghantar";
 "waitReceive" = "Resit";
 "completed" = "Bidang";

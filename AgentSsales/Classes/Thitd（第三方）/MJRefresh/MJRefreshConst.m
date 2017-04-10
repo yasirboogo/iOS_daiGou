@@ -13,8 +13,9 @@ NSString *const MJRefreshKeyPathContentInset = @"contentInset";
 NSString *const MJRefreshKeyPathContentSize = @"contentSize";
 NSString *const MJRefreshKeyPathPanState = @"state";
 
-NSString *const MJRefreshHeaderLastUpdatedTimeKey = @"MJRefreshHeaderLastUpdatedTimeKey";
 
+NSString *const MJRefreshHeaderLastUpdatedTimeKey = @"MJRefreshHeaderLastUpdatedTimeKey";
+/*
 NSString *const MJRefreshHeaderIdleText = @"MJRefreshHeaderIdleText";
 NSString *const MJRefreshHeaderPullingText = @"MJRefreshHeaderPullingText";
 NSString *const MJRefreshHeaderRefreshingText = @"MJRefreshHeaderRefreshingText";
@@ -31,3 +32,4 @@ NSString *const MJRefreshBackFooterNoMoreDataText = @"MJRefreshBackFooterNoMoreD
 NSString *const MJRefreshHeaderLastTimeText = @"MJRefreshHeaderLastTimeText";
 NSString *const MJRefreshHeaderDateTodayText = @"MJRefreshHeaderDateTodayText";
 NSString *const MJRefreshHeaderNoneLastDateText = @"MJRefreshHeaderNoneLastDateText";
+*/

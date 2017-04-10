@@ -12,6 +12,8 @@
 
 @property (nonatomic,strong) NSArray<NSDictionary*> *inforArray;
 
-@property (nonatomic,strong) NSMutableArray<NSString*> *textArrayM;
+@property (nonatomic,strong) NSString *loginphone;
+
+@property (nonatomic,strong) NSString *password;
 
 @end

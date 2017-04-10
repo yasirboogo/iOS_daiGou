@@ -10,6 +10,10 @@
 
 @interface YNPayMoneyViewController : YNBaseViewController
 
-@property (nonatomic,strong) NSDictionary * orderDict;
+@property (nonatomic,copy) NSString * orderId;
+
+@property (nonatomic,copy) NSString * postage;
+
+@property (nonatomic,assign) NSInteger index;
 
 @end

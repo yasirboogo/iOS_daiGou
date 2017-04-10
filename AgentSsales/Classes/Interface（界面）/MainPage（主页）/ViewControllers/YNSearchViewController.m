@@ -9,6 +9,8 @@
 #import "YNSearchViewController.h"
 #import "YNMoreGoodsCollectionView.h"
 #import "YSearchHistoryView.h"
+#import "YNTerraceGoodsViewController.h"
+#import "YNLoginViewController.h"
 
 @interface YNSearchViewController ()<UITextFieldDelegate>
 {
@@ -57,10 +59,16 @@
                              @"pageSize":[NSNumber numberWithInteger:self.pageSize]
                              };
     [YNHttpManagers searchGoodsWithParams:params success:^(id response) {
-        self.collectionView.dataArray = response;
-        self.collectionView.hidden = !self.collectionView.dataArray.count;
-        self.emptyView.hidden = !self.collectionView.hidden;
+        if ([response[@"code"] isEqualToString:@"success"]) {
+            //do success things
+            self.collectionView.dataArray = response[@"goodsArray"];
+            self.collectionView.hidden = !self.collectionView.dataArray.count;
+            self.emptyView.hidden = !self.collectionView.hidden;
+        }else{
+            //do failure things
+        }
     } failure:^(NSError *error) {
+        //do error things
     }];
 }
 -(void)startNetWorkingRequestWithSaveSearchKeys{
@@ -68,7 +76,13 @@
                              @"content":_searchTField.text
                              };
     [YNHttpManagers saveSearchKeysWithParams:params success:^(id response) {
+        if ([response[@"code"] isEqualToString:@"success"]) {
+            //do success things
+        }else{
+            //do failure things
+        }
     } failure:^(NSError *error) {
+        //do error things
     }];
 }
 #pragma mark - 视图加载
@@ -78,7 +92,7 @@
         _searchTField = searchTField;
         [self.navView addSubview:searchTField];
         searchTField.delegate = self;
-        searchTField.placeholder = kLocalizedString(@"searchContent",@"请输入搜索内容");
+        searchTField.placeholder = LocalSearchContent;
         searchTField.font = FONT(28);
         searchTField.textColor = COLOR_999999;
         searchTField.clearButtonMode = UITextFieldViewModeAlways;
@@ -92,7 +106,7 @@
         _emptyView = emptyView;
         [self.view addSubview:emptyView];
         emptyView.tipImg = [UIImage imageNamed:@"zhaobudaoi_sousuo"];
-        emptyView.tips = @"找不到搜索内容";
+        emptyView.tips = LocalNoSearchTips;
     }
     return _emptyView;
 }
@@ -101,10 +115,15 @@
         CGRect frame = CGRectMake(0,
                                   kUINavHeight,
                                   SCREEN_WIDTH,
-                                  SCREEN_HEIGHT-kUINavHeight-kUITabBarH);
+                                  SCREEN_HEIGHT-kUINavHeight);
         YNMoreGoodsCollectionView *collectionView = [[YNMoreGoodsCollectionView alloc] initWithFrame:frame];
         _collectionView = collectionView;
         [self.view addSubview:collectionView];
+        [collectionView setDidSelectMoreGoodsCellBlock:^(NSString *goodsId) {
+            YNTerraceGoodsViewController *pushVC = [[YNTerraceGoodsViewController alloc] init];
+            pushVC.goodsId = [NSString stringWithFormat:@"%@",goodsId];
+            [self.navigationController pushViewController:pushVC animated:NO];
+        }];
     }
     return _collectionView;
 }
@@ -138,15 +157,18 @@
     self.navView.backgroundColor = COLOR_FFFFFF;
     __weak typeof(self) weakSelf = self;
     [self.backButton setImage:[UIImage imageNamed:@"fanhui_kui_fanhui"] forState:UIControlStateNormal];
-    UIButton *searchBtn = [self addNavigationBarBtnWithTitle:@"搜索" selectTitle:@"搜索" font:FONT_14 isOnRight:YES btnClickBlock:^(BOOL isShow) {
+    UIButton *searchBtn = [self addNavigationBarBtnWithTitle:LocalSearch selectTitle:LocalSearch font:FONT_14 isOnRight:YES btnClickBlock:^(BOOL isShow) {
         if (weakSelf.searchTField.text.length) {
             [weakSelf.view endEditing:YES];
             weakSelf.collectionView.hidden = NO;
             weakSelf.searchHistoryView.searchContent = weakSelf.searchTField.text;
             [weakSelf startNetWorkingRequestWithSearchGoods];
-            [weakSelf startNetWorkingRequestWithSaveSearchKeys];
+            if ([DEFAULTS valueForKey:kUserLoginInfors]) {
+                [weakSelf startNetWorkingRequestWithSaveSearchKeys];
+            }
         }else{
-            NSLog(@"输入为空");
+            [SVProgressHUD showImage:nil status:LocalInputIsEmpty];
+            [SVProgressHUD dismissWithDelay:2.0f];
         }
     }];
     searchBtn.backgroundColor = COLOR_DF463E;

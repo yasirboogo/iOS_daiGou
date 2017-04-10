@@ -7,7 +7,10 @@
 //
 
 #import "AppDelegate.h"
+#import "WXApi.h"
 
-@interface AppDelegate (ThirdPay)
+@interface AppDelegate (ThirdPay)<WXApiDelegate>
+
+-(void)ThirdPayApplication:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions;
 
 @end

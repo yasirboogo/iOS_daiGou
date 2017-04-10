@@ -23,23 +23,20 @@
         self.separatorStyle = UITableViewCellSeparatorStyleNone;
         self.delegate = self;
         self.dataSource = self;
-        
+        self.bounces = NO;
         UIView *footerView = [[UIView alloc] init];
         footerView.backgroundColor = COLOR_EDEDED;
         footerView.frame = CGRectMake(0, 0, WIDTHF(self), kMinSpace);
         self.tableFooterView = footerView;
-        
     }
     return self;
 }
-
--(void)setDataArrayM:(NSMutableArray<NSMutableDictionary *> *)dataArrayM{
-    _dataArrayM = dataArrayM;
+-(void)setShoppingCartListModel:(YNShoppingCartListModel *)shoppingCartListModel{
+    _shoppingCartListModel = shoppingCartListModel;
     [self reloadData];
 }
-
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
-    return _dataArrayM.count;
+    return _shoppingCartListModel.shoppingArray.count;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
@@ -49,78 +46,79 @@
         cartCell.selectionStyle = UITableViewCellSelectionStyleNone;
         cartCell.backgroundColor = COLOR_EDEDED;
     }
-    cartCell.count = self.numArrayM[indexPath.row];
-    cartCell.isSelected = [self.selectArrayM[indexPath.row] boolValue];
-    cartCell.dict = self.dataArrayM[indexPath.row];
-    [cartCell setDidSelectedButtonClickBlock:^(BOOL isSelect) {
-        [_selectArrayM replaceObjectAtIndex:indexPath.row withObject:[NSNumber numberWithBool:isSelect]];
-        if (isSelect) {
-            self.allCount += [self.numArrayM[indexPath.row] integerValue];
-            self.allPrice += [self.numArrayM[indexPath.row] integerValue]*[self.dataArrayM[indexPath.row][@"salesprice"] floatValue];
-            [self.goodsIdsArrayM replaceObjectAtIndex:indexPath.row withObject:[NSString stringWithFormat:@"%@",self.dataArrayM[indexPath.row][@"shoppingId"]]];
+    YNShoppingCartGoodsModel *shoppingCartGoodsModel = _shoppingCartListModel.shoppingArray[indexPath.row];
+    cartCell.shoppingCartGoodsModel = shoppingCartGoodsModel;
+    [cartCell setDidSelectedButtonClickBlock:^(BOOL isSelected) {
+        CGFloat salesprice = [[NSString decimalNumberWithDouble:shoppingCartGoodsModel.salesprice] floatValue];
+        if (isSelected) {
+            //加数量，加价格
+            _shoppingCartListModel.allCount += shoppingCartGoodsModel.count;
+            _shoppingCartListModel.allPrice += shoppingCartGoodsModel.count * salesprice;
         }else{
-            self.allCount -= [self.numArrayM[indexPath.row] integerValue];
-            self.allPrice -= [self.numArrayM[indexPath.row] integerValue]*[self.dataArrayM[indexPath.row][@"salesprice"] floatValue];
-            [self.goodsIdsArrayM replaceObjectAtIndex:indexPath.row withObject:@"-99"];
+            //减数量，减价格
+            _shoppingCartListModel.allCount -= shoppingCartGoodsModel.count;
+            _shoppingCartListModel.allPrice -= shoppingCartGoodsModel.count * salesprice;
         }
+        YNShoppingCartGoodsModel *shoppingCartGoodsModel = _shoppingCartListModel.shoppingArray[indexPath.row];
+        shoppingCartGoodsModel.selected = isSelected;
+        [self.shoppingCartListModel.shoppingArray replaceObjectAtIndex:indexPath.row withObject:shoppingCartGoodsModel];
+        
+        [self sendNotificationCenterPriceAndCount];
         [self reloadData];
     }];
-    cartCell.isEnabled = [self.numArrayM[indexPath.row] integerValue] > 1 ? YES:NO;
-    [cartCell setHandleCellAddButtonBlock:^(BOOL isSelect,NSInteger lastNum,NSInteger newNum) {
-        [self.numArrayM replaceObjectAtIndex:indexPath.row withObject:[NSString stringWithFormat:@"%ld",newNum]];
-        if (isSelect) {
-            self.allCount += newNum-lastNum;
-            self.allPrice += (newNum-lastNum)*[self.dataArrayM[indexPath.row][@"salesprice"] floatValue];
+    [cartCell setHandleCellEditButtonBlock:^(BOOL isEditing) {
+        YNShoppingCartGoodsModel *shoppingCartGoodsModel = _shoppingCartListModel.shoppingArray[indexPath.row];
+        shoppingCartGoodsModel.editing = isEditing;
+        if (!isEditing) {
+            self.shoppingCartListModel.editingCount -= 1;
+            self.handleCellEditButtonBlock(indexPath.row);
+        }else{
+            self.shoppingCartListModel.editingCount += 1;
         }
+        [self sendNotificationCenterPriceAndCount];
         [self reloadData];
     }];
-    [cartCell setHandleCellEditButtonBlock:^(BOOL isEdit) {
-        if (isEdit) {
-            self.allSaveCount +=1;
-        }else{
-            self.allSaveCount -=1;
+    [cartCell setHandleCellAddButtonBlock:^(NSInteger afterNum) {
+        YNShoppingCartGoodsModel *shoppingCartGoodsModel = _shoppingCartListModel.shoppingArray[indexPath.row];
+        if (shoppingCartGoodsModel.selected) {
+            CGFloat salesprice = [[NSString decimalNumberWithDouble:shoppingCartGoodsModel.salesprice] floatValue];
+
+            //加数量，加价格
+            _shoppingCartListModel.allCount += afterNum - shoppingCartGoodsModel.count;
+            _shoppingCartListModel.allPrice += (afterNum - shoppingCartGoodsModel.count) * salesprice;
         }
-        self.handleCellEditButtonBlock(isEdit,indexPath.row);
-        [self sendNSNotificationCenterToBalance];
+        shoppingCartGoodsModel.count = afterNum;
+        [self sendNotificationCenterPriceAndCount];
+        [self reloadData];
     }];
-    [self sendNSNotificationCenterToBalance];
+    [cartCell setDidSelectedGoodsCellBlock:^{
+        if (self.didSelectCellBlock && shoppingCartGoodsModel.goodsId) {
+            self.didSelectCellBlock(shoppingCartGoodsModel.goodsId);
+        }
+    }];
     return cartCell;
 }
-
--(void)sendNSNotificationCenterToBalance{
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"priceBalance" object:nil userInfo:
-     @{@"allPrice":[NSString stringWithFormat:@"%f",self.allPrice],
-       @"allCount":[NSString stringWithFormat:@"%ld",self.allCount],
-       @"allSaveCount":[NSString stringWithFormat:@"%ld",self.allSaveCount],
-       @"goodsIdsArrayM":self.goodsIdsArrayM}];
-}
-
--(NSMutableArray<NSNumber *> *)selectArrayM{
-    if (!_selectArrayM) {
-        _selectArrayM = [NSMutableArray array];
-        for (NSInteger i = 0; i<_dataArrayM.count; i++) {
-            [_selectArrayM addObject:@NO];
+-(void)sendNotificationCenterPriceAndCount{
+    NSMutableString *shoppingIds = [NSMutableString string];
+    NSInteger isUnableCount = 0;
+    for (YNShoppingCartGoodsModel *shoppingCartGoodsModel in _shoppingCartListModel.shoppingArray) {
+        if (shoppingCartGoodsModel.selected) {
+            [shoppingIds appendFormat:@",%ld",shoppingCartGoodsModel.shoppingId];
+            BOOL isUnAble = shoppingCartGoodsModel.isdelete || (shoppingCartGoodsModel.count>shoppingCartGoodsModel.stock&&shoppingCartGoodsModel.goodsId);
+            if (isUnAble) {
+                isUnableCount += 1;
+            }
         }
     }
-    return _selectArrayM;
-}
--(NSMutableArray<NSString *> *)numArrayM{
-    if (!_numArrayM) {
-        _numArrayM = [NSMutableArray array];
-        for (NSInteger i = 0; i<_dataArrayM.count; i++) {
-            [_numArrayM addObject:[NSString stringWithFormat:@"%@",_dataArrayM[i][@"count"]]];
-        }
+    if (shoppingIds.length) {
+        [shoppingIds deleteCharactersInRange:NSMakeRange(0, 1)];
     }
-    return _numArrayM;
-}
--(NSMutableArray<NSString *> *)goodsIdsArrayM{
-    if (!_goodsIdsArrayM) {
-        _goodsIdsArrayM = [NSMutableArray array];
-        for (NSInteger i = 0; i<_dataArrayM.count; i++) {
-            [_goodsIdsArrayM addObject:@"-99"];
-        }
-    }
-    return _goodsIdsArrayM;
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"priceAndCount" object:nil userInfo:
+     @{@"allPrice":[NSString stringWithFormat:@"%f",_shoppingCartListModel.allPrice],
+       @"allCount":[NSString stringWithFormat:@"%ld",_shoppingCartListModel.allCount],
+       @"isEditing":[NSNumber numberWithBool:_shoppingCartListModel.editingCount],
+       @"isUnAble":[NSNumber numberWithBool:isUnableCount],
+       @"shoppingIds":shoppingIds}];
 }
 @end
 @interface YNGoodsCartCell ()<UITextFieldDelegate>
@@ -146,51 +144,62 @@
 @property (nonatomic,weak) UIButton * addBtn;
 /** 编辑按钮 */
 @property (nonatomic,weak) UIButton * editBtn;
+/** 是否下架/不足 */
+@property (nonatomic,weak) UILabel * msgLabel;
 @end
 @implementation YNGoodsCartCell
 
--(void)setDict:(NSDictionary *)dict{
-    _dict = dict;
+-(void)setShoppingCartGoodsModel:(YNShoppingCartGoodsModel *)shoppingCartGoodsModel{
+    _shoppingCartGoodsModel = shoppingCartGoodsModel;
+    [self.leftImgView sd_setImageWithURL:[NSURL URLWithString:shoppingCartGoodsModel.img] placeholderImage:[UIImage imageNamed:@"zhanwei1"]];
     
-    [self.leftImgView sd_setImageWithURL:[NSURL URLWithString:dict[@"img"]] placeholderImage:[UIImage imageNamed:@"zhanwei1"]];
+    self.titleLabel.text = shoppingCartGoodsModel.name;
     
-    self.titleLabel.text = dict[@"name"];
+    if (shoppingCartGoodsModel.note) {
+        self.subTitleLabel.text = shoppingCartGoodsModel.note;
+    }else{
+        self.subTitleLabel.text = LocalNothing;
+    }
     
-    self.subTitleLabel.text = dict[@"note"];
+    self.markLabel.text = LocalMoneyMark;
     
-    self.markLabel.text = @"$";
+    self.priceLabel.text = [NSString decimalNumberWithDouble:shoppingCartGoodsModel.salesprice] ;
     
-    self.priceLabel.text = [NSString stringWithFormat:@"%@",dict[@"salesprice"]];
-
+    self.amountTField.text = [NSString stringWithFormat:@"%ld",shoppingCartGoodsModel.count];
     
-}
--(void)setCount:(NSString *)count{
-    _count = count;
-    self.amountTField.text = count;
-}
-
--(void)setIsSelected:(BOOL)isSelected{
-    _isSelected = isSelected;
-    self.selectBtn.selected = isSelected;
-}
--(void)setIsEnabled:(BOOL)isEnabled{
-    _isEnabled = isEnabled;
-    self.subBtn.enabled = isEnabled && self.addBtn.enabled;
+    self.selectBtn.selected = shoppingCartGoodsModel.selected;
+    
+    self.editBtn.selected = shoppingCartGoodsModel.editing ;
+    
+    self.addBtn.enabled = shoppingCartGoodsModel.editing;
+    
+    self.subBtn.enabled = (shoppingCartGoodsModel.editing) && shoppingCartGoodsModel.count > 1;
+    
+    self.amountTField.enabled = shoppingCartGoodsModel.editing;
+    if (shoppingCartGoodsModel.isdelete) {
+        self.msgLabel.text = LocalShelf;
+    }else if (shoppingCartGoodsModel.count>shoppingCartGoodsModel.stock&&shoppingCartGoodsModel.goodsId){
+        self.msgLabel.text = LocalStock;
+    }else{
+        self.msgLabel.text = @"";
+    }
 }
 -(void)layoutSubviews{
     [super layoutSubviews];
 //    不同模式控件布局
     CGSize titleSize = [_titleLabel.text calculateHightWithWidth:XF(self.editBtn)-MaxXF(_leftImgView)-W_RATIO(20)*2 font:_titleLabel.font line:_titleLabel.numberOfLines];
     self.titleLabel.frame = CGRectMake(MaxXF(_leftImgView)+W_RATIO(20), W_RATIO(20)*2, titleSize.width,titleSize.height);
-
+    
     CGSize subTitleSize = [_subTitleLabel.text calculateHightWithWidth:WIDTHF(_titleLabel) font:_subTitleLabel.font line:_subTitleLabel.numberOfLines];
     self.subTitleLabel.frame = CGRectMake(XF(_titleLabel), MaxYF(_titleLabel)+kMinSpace, subTitleSize.width,subTitleSize.height);
-
+    
+    self.msgLabel.frame = CGRectMake(XF(_titleLabel), MaxYF(_subTitleLabel)+kMinSpace, subTitleSize.width+WIDTHF(self.editBtn),subTitleSize.height);
+    
     CGSize markSize = [_markLabel.text calculateHightWithFont:_markLabel.font maxWidth:0];
     self.markLabel.frame = CGRectMake(XF(_subTitleLabel),MaxYF(_leftImgView)-markSize.height-W_RATIO(20), markSize.width,markSize.height);
     
     CGSize priceSize = [_priceLabel.text calculateHightWithFont:_priceLabel.font maxWidth:0];
-    self.priceLabel.frame = CGRectMake(MaxXF(_markLabel),MaxYF(_markLabel)-priceSize.height,WIDTHF(_subTitleLabel)*3/5.0,priceSize.height);
+    self.priceLabel.frame = CGRectMake(MaxXF(_markLabel),MaxYF(_markLabel)-priceSize.height,WIDTHF(_titleLabel)*3/6.0,priceSize.height);
     
     self.subBtn.frame = CGRectMake(MaxXF(_priceLabel)+kMinSpace,YF(_priceLabel), HEIGHTF(_priceLabel),  HEIGHTF(_priceLabel));
     
@@ -227,8 +236,17 @@
         bgView.frame = CGRectMake(W_RATIO(80), W_RATIO(20), W_RATIO(650), W_RATIO(260));
         bgView.layer.cornerRadius = W_RATIO(20);
         bgView.layer.masksToBounds = YES;
+        bgView.userInteractionEnabled = YES;
+        
+        UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleSelectGoodsCell)];
+        [bgView addGestureRecognizer:tap];
     }
     return _bgView;
+}
+-(void)handleSelectGoodsCell{
+    if (self.didSelectedGoodsCellBlock) {
+        self.didSelectedGoodsCellBlock();
+    }
 }
 -(UIImageView *)leftImgView{
     if (!_leftImgView) {
@@ -255,9 +273,9 @@
         UIButton *editBtn = [UIButton buttonWithType:UIButtonTypeCustom];
         _editBtn = editBtn;
         [self.bgView addSubview:editBtn];
-        [editBtn setTitle:@"编辑" forState:UIControlStateNormal];
+        [editBtn setTitle:LocalEdit forState:UIControlStateNormal];
         [editBtn setTitleColor:COLOR_666666 forState:UIControlStateNormal];
-        [editBtn setTitle:@"保存" forState:UIControlStateSelected];
+        [editBtn setTitle:LocalSave forState:UIControlStateSelected];
         [editBtn setTitleColor:COLOR_666666 forState:UIControlStateSelected];
         editBtn.titleLabel.font = FONT(30);
         [editBtn addTarget:self action:@selector(handleCellEditButtonClick:) forControlEvents:UIControlEventTouchUpInside];
@@ -268,22 +286,32 @@
 -(void)handleCellEditButtonClick:(UIButton*)btn{
     btn.selected = !btn.selected;
     if (self.handleCellEditButtonBlock) {
-        self.handleCellEditButtonBlock(!btn.selected);
+        self.handleCellEditButtonBlock(btn.selected);
     }
-    self.addBtn.enabled = btn.selected;
-    self.subBtn.enabled = (btn.selected) &&self.isEnabled;
-    self.amountTField.enabled = btn.selected;
 }
 -(UILabel *)subTitleLabel{
     if (!_subTitleLabel) {
         UILabel * subTitleLabel = [[UILabel alloc] init];
         _subTitleLabel = subTitleLabel;
         [self.bgView addSubview:subTitleLabel];
-        subTitleLabel.font = FONT(26);
+        subTitleLabel.font = FONT(28);
         subTitleLabel.textColor = COLOR_999999;
-        subTitleLabel.numberOfLines = 2;
+        subTitleLabel.numberOfLines = 1;
+        
     }
     return _subTitleLabel;
+}
+-(UILabel *)msgLabel{
+    if (!_msgLabel) {
+        UILabel *msgLabel = [[UILabel alloc] init];
+        _msgLabel = msgLabel;
+        [self.bgView addSubview:msgLabel];
+        msgLabel.font = FONT(26);
+        msgLabel.textAlignment = NSTextAlignmentRight;
+        msgLabel.textColor = COLOR_FF4844;
+        msgLabel.numberOfLines = 1;
+    }
+    return _msgLabel;
 }
 -(UILabel *)priceLabel{
     if (!_priceLabel) {
@@ -315,23 +343,25 @@
         amountTField.enabled = NO;
         amountTField.textAlignment = NSTextAlignmentCenter;
         amountTField.keyboardType = UIKeyboardTypeNumberPad;
-        amountTField.delegate = self;
+        //amountTField.delegate = self;
         amountTField.adjustsFontSizeToFitWidth = YES;
         amountTField.font = FONT(40);
         amountTField.textColor = COLOR_666666;
+        [amountTField addTarget:self action:@selector(textfieldTextDidChange:) forControlEvents:UIControlEventEditingChanged];
     }
     return _amountTField;
 }
-- (void)textFieldDidEndEditing:(UITextField *)textField{
+- (void)textfieldTextDidChange:(UITextField *)textField
+{
     if ([textField.text integerValue]<=1) {
         textField.text = [NSString stringWithFormat:@"1"];
         self.subBtn.enabled = NO;
     }else if ([textField.text integerValue]>1){
-        textField.text = [NSString stringWithFormat:@"%ld",[textField.text integerValue]];
+        textField.text = [NSString stringWithFormat:@"%d",[textField.text integerValue]];
         self.subBtn.enabled = YES;
     }
     if (self.handleCellAddButtonBlock) {
-        self.handleCellAddButtonBlock(self.selected,[self.count integerValue],[textField.text integerValue]);
+        self.handleCellAddButtonBlock([textField.text integerValue]);
     }
 }
 -(UIButton *)subBtn{
@@ -361,14 +391,14 @@
     return _addBtn;
 }
 -(void)handleCellAmountButtonClick:(UIButton*)btn{
-    NSInteger num = [self.count integerValue];
+    NSInteger num = _shoppingCartGoodsModel.count;
     if (btn.tag == 0) {
         num -= 1;
     }else if (btn.tag == 1){
         num += 1;
     }
     if (self.handleCellAddButtonBlock) {
-        self.handleCellAddButtonBlock(self.selected,[self.count integerValue],num);
+        self.handleCellAddButtonBlock(num);
     }
 }
 @end

@@ -10,6 +10,7 @@
 
 @interface YNHttpManagers : NSObject
 
+
 +(void)setupHttpTool;
 
 /**

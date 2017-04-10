@@ -23,6 +23,7 @@
         self.separatorStyle = UITableViewCellSeparatorStyleNone;
         self.delegate = self;
         self.dataSource = self;
+        
     }
     return self;
 }
@@ -55,6 +56,7 @@
         if (adCell == nil) {
             adCell = [[YNNewsAdCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"adCell"];
             adCell.selectionStyle = UITableViewCellSelectionStyleNone;
+            
         }
         if ((indexPath.row+1)%4 == 0) {
             adCell.imageUrl = _adArrayM[(indexPath.row+1)/4-1][@"img"];
@@ -72,6 +74,17 @@
         return listCell;
     }
 }
+/*
+- (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if ([cell respondsToSelector:@selector(setSeparatorInset:)]) {
+        [cell setSeparatorInset:UIEdgeInsetsZero];
+    }
+    if ([cell respondsToSelector:@selector(setLayoutMargins:)]) {
+        [cell setLayoutMargins:UIEdgeInsetsZero];
+    }
+}
+*/
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
     [tableView deselectRowAtIndexPath:indexPath animated:NO];
     if ((indexPath.row+1)%4 == 0 || indexPath.row == _adArrayM.count+_dataArrayM.count-1) {
@@ -104,7 +117,12 @@
 
 @end
 @implementation YNNewsListCell
-
+/*
+-(void)setFrame:(CGRect)frame{
+    frame.size.height -= 1;
+    return [super setFrame:frame];
+}
+ */
 -(void)setDict:(NSDictionary *)dict{
     _dict = dict;
 

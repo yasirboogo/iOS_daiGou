@@ -8,6 +8,7 @@
 
 #import "YNWebViewController.h"
 
+
 @interface YNWebViewController ()
 @property (nonatomic,weak) UIWebView * webView;
 
@@ -73,17 +74,6 @@
         wkWebView.allowsBackForwardNavigationGestures =YES;//打开网页间的滑动返回
     }
     return _wkWebView;
-}
--(UIWebView *)webView{
-    if (!_webView) {
-        CGRect frame = CGRectMake(0,0, SCREEN_WIDTH, SCREEN_HEIGHT);
-        UIWebView *webView = [[UIWebView alloc] initWithFrame:frame];
-        _webView = webView;
-        [self.view addSubview:webView];
-        webView.scalesPageToFit = YES;
-        //webView.delegate = self;
-    }
-    return _webView;
 }
 
 #pragma mark - 视图加载

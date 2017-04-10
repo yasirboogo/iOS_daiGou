@@ -39,13 +39,30 @@
 -(void)setPrice:(NSString *)price{
     _price = price;
     self.priceLabel.text = [NSString stringWithFormat:@"%.2f",[price floatValue]];
+    [self layoutSubviews];
+}
+-(void)setDict:(NSDictionary *)dict{
+    _dict = dict;
+    self.priceLabel.text = [NSString decimalNumberWithDouble:dict[@"salesprice"]];
+    BOOL unEnable = [dict[@"isdelete"] integerValue] || [dict[@"stock"] integerValue]<1;
+    self.buyBtn.enabled = !unEnable;
+    self.addBtn.enabled = !unEnable;
+    if (unEnable) {
+        self.buyBtn.backgroundColor = COLOR_999999;
+        self.addBtn.backgroundColor = COLOR_999999;
+    }else{
+        self.addBtn.layer.borderColor = COLOR_DF463E.CGColor;
+        self.addBtn.layer.borderWidth = kOutLine;
+        self.buyBtn.backgroundColor = COLOR_DF463E;
+    }
+    [self layoutSubviews];
 }
 -(UILabel *)markLabel{
     if (!_markLabel) {
         UILabel *markLabel = [[UILabel alloc] init];
         _markLabel = markLabel;
         [self addSubview:markLabel];
-        markLabel.text = @"￥";
+        markLabel.text = LocalMoneyMark;
         markLabel.textColor = COLOR_DF463E;
         markLabel.font = FONT(26);
     }
@@ -67,11 +84,10 @@
         _addBtn = addBtn;
         [self addSubview:addBtn];
         addBtn.titleLabel.font = FONT(30);
-        [addBtn setTitle:@"加入购物车" forState:UIControlStateNormal];
+        [addBtn setTitle:LocalJoinCart forState:UIControlStateNormal];
         [addBtn setTitleColor:COLOR_DF463E forState:UIControlStateNormal];
+        [addBtn setTitleColor:COLOR_FFFFFF forState:UIControlStateDisabled];
         [addBtn addTarget:self action:@selector(handleAddCartButtonClick:) forControlEvents:UIControlEventTouchUpInside];
-        addBtn.layer.borderWidth = kOutLine;
-        addBtn.layer.borderColor = COLOR_DF463E.CGColor;
     }
     return _addBtn;
 }
@@ -86,10 +102,10 @@
         _buyBtn = buyBtn;
         [self addSubview:buyBtn];
         buyBtn.titleLabel.font = FONT(30);
-        [buyBtn setTitle:@"立即购买" forState:UIControlStateNormal];
+        [buyBtn setTitle:LocalNowBuy forState:UIControlStateNormal];
         [buyBtn setTitleColor:COLOR_FFFFFF forState:UIControlStateNormal];
+        [buyBtn setTitleColor:COLOR_FFFFFF forState:UIControlStateDisabled];
         [buyBtn addTarget:self action:@selector(handlebuyButtonClick:) forControlEvents:UIControlEventTouchUpInside];
-        buyBtn.backgroundColor = COLOR_DF463E;
     }
     return _buyBtn;
 }

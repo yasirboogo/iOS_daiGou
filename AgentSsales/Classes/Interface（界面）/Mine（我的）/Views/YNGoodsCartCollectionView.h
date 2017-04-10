@@ -10,13 +10,13 @@
 
 @interface YNGoodsCartCollectionView : UICollectionView
 
-@property (nonatomic,strong) NSArray * dataArray;
+@property (nonatomic,strong) NSMutableArray * dataArrayM;
 
-@property (nonatomic,strong) void(^didSelectOrderGoodsCell)(NSString*);
+@property (nonatomic,strong) void(^didSelectOrderGoodsCell)(NSInteger,NSInteger,NSString*);
 
-@property (nonatomic,copy) void(^didFooterViewLeftButtonBlock)(NSInteger,NSInteger);
+@property (nonatomic,copy) void(^didFooterViewLeftButtonBlock)(NSInteger,NSInteger,NSInteger,NSString*);
 
-@property (nonatomic,copy) void(^didFooterViewRightButtonBlock)(NSInteger,NSInteger);
+@property (nonatomic,copy) void(^didFooterViewRightButtonBlock)(NSInteger,NSInteger,NSInteger,NSString*);
 
 @property (nonatomic,copy) void(^didFooterViewQuestionButtonBlock)();
 

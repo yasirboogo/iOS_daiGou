@@ -44,27 +44,52 @@
 }
 
 #pragma mark - 网路请求
+
 -(void)startNetWorkingRequestWithPhoneCode{
     NSDictionary *params = @{
-                             @"loginphone":[NSString stringWithFormat:@"%@%@",self.code,self.phone]
+                             @"loginphone":[NSString stringWithFormat:@"%@",self.loginphone],
+                             @"type":[NSNumber numberWithInteger:self.type+1],
                              };
     [YNHttpManagers getMsgCodeWithParams:params success:^(id response) {
-        _checkCode = response;
+        if ([response[@"code"] isEqualToString:@"success"]) {
+            //do success things
+            _checkCode = [NSString stringWithFormat:@"%@",response[@"yzm"]];
+            DLog(@"login = %@,yzm = %@",_loginphone,_checkCode);
+        }else{
+            //do failure things
+        }
     } failure:^(NSError *error) {
-        NSLog(@"%@",error);
+        //do error things
     }];
 }
 -(void)startNetWorkingRequestWithUpadatePwd{
-    NSDictionary *params = @{
-                             @"phone":self.phone,
-                             @"password":_tableView.textArrayM[1],
+    NSDictionary *params = @{@"phone":self.loginphone,
+                             @"password":_tableView.firPassword,
                              };
     [YNHttpManagers forgetPasswordWithParams:params success:^(id response) {
         [self.view endEditing:YES];
-        YNLoginViewController *pushVC =[[YNLoginViewController alloc] init];
-        [self.navigationController pushViewController:pushVC animated:NO];
+        if ([response[@"code"] isEqualToString:@"success"]) {
+            //do success things
+            UICKeyChainStore *keychain = [UICKeyChainStore keyChainStoreWithService:kKeychainService];
+            if (keychain.allKeys) {
+                [keychain removeItemForKey:keychain.allKeys.firstObject];
+            }
+            [keychain setString:@"" forKey:_loginphone];
+            [DEFAULTS setObject:(NSDictionary*)response forKey:kUserLoginInfors];
+            [DEFAULTS synchronize];
+            [SVProgressHUD showImage:nil status:LocalChangeSuccess];
+            [SVProgressHUD dismissWithDelay:2.0f completion:^{
+                YNLoginViewController *pushVC = [[YNLoginViewController alloc] init];
+                [self.navigationController pushViewController:pushVC animated:NO];
+            }];
+        }else{
+            //do failure things
+            DLog(@"%@",response[@"message"]);
+            [SVProgressHUD showImage:nil status:LocalChangeFailure];
+            [SVProgressHUD dismissWithDelay:2.0f];
+        }
     } failure:^(NSError *error) {
-        NSLog(@"%@",error);
+        //do error things
     }];
 }
 #pragma mark - 视图加载
@@ -88,7 +113,7 @@
         submitBtn.layer.cornerRadius = kViewRadius;
         submitBtn.backgroundColor = COLOR_DF463E;
         submitBtn.titleLabel.font = FONT(36);
-        [submitBtn setTitle:@"确认修改" forState:UIControlStateNormal];
+        [submitBtn setTitle:LocalConfirmChange forState:UIControlStateNormal];
         [submitBtn setTitleColor:COLOR_FFFFFF forState:UIControlStateNormal];
         [submitBtn addTarget:self action:@selector(handleUpdatePswordSubmitButtonClick:) forControlEvents:UIControlEventTouchUpInside];
         [self.view addSubview:submitBtn];
@@ -99,14 +124,31 @@
 
 #pragma mark - 函数、消息
 -(void)handleUpdatePswordSubmitButtonClick:(UIButton*)btn{
-    [self startNetWorkingRequestWithUpadatePwd];
+    [self.view endEditing:YES];
+    BOOL isEmpty = !_tableView.checkCode.length || !_tableView.firPassword.length || !_tableView.secPassword.length;
+    BOOL isCheckCode = [_tableView.checkCode isEqualToString:_checkCode];
+    
+    BOOL isEqual = [_tableView.firPassword isEqualToString:_tableView.secPassword];
+
+    if (isEmpty) {
+        [SVProgressHUD showImage:nil status:LocalInputIsEmpty];
+        [SVProgressHUD dismissWithDelay:2.0f];
+    }else if (!isCheckCode) {
+        [SVProgressHUD showImage:nil status:LocalCCodeError];
+        [SVProgressHUD dismissWithDelay:2.0f];
+    }else if (!isEqual){
+        [SVProgressHUD showImage:nil status:LocalPwdDifferent];
+        [SVProgressHUD dismissWithDelay:2.0f];
+    }else{
+        [self startNetWorkingRequestWithUpadatePwd];
+    }
 }
 -(void)makeData{
     [super makeData];
 }
 -(void)makeNavigationBar{
     [super makeNavigationBar];
-    self.titleLabel.text = @"忘记密码";
+    self.titleLabel.text = LocalFogetPwd;
 }
 -(void)makeUI{
     [super makeUI];

@@ -155,7 +155,7 @@
                 return CGSizeMake(w, h);
             }
         } else {
-            return CGSizeZero;
+            return CGSizeMake(320, 160);
         }
     }
 }

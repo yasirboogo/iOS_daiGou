@@ -12,11 +12,13 @@
 
 @interface YNHomePageCollectionView : UICollectionView
 
+@property (nonatomic,strong) NSArray *rateArray;
+
 @property (nonatomic,strong) NSArray *adArray;
 
 @property (nonatomic,strong) NSArray *hotArray;
 
-@property (nonatomic,strong) NSArray *featureArray;
+@property (nonatomic,strong) NSMutableArray *dataArrayM;
 
 /** 点击轮播广告回调 */
 @property (nonatomic,copy)void(^didSelectPlayerImgClickBlock)(NSString*,NSString*);

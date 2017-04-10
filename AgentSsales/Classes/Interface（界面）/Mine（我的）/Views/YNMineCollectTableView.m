@@ -18,17 +18,11 @@
     _isEdit = isEdit;
     [self reloadData];
 }
--(void)setDataArray:(NSArray<NSDictionary *> *)dataArray{
-    _dataArray = dataArray;
-    [self reloadData];
-}
-
 -(instancetype)init{
     self = [super init];
     if (self) {
         self.rowHeight = W_RATIO(280);
         self.showsVerticalScrollIndicator = NO;
-        self.bounces = NO;
         self.backgroundColor = COLOR_EDEDED;
         self.separatorStyle = UITableViewCellSeparatorStyleNone;
         self.delegate = self;
@@ -37,10 +31,14 @@
     }
     return self;
 }
-
+-(void)setSelectArrayM:(NSMutableArray<NSNumber *> *)selectArrayM{
+    _selectArrayM = selectArrayM;
+    for (NSDictionary *dict in _dataArrayM) {
+        [_selectArrayM addObject:@NO];
+    }
+}
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
-
-    return _dataArray.count;
+    return _dataArrayM.count;
 }
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
     YNMineCollectCell * collectCell = [tableView dequeueReusableCellWithIdentifier:@"collectCell"];
@@ -50,28 +48,19 @@
         collectCell.backgroundColor = COLOR_CLEAR;
     }
     collectCell.isEdit = self.isEdit;
-    collectCell.cellDict = _dataArray[indexPath.row];
+    collectCell.cellDict = _dataArrayM[indexPath.row];
     collectCell.isSelected = [self.selectArrayM[indexPath.row] boolValue];
     [collectCell setDidSelectedButtonClickBlock:^(BOOL isSelect) {
         [_selectArrayM replaceObjectAtIndex:indexPath.row withObject:[NSNumber numberWithBool:isSelect]];
-        [self reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:NO];
+        [self reloadData];
     }];
     return collectCell;
 }
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
     [tableView deselectRowAtIndexPath:indexPath animated:NO];
     if (self.didSelectMineCollectCellBlock) {
-        self.didSelectMineCollectCellBlock(@"点击了我的收藏Cell");
+        self.didSelectMineCollectCellBlock([NSString stringWithFormat:@"%@",_dataArrayM[indexPath.row][@"id"]]);
     }
-}
--(NSMutableArray<NSNumber *> *)selectArrayM{
-    if (!_selectArrayM) {
-        _selectArrayM = [NSMutableArray array];
-        for (NSInteger i =0; i < _dataArray.count; i++) {
-            [_selectArrayM addObject:@NO];
-        }
-    }
-    return _selectArrayM;
 }
 @end
 
@@ -93,9 +82,10 @@
     [self.leftImgView sd_setImageWithURL:[NSURL URLWithString:cellDict[@"img"]] placeholderImage:[UIImage imageNamed:@"zhanwei1"]];
     self.titleLabel.text = cellDict[@"name"];
     self.versionLabel.text = cellDict[@"note"];
-    self.invalidLabel.text = cellDict[@"stock"];
-    self.priceLabel.text = [NSString stringWithFormat:@"%.2f",[cellDict[@"salesprice"] floatValue]];
-    self.invalidLabel.hidden = ![cellDict[@"stock"] length];
+    self.invalidLabel.text = LocalInvalid;
+    self.markLabel.text = LocalMoneyMark;
+    self.priceLabel.text = [NSString decimalNumberWithDouble:cellDict[@"salesprice"]];
+    self.invalidLabel.hidden = ![cellDict[@"isdelete"] integerValue] && [cellDict[@"stock"] integerValue] > 0;
 }
 -(void)setIsSelected:(BOOL)isSelected{
     _isSelected = isSelected;
@@ -222,7 +212,6 @@
         _markLabel = markLabel;
         [self.bgView addSubview:markLabel];
         markLabel.font = FONT(26);
-        markLabel.text = @"$";
         markLabel.textColor = COLOR_666666;
     }
     return _markLabel;

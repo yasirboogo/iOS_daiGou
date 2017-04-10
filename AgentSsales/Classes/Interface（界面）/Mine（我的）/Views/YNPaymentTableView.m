@@ -29,7 +29,7 @@
         self.dataSource = self;
         
         UILabel *tipsLabel = [[UILabel alloc] init];
-        tipsLabel.text = @"付款方式";
+        tipsLabel.text = LocalPayWay;
         tipsLabel.font = FONT(28);
         tipsLabel.textColor = COLOR_999999;
         tipsLabel.frame = CGRectMake(0, 0, WIDTHF(self), W_RATIO(80));
@@ -43,10 +43,6 @@
     _dataArray = dataArray;
     [self reloadData];
 }
--(void)setIndexPath:(NSIndexPath *)indexPath{
-    _indexPath = indexPath;
-    [self reloadData];
-}
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
     return _dataArray.count;
 }
@@ -57,14 +53,15 @@
         PaymentCell.selectionStyle = UITableViewCellSelectionStyleNone;
     }
     PaymentCell.dict = _dataArray[indexPath.row];
-    PaymentCell.isSelect = indexPath == self.indexPath ? YES :NO;
+    PaymentCell.isSelect = ([indexPath compare:self.indexPath] == NSOrderedSame) ? YES : NO;
     return PaymentCell;
 }
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
     [tableView deselectRowAtIndexPath:indexPath animated:NO];
     self.indexPath = indexPath;
+    [self reloadData];
     if (self.didSelectPaymentCellBlock) {
-        self.didSelectPaymentCellBlock(_dataArray[indexPath.row][@"payment"]);
+        self.didSelectPaymentCellBlock(indexPath.row);
     }
 }
 @end

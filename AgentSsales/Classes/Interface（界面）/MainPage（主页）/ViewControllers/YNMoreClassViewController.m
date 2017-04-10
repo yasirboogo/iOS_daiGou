@@ -9,6 +9,7 @@
 #import "YNMoreClassViewController.h"
 #import "YNHotGoodsClassesView.h"
 #import "YNTerraceGoodsViewController.h"
+#import "YNShowEmptyView.h"
 
 @interface YNMoreClassViewController ()
 {
@@ -17,6 +18,8 @@
     NSInteger _pageSize;
 }
 @property (nonatomic,weak) YNHotGoodsClassesView * collectionView;
+
+@property (nonatomic,weak) YNShowEmptyView * emptyView;
 
 @end
 
@@ -35,7 +38,6 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self makeData];
-    [self makeUI];
 }
 
 - (void)viewWillDisappear:(BOOL)animated{
@@ -53,8 +55,16 @@
                              @"pageSize":[NSNumber numberWithInteger:_pageSize],
                              @"classId":_classId};
     [YNHttpManagers goodsClassSearchWithParams:params success:^(id response) {
-        self.collectionView.dataArray = response;
+        [self handleEndMJRefresh];
+        if ([response[@"code"] isEqualToString:@"success"]) {
+            //do success things
+            [self handleMJRefreshComplateWithResponse:response[@"goodsArray"]];
+        }else{
+            //do failure things
+        }
     } failure:^(NSError *error) {
+        //do error things
+        [self handleEndMJRefresh];
     }];
 }
 #pragma mark - 视图加载
@@ -66,19 +76,62 @@
         [self.view addSubview:collectionView];
         [collectionView setDidSelectHotGoodsClassesCellBlock:^(NSInteger index) {
             YNTerraceGoodsViewController *pushVC = [[YNTerraceGoodsViewController alloc] init];
-            pushVC.goodsId = self.collectionView.dataArray[index][@"goodsId"];
+            pushVC.goodsId = self.collectionView.dataArrayM[index][@"goodsId"];
             [self.navigationController pushViewController:pushVC animated:NO];
+        }];
+        
+        collectionView.mj_header= [MJRefreshNormalHeader headerWithRefreshingBlock:^{
+            _pageIndex = 1;
+            [collectionView.mj_footer endRefreshing];
+            [self startNetWorkingRequestWithGoodsClassSearch];
+        }];
+        // 设置自动切换透明度(在导航栏下面自动隐藏)
+        collectionView.mj_header.automaticallyChangeAlpha = YES;
+        collectionView.mj_footer = [MJRefreshBackNormalFooter footerWithRefreshingBlock:^{
+            _pageIndex += 1;
+            [collectionView.mj_header endRefreshing];
+            [self startNetWorkingRequestWithGoodsClassSearch];
         }];
     }
     return _collectionView;
 }
+-(YNShowEmptyView *)emptyView{
+    if (!_emptyView) {
+        CGRect frame = CGRectMake(0, W_RATIO(2), SCREEN_WIDTH, SCREEN_HEIGHT-W_RATIO(90)-W_RATIO(2));
+        YNShowEmptyView *emptyView = [[YNShowEmptyView alloc] initWithFrame:frame];
+        _emptyView = emptyView;
+        [self.view addSubview:emptyView];
+        emptyView.tipImg = [UIImage imageNamed:@"wudizhi"];
+        emptyView.tips = @"当前分类暂无内容";
+    }
+    return _emptyView;
+}
 #pragma mark - 代理实现
 
 #pragma mark - 函数、消息
+-(void)handleMJRefreshComplateWithResponse:(NSArray*)response{
+    if (_pageIndex == 1) {
+        _collectionView.dataArrayM = [NSMutableArray arrayWithArray:response];
+        self.emptyView.hidden = _collectionView.dataArrayM.count;
+    }else{
+        [_collectionView.dataArrayM addObjectsFromArray:response];
+    }
+    [_collectionView reloadData];
+    if (response.count == 0) {
+        [_collectionView.mj_footer endRefreshingWithNoMoreData];
+    }
+}
+-(void)handleEndMJRefresh{
+    if (_pageIndex == 1) {
+        [self.collectionView.mj_header endRefreshing];
+    }else{
+        [self.collectionView.mj_footer endRefreshing];
+    }
+}
 -(void)makeData{
     _type = [LanguageManager currentLanguageIndex];
     _pageIndex = 1;
-    _pageSize = 10;
+    _pageSize = 12;
 }
 -(void)makeUI{
     

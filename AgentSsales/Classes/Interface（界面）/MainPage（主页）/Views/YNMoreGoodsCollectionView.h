@@ -12,4 +12,6 @@
 
 @property (nonatomic,strong) NSArray *dataArray;
 
+@property (nonatomic,copy) void (^didSelectMoreGoodsCellBlock)(NSString *);
+
 @end

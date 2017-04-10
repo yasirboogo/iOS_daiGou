@@ -10,7 +10,7 @@
 
 @interface YNHotGoodsClassesView : UICollectionView
 
-@property (nonatomic,strong) NSArray * dataArray;
+@property (nonatomic,strong) NSMutableArray * dataArrayM;
 
 @property (nonatomic,copy) void(^didSelectHotGoodsClassesCellBlock)(NSInteger);
 

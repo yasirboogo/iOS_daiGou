@@ -13,6 +13,7 @@
 @interface YNUpdatePhoneViewController ()
 {
     NSString *_checkCode;
+    NSInteger _type;
 }
 @property (nonatomic,strong) YNPhoneAreaCodeView *areaCodeView;
 
@@ -48,32 +49,63 @@
 }
 
 #pragma mark - 网路请求
+-(void)startNetWorkingRequestWithGetCountryCode{
+    NSDictionary *params = @{@"type":[NSNumber numberWithInteger:_type]
+                             };
+    [YNHttpManagers getCountryCodeWithParams:params success:^(id response) {
+        if ([response[@"code"] isEqualToString:@"success"]) {
+            //do success things
+            self.areaCodeView.dataArray = response[@"countryArray"];
+        }else{
+            //do failure things
+        }
+    } failure:^(NSError *error) {
+        //do error things
+    }];
+}
 -(void)startNetWorkingRequestWithPhoneCode{
     NSDictionary *params = @{
-                             @"loginphone":[NSString stringWithFormat:@"%@%@",_areaCodeView.dataArray[_index][@"code"],_tableView.textArrayM[1]]
+                             @"loginphone":_tableView.loginphone,
+                             @"type":[NSNumber numberWithInteger:_index+1]
                              };
     [YNHttpManagers getMsgCodeWithParams:params success:^(id response) {
-        _checkCode = [NSString stringWithFormat:@"%@",response];
+        if ([response[@"code"] isEqualToString:@"success"]) {
+            //do success things
+            _checkCode = [NSString stringWithFormat:@"%@",response[@"yzm"]];
+        }else{
+            //do failure things
+        }
     } failure:^(NSError *error) {
-        NSLog(@"%@",error);
+        //do error things
     }];
 }
 -(void)startNetWorkingRequestWithUpdateUserPhone{
-    NSDictionary *params = @{@"userId":[DEFAULTS valueForKey:kUserLoginInfors][@"userId"],@"phone":_tableView.textArrayM[1]};
+    NSDictionary *params = @{@"userId":[DEFAULTS valueForKey:kUserLoginInfors][@"userId"],
+                             @"phone":_tableView.loginphone};
     [YNHttpManagers updateUserPhoneWithParams:params success:^(id response) {
-        [self.navigationController popViewControllerAnimated:NO];
+        if ([response[@"code"] isEqualToString:@"success"]) {
+            //do success things
+            [SVProgressHUD showImage:nil status:LocalChangeSuccess];
+            [SVProgressHUD dismissWithDelay:2.0f completion:^{
+                [self.navigationController popViewControllerAnimated:NO];
+            }];
+        }else{
+            //do failure things
+            [SVProgressHUD showImage:nil status:LocalChangeFailure];
+            [SVProgressHUD dismissWithDelay:2.0f];
+        }
     } failure:^(NSError *error) {
+        //do error things
     }];
 }
 #pragma mark - 视图加载
 -(YNPhoneAreaCodeView *)areaCodeView{
     if (!_areaCodeView) {
-        CGRect frame = CGRectMake(kMidSpace, (SCREEN_HEIGHT-(W_RATIO(120)*3))/2.0, SCREEN_WIDTH-kMidSpace*2, W_RATIO(120)*3);
-        YNPhoneAreaCodeView *areaCodeView = [[YNPhoneAreaCodeView alloc] initWithFrame:frame];
+        YNPhoneAreaCodeView *areaCodeView = [[YNPhoneAreaCodeView alloc] init];
         _areaCodeView = areaCodeView;
         [areaCodeView setDidSelectCodeCellBlock:^(NSInteger index) {
             self.index = index;
-            self.tableView.code = self.areaCodeView.dataArray[_index][@"code"];
+            self.tableView.country = self.areaCodeView.dataArray[_index];
         }];
     }
     return _areaCodeView;
@@ -84,7 +116,7 @@
         _tableView  = tableView;
         [self.view addSubview:tableView];
         [tableView setDidSelectAreaCellBlock:^{
-            [self.areaCodeView showPopView:YES];
+            [self startNetWorkingRequestWithGetCountryCode];
         }];
         [tableView setDidSelectSendPhoneCodeBlock:^{
             
@@ -100,7 +132,7 @@
         submitBtn.frame = CGRectMake(0 ,SCREEN_HEIGHT-W_RATIO(100), SCREEN_WIDTH, W_RATIO(100));
         submitBtn.backgroundColor = COLOR_DF463E;
         submitBtn.titleLabel.font = FONT(36);
-        [submitBtn setTitle:@"确认修改" forState:UIControlStateNormal];
+        [submitBtn setTitle:LocalConfirmChange forState:UIControlStateNormal];
         [submitBtn setTitleColor:COLOR_FFFFFF forState:UIControlStateNormal];
         [submitBtn addTarget:self action:@selector(handleUpdatePswordSubmitButtonClick:) forControlEvents:UIControlEventTouchUpInside];
         [self.view addSubview:submitBtn];
@@ -111,21 +143,26 @@
 
 #pragma mark - 函数、消息
 -(void)handleUpdatePswordSubmitButtonClick:(UIButton*)btn{
-    BOOL isCheckCode = [_tableView.textArrayM[2] isEqualToString:_checkCode];
-    if (isCheckCode) {
+    [self.view endEditing:YES];
+    BOOL isEmpty = !_tableView.country.length || !_tableView.loginphone.length || !_tableView.checkCode;
+    BOOL isCheckCode = [_tableView.checkCode isEqualToString:_checkCode];
+    if (isEmpty) {
+        [SVProgressHUD showImage:nil status:LocalInputIsEmpty];
+        [SVProgressHUD dismissWithDelay:2.0f];
+    }else if (!isCheckCode) {
+        [SVProgressHUD showImage:nil status:LocalCCodeError];
+        [SVProgressHUD dismissWithDelay:2.0f];
+    }else{
         [self startNetWorkingRequestWithUpdateUserPhone];
     }
 }
 -(void)makeData{
     [super makeData];
-    self.areaCodeView.dataArray =@[
-                                   @{@"image":@"zhongguo_yuan",@"title":@"中国",@"code":@"86"},
-                                   @{@"image":@"malaixiya_yuan",@"title":@"马来西亚",@"code":@"60"}
-                                   ];
+    _type = [LanguageManager currentLanguageIndex];
 }
 -(void)makeNavigationBar{
     [super makeNavigationBar];
-    self.titleLabel.text = @"修改手机";
+    self.titleLabel.text = LocalChangePhone;
 }
 -(void)makeUI{
     [super makeUI];

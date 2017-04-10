@@ -30,9 +30,8 @@
     }
     return self;
 }
--(void)setCode:(NSString *)code{
-    [self.textArrayM replaceObjectAtIndex:0 withObject:code];
-    _code = [NSString stringWithFormat:@"+%@",code];
+-(void)setCountry:(NSString *)country{
+    _country = country;
     [self reloadData];
 }
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
@@ -51,7 +50,7 @@
     }
     inforCell.textFieldText = nil;
     if (indexPath.row == 0) {
-        inforCell.textFieldText = _code;
+        inforCell.textFieldText = _country;
         inforCell.isShowArrowImg = YES;
         inforCell.isForbidClick = YES;
     }else if (indexPath.row == 1){
@@ -62,18 +61,25 @@
         }];
     }else if (indexPath.row == 2){
         inforCell.keyboardType = UIKeyboardTypeNumberPad;
-    }else if (indexPath.row == 3){
-        inforCell.keyboardType = UIKeyboardTypeASCIICapable;
     }
     inforCell.inforDict = _inforArray[indexPath.row];
+    void (^codeBtnEnable)(BOOL) = ^(BOOL isEnable){
+        inforCell.isEnableCodeBtn = isEnable;
+    };
     
     [inforCell setInforCellTextFieldBlock:^(NSString *str) {
         
-        [self.textArrayM replaceObjectAtIndex:indexPath.row withObject:str];
+        if (indexPath.row == 1) {
+            self.loginphone = str;
+            codeBtnEnable(str.length && _country.length);
+        }else if (indexPath.row == 2){
+            self.checkCode = str;
+        }
     }];
     
     return inforCell;
 }
+
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
     [tableView deselectRowAtIndexPath:indexPath animated:NO];
     if (indexPath.row == 0) {
@@ -82,18 +88,12 @@
         }
     }
 }
--(NSMutableArray<NSString *> *)textArrayM{
-    if (!_textArrayM) {
-        _textArrayM = [NSMutableArray arrayWithObjects:kZeroStr,kZeroStr,kZeroStr, nil];
-    }
-    return _textArrayM;
-}
 -(NSArray<NSDictionary *> *)inforArray{
     if (!_inforArray) {
         _inforArray = @[
-                        @{@"item":@"国家(区号)",@"placeholder":@"选择您所在的国家(区号)"},
-                        @{@"item":@"新手机号码",@"placeholder":@"请输入新号码"},
-                        @{@"item":@"验证码",@"placeholder":@"请填写验证码"}
+                        @{@"item":LocalCountry,@"placeholder":LocalCountryID},
+                        @{@"item":LocalNewPhone,@"placeholder":LocalInputNewPhone},
+                        @{@"item":LocalCodeID,@"placeholder":LocalInputCodeID}
                         ];
     }
     return _inforArray;

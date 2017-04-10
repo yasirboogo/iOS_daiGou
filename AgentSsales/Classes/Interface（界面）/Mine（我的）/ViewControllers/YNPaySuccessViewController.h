@@ -9,7 +9,7 @@
 #import "YNBaseViewController.h"
 
 @interface YNPaySuccessViewController : YNBaseViewController
-/** 标题 */
-@property (nonatomic,copy) NSString * titleStr;
+
+@property (nonatomic,assign) NSInteger type;
 
 @end

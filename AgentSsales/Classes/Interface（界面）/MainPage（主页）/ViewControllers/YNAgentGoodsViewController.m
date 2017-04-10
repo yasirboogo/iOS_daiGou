@@ -7,6 +7,9 @@
 //
 
 #import "YNAgentGoodsViewController.h"
+#import "ObjectiveGumbo.h"
+#import "OCGumbo.h"
+#import "OCGumbo+Query.h"
 
 @interface YNAgentGoodsViewController ()<WKUIDelegate,UIWebViewDelegate,WKNavigationDelegate,WKScriptMessageHandler,UIScrollViewDelegate>
 {
@@ -87,9 +90,9 @@
 
         wkWebView.UIDelegate = self;
         wkWebView.navigationDelegate = self;
-        wkWebView.allowsBackForwardNavigationGestures =YES;//打开网页间的滑动返回
-        //wkWebView.allowsLinkPreview = YES;//允许预览链接
+        wkWebView.allowsLinkPreview = YES;//允许预览链接
         wkWebView.scrollView.delegate = self;
+        
     }
     return _wkWebView;
 }
@@ -115,8 +118,8 @@
     
     //NSLog(@"forwordlst==%@",webView.backForwardList.forwardList);
     
-    NSLog(@"url===%@",webView.backForwardList.currentItem.URL);
-    self.isBuy = NO;
+    //NSLog(@"url===%@",webView.backForwardList.currentItem.URL);
+    //self.isBuy = NO;
     self.getUrl = [NSString stringWithFormat:@"%@",webView.backForwardList.currentItem.URL];
     if ([self.getUrl hasPrefix:@"http://h5.m.taobao.com/awp/core/detail.htm?"]//天猫
         || [self.getUrl hasPrefix:@"https://ju.taobao.com/m/jusp/alone/detailwap/mtp.htm?"]//聚划算
@@ -125,10 +128,40 @@
         || [self.getUrl hasPrefix:@"http://m.vip.com/product"]//唯品会
         || [self.getUrl hasPrefix:@"https://item.m.jd.com/"])//京东
     {
+        
+        NSString *htmlString = [NSString stringWithContentsOfURL:[NSURL URLWithString:self.urlStr] encoding:NSUTF8StringEncoding error:nil];
+        //NSLog(@"html = %@",html);
         self.isBuy = YES;
         NSLog(@"getUrl===%@",self.getUrl);
         self.buyBtn.hidden = NO;
+        //OGDocument *document = [ObjectiveGumbo parseDocumentWithUrl:[NSURL URLWithString:self.urlStr]];
+        //NSLog(@"document = %@",document);
+        OCGumboDocument *document = [[OCGumboDocument alloc] initWithHTMLString:htmlString];
+        NSLog(@"text: %@", document.Query(@"title").text());
     }
+}
+- (void)webView:(WKWebView *)webView didCommitNavigation:(WKNavigation *)navigation
+{
+    //这里处理返回按钮.默.然后根据webView加载情况判断是否显示或隐藏.
+    //self.backButton.hidden = !webView.canGoBack;
+}
+- (BOOL)webView:(WKWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType
+{
+    //判断是否是单击
+    /*
+     UIWebViewNavigationTypeLinkClicked，用户触击了一个链接。
+     UIWebViewNavigationTypeFormSubmitted，用户提交了一个表单。
+     UIWebViewNavigationTypeBackForward，用户触击前进或返回按钮。
+     UIWebViewNavigationTypeReload，用户触击重新加载的按钮。
+     UIWebViewNavigationTypeFormResubmitted，用户重复提交表单
+     UIWebViewNavigationTypeOther，发生其它行为。
+     */
+    if (navigationType == UIWebViewNavigationTypeBackForward)
+    {
+
+        return NO;
+    }
+    return NO;
 }
 - (void)webView:(WKWebView *)webView didFailProvisionalNavigation:(WKNavigation *)navigation{
     [self toggleState];
@@ -181,6 +214,7 @@
     self.toolbarItems = [toolbarItems copy];
 }
 #pragma mark - UITableView delegate
+/*
 -(void)scrollViewDidScroll:(UIScrollView *)scrollView{
     if (self.isBuy) {
         if (scrollView.contentOffset.y > SCREEN_HEIGHT/2.0) {
@@ -190,6 +224,7 @@
         }
     }
 }
+ */
 #pragma mark - 函数、消息
 -(void)makeData{
     if (iOS8) {
@@ -342,7 +377,7 @@
         buyBtn.backgroundColor = COLOR_DF463E;
         [buyBtn setTitleColor:COLOR_FFFFFF forState:UIControlStateNormal];
         [buyBtn addTarget:self action:@selector(handleBuyButtonClick:) forControlEvents:UIControlEventTouchUpInside];
-        buyBtn.frame = CGRectMake(0, SCREEN_HEIGHT-44-W_RATIO(100), SCREEN_WIDTH, W_RATIO(100));
+        buyBtn.frame = CGRectMake(0, SCREEN_HEIGHT-44-W_RATIO(120), SCREEN_WIDTH, W_RATIO(120));
         [self.view bringSubviewToFront:buyBtn];
         buyBtn.hidden = YES;
     }

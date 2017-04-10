@@ -10,4 +10,6 @@
 
 @interface YNRegisterViewController : YNBaseViewController
 
+@property (nonatomic,copy) NSString * parentId;
+
 @end

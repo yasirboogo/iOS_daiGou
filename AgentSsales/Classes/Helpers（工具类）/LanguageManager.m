@@ -109,7 +109,7 @@
         appDelegate.window.rootViewController = tabBC;
     }else if (type == 1){
         YNLoginViewController *linVC = [[YNLoginViewController alloc]init];
-        appDelegate.window.rootViewController = linVC;
+        appDelegate.window.rootViewController = [[UINavigationController alloc] initWithRootViewController:linVC];
     }
 }
 //获取语言
@@ -119,7 +119,19 @@
     return language;
 }
 +(NSInteger)currentLanguageIndex{
-    return [@[@"zh-Hans",@"ms-my",@"en-us"] indexOfObject:[LanguageManager currentLanguage]];
+    
+    NSArray *language = @[@"zh-Hans",@"ms-my",@"en-us"];
+    
+    NSString *currentLanguage = [LanguageManager currentLanguage];
+    if (currentLanguage.length == 0) {
+        currentLanguage = [[NSLocale preferredLanguages] objectAtIndex:0];;
+    }
+    for (NSInteger index = 0; index < language.count; index ++) {
+        if ([language[index] hasPrefix:currentLanguage]) {
+            return index;
+        }
+    }
+    return 0;
 }
 //获取当前语种下的内容
 - (NSString *)localizedStringForKey:(NSString *)key value:(NSString *)value {

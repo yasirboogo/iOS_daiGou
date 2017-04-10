@@ -9,6 +9,8 @@
 #import "YNShowMoreGoodsViewController.h"
 #import "YNSearchViewController.h"
 #import "YNMoreGoodsCollectionView.h"
+#import "YNTerraceGoodsViewController.h"
+
 
 @interface YNShowMoreGoodsViewController ()
 {
@@ -48,8 +50,14 @@
                              @"pageIndex":[NSNumber numberWithInteger:self.pageIndex],
                              @"pageSize":[NSNumber numberWithInteger:self.pageSize]};
     [YNHttpManagers getSpecialPurchaseWithParams:params success:^(id response) {
-        self.collectionView.dataArray = response;
+        if ([response[@"code"] isEqualToString:@"success"]) {
+            //do success things
+            self.collectionView.dataArray = response[@"goodsArray"];
+        }else{
+            //do failure things
+        }
     } failure:^(NSError *error) {
+        //do error things
     }];
 }
 #pragma mark - 视图加载
@@ -62,6 +70,11 @@
         YNMoreGoodsCollectionView *collectionView = [[YNMoreGoodsCollectionView alloc] initWithFrame:frame];
         _collectionView = collectionView;
         [self.view addSubview:collectionView];
+        [collectionView setDidSelectMoreGoodsCellBlock:^(NSString *goodsId) {
+            YNTerraceGoodsViewController *pushVC = [[YNTerraceGoodsViewController alloc] init];
+            pushVC.goodsId = [NSString stringWithFormat:@"%@",goodsId];
+            [self.navigationController pushViewController:pushVC animated:NO];
+        }];
     }
     return _collectionView;
 }
@@ -79,8 +92,7 @@
         YNSearchViewController *pushVC = [[YNSearchViewController alloc] init];
         [weakSelf.navigationController pushViewController:pushVC animated:NO];
     }];
-    
-    self.titleLabel.text = kLocalizedString(@"specialPurchase", @"特色惠购");
+    self.titleLabel.text = LocalSpecialPurchase;
 }
 -(void)makeUI{
     [super makeUI];
