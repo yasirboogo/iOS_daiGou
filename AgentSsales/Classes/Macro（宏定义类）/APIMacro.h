@@ -9,10 +9,13 @@
 #ifndef APIMacro_h
 #define APIMacro_h
 
-
-//#define kBaseUrl @"http://192.168.1.138/daigou/app"
-
-#define kBaseUrl @"http://120.76.159.40:8631/app"
+#if 0
+/* 本地 */
+    #define kBaseUrl @"http://192.168.1.138/daigou/app"
+#else
+/* 网络*/
+    #define kBaseUrl @"http://120.76.159.40:8631/app"
+#endif
 
 
 #endif /* APIMacro_h */

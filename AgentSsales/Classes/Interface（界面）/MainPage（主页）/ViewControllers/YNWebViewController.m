@@ -10,7 +10,6 @@
 
 
 @interface YNWebViewController ()
-@property (nonatomic,weak) UIWebView * webView;
 
 @property (nonatomic,weak) WKWebView * wkWebView;
 @end
@@ -85,8 +84,8 @@
     NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:self.url]];
     if (iOS8) {
         [self.wkWebView loadRequest:request];
-    }else{
-        [self.webView loadRequest:request];
+        [SVProgressHUD showWithStatus:LocalLoading];
+        [SVProgressHUD dismissWithDelay:2.0];
     }
 }
 -(void)makeNavigationBar{

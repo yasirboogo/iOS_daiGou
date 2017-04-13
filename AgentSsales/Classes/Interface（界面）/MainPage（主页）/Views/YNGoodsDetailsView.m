@@ -275,6 +275,7 @@
         [tableView reloadData];
         tableView.frame = self.bounds;
         tableView.tableHeaderView = self.headerView;
+        
     }
     return _tableView;
 }
@@ -314,16 +315,24 @@
             imgCell = [[YNDetailImgCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:@"imgCell"];
             imgCell.selectionStyle = UITableViewCellSelectionStyleNone;
         }
-        imgCell.cellFrame = self.detailUrls[indexPath.row-1];
+        
+        YNDetailImgCellFrame *cellFrame = self.detailUrls[indexPath.row - 1];
+        imgCell.cellFrame = cellFrame;
         return imgCell;
     }
     return nil;
 }
 @end
+
+
+
+
+
+
 @implementation YNDetailImgCellFrame
 -(void)setImgUrl:(NSString *)imgUrl{
     _imgUrl = imgUrl;
-    CGSize imgSize = [YNImageSize downloadImageSizeWithURL:imgUrl];
+    CGSize imgSize = [YNImageSize calculateImageSizeWithURL:imgUrl];
     self.cellHeight = imgSize.height / imgSize.width * W_RATIO(750);
 }
 +(NSMutableArray *)initWithFromDictionaries:(NSArray*)array{
@@ -337,13 +346,10 @@
         cellFrame.imgUrl = imgUrl;
         [endArray addObject:cellFrame];
     }];
-    
     return endArray;
 }
 @end
 @interface YNDetailImgCell()
-
-@property (nonatomic,weak) UIImageView * bgImgView;
 
 @end
 @implementation YNDetailImgCell
@@ -351,6 +357,7 @@
 -(void)setCellFrame:(YNDetailImgCellFrame *)cellFrame{
     _cellFrame = cellFrame;
     self.bgImgView.frame = CGRectMake(0, 0, SCREEN_WIDTH, cellFrame.cellHeight);
+    
     [self.bgImgView sd_setImageWithURL:[NSURL URLWithString:cellFrame.imgUrl] placeholderImage:[UIImage imageNamed:@"zhanwei2"]];
 }
 -(UIImageView *)bgImgView{

@@ -12,4 +12,6 @@
 
 +(CGSize)downloadImageSizeWithURL:(id)imageURL;
 
++(CGSize)calculateImageSizeWithURL:(id)imageURL;
+
 @end

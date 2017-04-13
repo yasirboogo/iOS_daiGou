@@ -16,6 +16,10 @@
 
 @property (nonatomic,strong) void(^viewScrollBlock)(CGFloat alpha);
 
+@property (nonatomic,copy) void (^viewDidDisappearStopTimerBlock)();
+
+@property (nonatomic,copy) void (^buttonNoClickStopTimerBlock)();
+
 @end
 
 
@@ -64,6 +68,16 @@
 @interface YNDetailsOrderMsgCell : UICollectionViewCell
 
 @property (nonatomic,strong) YNOrderMsgCellFrame * cellFrame;
+
+@end
+
+@interface YNCountdownMsgCell : UICollectionViewCell
+
+@property (nonatomic,copy) NSString *createTime;
+
+@property (nonatomic,copy) void (^viewDidDisappearStopTimerBlock)();
+
+@property (nonatomic,copy) void (^buttonNoClickStopTimerBlock)();
 
 @end
 @interface YNOrderDetailsHeaderView : UICollectionReusableView

@@ -30,6 +30,8 @@
 
 @property (nonatomic,copy) YNDetailImgCellFrame * cellFrame;
 
+@property (nonatomic,weak) UIImageView * bgImgView;
+
 @end
 @interface YNDetailVideoCell : UITableViewCell
 

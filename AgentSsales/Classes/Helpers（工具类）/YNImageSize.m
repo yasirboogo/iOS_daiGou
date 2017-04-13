@@ -9,8 +9,18 @@
 #import "YNImageSize.h"
 
 @implementation YNImageSize
+
 //讨厌警告
 -(id)diskImageDataBySearchingAllPathsForKey:(id)key{return nil;}
+
++(CGSize)calculateImageSizeWithURL:(id)imageURL{
+    
+    NSData *data = [NSData dataWithContentsOfURL:[NSURL URLWithString:imageURL]];
+    UIImage *image = [UIImage imageWithData:data];
+    return image.size;
+}
+
+
 +(CGSize)downloadImageSizeWithURL:(id)imageURL
 {
     NSURL* URL = nil;
@@ -155,7 +165,7 @@
                 return CGSizeMake(w, h);
             }
         } else {
-            return CGSizeMake(320, 160);
+            return CGSizeMake(SCREEN_WIDTH, 400);
         }
     }
 }

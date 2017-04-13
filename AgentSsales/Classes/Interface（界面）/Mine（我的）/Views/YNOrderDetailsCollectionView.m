@@ -30,6 +30,8 @@
     }
     [self registerClass:[UICollectionViewCell class] forCellWithReuseIdentifier:@"cell"];
     
+    [self registerClass:[YNCountdownMsgCell class] forCellWithReuseIdentifier:@"countdownMsgCell"];
+    
     [self registerClass:[YNDetailsManMsgCell class] forCellWithReuseIdentifier:@"manMsgCell"];
     
     [self registerClass:[YNDetailsOrderMsgCell class] forCellWithReuseIdentifier:@"orderMsgCell"];
@@ -54,15 +56,23 @@
     }
 }
 -(CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath{
-    if (indexPath.section == 0) {
+    if (indexPath.section == 0){
+        NSInteger status = [_detailDict[@"orderstatus"] integerValue];
+        if (status == 1 || status == 3) {
+            return CGSizeMake(WIDTHF(self), W_RATIO(150));
+        }else{
+            return CGSizeMake(WIDTHF(self), 0.001);
+        }
+    }
+    else if (indexPath.section == 1) {
         YNManMsgCellFrame *cellFrame = [YNManMsgCellFrame initWithFromDictionaries:@[_detailDict]].firstObject;
         return CGSizeMake(WIDTHF(self)-W_RATIO(20)*2,cellFrame.cellHeight);
-    }else if (indexPath.section == 1){
+    }else if (indexPath.section == 2){
         YNOrderMsgCellFrame *cellFrame = [YNOrderMsgCellFrame initWithFromDictionaries:@[_detailDict]].firstObject;
         return CGSizeMake(WIDTHF(self)-W_RATIO(20)*2,cellFrame.cellHeight);
-    }else if (indexPath.section == 2){
-        return CGSizeMake(WIDTHF(self)-W_RATIO(20)*2, W_RATIO(245));
     }else if (indexPath.section == 3){
+        return CGSizeMake(WIDTHF(self)-W_RATIO(20)*2, W_RATIO(245));
+    }else if (indexPath.section == 4){
         NSInteger status = [_detailDict[@"orderstatus"] integerValue];
         CGFloat bottomHight = 0.f;
         if (status == 1 ||status == 3 || status == 5 || status == 6) {
@@ -75,7 +85,7 @@
     return CGSizeZero;
 }
 -(NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView{
-    return 4;
+    return 5;
 }
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section{
     if (section == 0) {
@@ -83,20 +93,22 @@
     }else if (section == 1){
         return 1;
     }else if (section == 2){
-        return _myOrderListModel.goodsArray.count;
+        return 1;
     }else if (section == 3){
+        return _myOrderListModel.goodsArray.count;
+    }else if (section == 4){
         return 1;
     }
     return 0;
 }
 -(CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout referenceSizeForHeaderInSection:(NSInteger)section{
-    if (section == 3) {
+    if (section == 0 || section == 4) {
         return CGSizeZero;
     }
     return CGSizeMake(WIDTHF(self)-W_RATIO(20)*2, W_RATIO(86)+W_RATIO(20));
 }
 -(CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout referenceSizeForFooterInSection:(NSInteger)section{
-    if (section == 2){
+    if (section == 3){
         return CGSizeMake(WIDTHF(self)-W_RATIO(20)*2, W_RATIO(90));
     }
     return CGSizeZero;
@@ -104,16 +116,18 @@
 -(UICollectionReusableView *)collectionView:(UICollectionView *)collectionView viewForSupplementaryElementOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath{
     if ([kind isEqualToString:UICollectionElementKindSectionHeader]) {
         YNOrderDetailsHeaderView *headerView = [collectionView dequeueReusableSupplementaryViewOfKind:kind withReuseIdentifier:@"headerView" forIndexPath:indexPath];
-        if (indexPath.section == 0) {
+        if (indexPath.section == 0){
+            //headerView.dict = @{@"image":@"shangpinxinxi_dingdan",@"tips":@"付款倒计时"};
+        }else if (indexPath.section == 1) {
             headerView.dict = @{@"image":@"shouhuoren_dingdan",@"tips":LocalConsignee};
-        }else if (indexPath.section == 1){
-            headerView.dict = @{@"image":@"dingdanxinxi_dingdan",@"tips":LocalOrderInfor};
         }else if (indexPath.section == 2){
+            headerView.dict = @{@"image":@"dingdanxinxi_dingdan",@"tips":LocalOrderInfor,@"time":_detailDict[@"createtime"]};
+        }else if (indexPath.section == 3){
             headerView.dict = @{@"image":@"shangpinxinxi_dingdan",@"tips":LocalGoodsInfor};
         }
         return headerView;
     }else if ([kind isEqualToString:UICollectionElementKindSectionFooter]){
-        if (indexPath.section == 2) {
+        if (indexPath.section == 3) {
             YNOrderDetailsFooterView *footerView = [collectionView dequeueReusableSupplementaryViewOfKind:kind withReuseIdentifier:@"footerView" forIndexPath:indexPath];
             CGFloat allPrice = 0.f;
             for (MyOrderGoodsModel  *myOrderGoodsModel in _myOrderListModel.goodsArray) {
@@ -128,19 +142,36 @@
 
 }
 - (__kindof UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath{
-    if (indexPath.section == 0) {
+    if (indexPath.section == 0){
+        YNCountdownMsgCell *countdownMsgCell = [collectionView dequeueReusableCellWithReuseIdentifier:@"countdownMsgCell" forIndexPath:indexPath];
+        NSInteger status = [_detailDict[@"orderstatus"] integerValue];
+        if (status == 1 || status == 3) {
+            countdownMsgCell.createTime = _detailDict[@"createtime"];
+            [self setViewDidDisappearStopTimerBlock:^{
+                if (countdownMsgCell.viewDidDisappearStopTimerBlock) {
+                    countdownMsgCell.viewDidDisappearStopTimerBlock();
+                }
+            }];
+            [countdownMsgCell setButtonNoClickStopTimerBlock:^{
+                if (self.buttonNoClickStopTimerBlock) {
+                    self.buttonNoClickStopTimerBlock();
+                }
+            }];
+        }
+        return countdownMsgCell;
+    }else if (indexPath.section == 1) {
         YNDetailsManMsgCell *manMsgCell = [collectionView dequeueReusableCellWithReuseIdentifier:@"manMsgCell" forIndexPath:indexPath];
         manMsgCell.cellFrame = [YNManMsgCellFrame initWithFromDictionaries:@[_detailDict]].firstObject;
         return manMsgCell;
-    }else if (indexPath.section == 1){
+    }else if (indexPath.section == 2){
         YNDetailsOrderMsgCell *orderMsgCell = [collectionView dequeueReusableCellWithReuseIdentifier:@"orderMsgCell" forIndexPath:indexPath];
           orderMsgCell.cellFrame = [YNOrderMsgCellFrame initWithFromDictionaries:@[_detailDict]].firstObject;
         return orderMsgCell;
-    }else if (indexPath.section == 2){
+    }else if (indexPath.section == 3){
         YNOrderGoodsCell *goodsMsgCell = [collectionView dequeueReusableCellWithReuseIdentifier:@"goodsMsgCell" forIndexPath:indexPath];
         goodsMsgCell.myOrderGoodsModel = _myOrderListModel.goodsArray[indexPath.row];
         return goodsMsgCell;
-    }else if (indexPath.section == 3){
+    }else if (indexPath.section == 4){
         UICollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"cell" forIndexPath:indexPath];
         return cell;
     }
@@ -150,20 +181,157 @@
 
 @end
 
+@interface YNCountdownMsgCell ()
+
+@property (nonatomic,weak) UILabel * countdownLabel;
+
+@property (nonatomic,weak) UILabel * showTimeLabel;
+
+@property (nonatomic,weak) UIImageView * showImgLabel;
+
+@property (nonatomic,weak) UIView * bgView;
+
+/** 定时器(这里不用带*，因为dispatch_source_t就是个类，内部已经包含了*) */
+@property (nonatomic, strong) dispatch_source_t timer;
+
+@property (nonatomic, assign) BOOL istimer;
+@end
+
+@implementation YNCountdownMsgCell
+
+-(void)setCreateTime:(NSString *)createTime{
+    _createTime = createTime;
+    
+    self.countdownLabel.text = [NSString stringWithFormat:@"等待买家付款"];
+
+    self.showImgLabel.image = [UIImage imageNamed:@"qianbao_gouwuche"];
+    
+    if (!_istimer++) {
+        dispatch_resume(self.timer);
+    }
+}
+
+
+-(UIView *)bgView{
+    if (!_bgView) {
+        UIView *bgView = [[UIView alloc] init];
+        _bgView= bgView;
+        [self.contentView addSubview:bgView];
+        bgView.layer.masksToBounds = YES;
+        bgView.backgroundColor = COLOR_FFFFFF;
+        bgView.frame = self.contentView.bounds;
+    }
+    return _bgView;
+}
+-(UILabel *)countdownLabel{
+    if (!_countdownLabel) {
+        UILabel *countdownLabel = [[UILabel alloc] init];
+        _countdownLabel = countdownLabel;
+        [self.bgView addSubview:countdownLabel];
+        countdownLabel.font = FONT(34);
+        countdownLabel.textColor = COLOR_333333;
+        countdownLabel.numberOfLines = 0;
+        countdownLabel.frame = CGRectMake(kMaxSpace,W_RATIO(20), SCREEN_WIDTH-kMaxSpace*2, HEIGHT(_bgView)/2.0-W_RATIO(20));
+    }
+    return _countdownLabel;
+}
+-(UILabel *)showTimeLabel{
+    if (!_showTimeLabel) {
+        UILabel *showTimeLabel = [[UILabel alloc] init];
+        _showTimeLabel = showTimeLabel;
+        [self.bgView addSubview:showTimeLabel];
+        showTimeLabel.font = FONT(26);
+        showTimeLabel.textColor = COLOR_DF463E;
+        showTimeLabel.frame = CGRectMake(kMaxSpace,MaxYF(_countdownLabel), SCREEN_WIDTH-kMaxSpace*2, HEIGHT(_bgView)/2.0-W_RATIO(20));
+    }
+    return _showTimeLabel;
+}
+-(UIImageView *)showImgLabel{
+    if (!_showImgLabel) {
+        UIImageView *showImgLabel = [[UIImageView alloc] init];
+        _showImgLabel = showImgLabel;
+        [self.bgView addSubview:showImgLabel];
+        //showImgLabel.frame = CGRectMake(MaxXF(_showTimeLabel)+kMidSpace, YF(_countdownLabel), MaxYF(_showTimeLabel)-YF(_countdownLabel), MaxYF(_showTimeLabel)-YF(_countdownLabel));
+    }
+    return _showImgLabel;
+}
+/**
+ * 开始到结束的时间差
+ */
+- (NSString *)dateTimeDifferenceWithStartTime:(NSString *)startTime endTime:(NSString *)endTime{
+    NSDateFormatter *date = [[NSDateFormatter alloc]init];
+    [date setDateFormat:@"yyyy-MM-dd HH:mm"];
+    NSDate *startD =[date dateFromString:startTime];
+    NSDate *endD = [date dateFromString:endTime];
+    NSTimeInterval start = [[startD dateByAddingHours:24/*小时*/] timeIntervalSince1970]*1;
+    NSTimeInterval end = [endD timeIntervalSince1970]*1;
+    NSTimeInterval value = start - end;
+    int minute = 0;
+    int house = 0;
+    int day = 0;
+    if (value > 0) {
+        minute = (int)value /60%60;
+        house = (int)value / 3600%60;
+        day = (int)value / (24 * 3600);
+    }else{
+        dispatch_cancel(self.timer);
+        _timer = nil;
+        if (self.buttonNoClickStopTimerBlock) {
+            self.buttonNoClickStopTimerBlock();
+        }
+    }
+    return [NSString stringWithFormat:@"%d天%d时%d分",day,house,minute];
+}
+
+-(dispatch_source_t)timer{
+    if (!_timer) {
+        // 创建定时器
+        dispatch_queue_t queue = dispatch_get_main_queue();
+        dispatch_source_t timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, queue);
+        _timer = timer;
+        dispatch_time_t start = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.0 * NSEC_PER_SEC));
+        uint64_t interval = (uint64_t)(60 * NSEC_PER_SEC);
+        dispatch_source_set_timer(timer, start, interval, 0);
+        // 设置回调
+        NSDateFormatter *dateformatter=[[NSDateFormatter alloc] init];
+        [dateformatter setDateFormat:@"YYYY-MM-dd HH:mm"];
+        
+        __weak typeof(self) weakSelf = self;
+        dispatch_source_set_event_handler(timer, ^{
+            
+            NSDate * senddate=[NSDate date];
+            NSString * countdown = [weakSelf dateTimeDifferenceWithStartTime:weakSelf.createTime endTime:[dateformatter stringFromDate:senddate]];
+            weakSelf.showTimeLabel.text = [NSString stringWithFormat:@"距订单关闭还剩：%@",countdown];
+            
+            [weakSelf setViewDidDisappearStopTimerBlock:^{
+                // 取消定时器
+                dispatch_cancel(weakSelf.timer);
+                _timer = nil;
+            }];
+            /*
+             // 启动定时器
+             dispatch_resume(self.timer);
+             */
+        });
+    }
+    return _timer;
+}
+@end
+
 @implementation YNManMsgCellFrame
 
 -(void)setDict:(NSDictionary *)dict{
     _dict = dict;
     
     CGSize nameSize = [dict[@"username"] calculateHightWithFont:FONT(34) maxWidth:W_RATIO(400)];
-    self.nameF = CGRectMake(kMaxSpace, kMidSpace, nameSize.width, nameSize.height);
+    self.nameF = CGRectMake(kMaxSpace, W_RATIO(20), nameSize.width, nameSize.height);
     
     self.phoneF = CGRectMake(MaxX(_nameF)+kMinSpace,Y(_nameF),SCREEN_WIDTH-W_RATIO(20)*2-kMidSpace-MaxX(_nameF)-kMidSpace ,HEIGHT(_nameF));
     
     CGSize addressSize = [dict[@"address"] calculateHightWithWidth:MaxX(_phoneF)-kMidSpace font:FONT(30)];
     self.addresssF = CGRectMake(X(_nameF),MaxY(_nameF)+W_RATIO(20),addressSize.width,addressSize.height);
     
-    self.bgViewF = CGRectMake(0,0, SCREEN_WIDTH-W_RATIO(20)*2, MaxY(_addresssF)+kMidSpace);
+    self.bgViewF = CGRectMake(0,0, SCREEN_WIDTH-W_RATIO(20)*2, MaxY(_addresssF)+W_RATIO(20));
     
     self.cellHeight = MaxY(_bgViewF);
 }
@@ -238,7 +406,7 @@
         UILabel *nameLabel = [[UILabel alloc] init];
         _nameLabel = nameLabel;
         [self.bgView addSubview:nameLabel];
-        nameLabel.font = FONT(34);
+        nameLabel.font = FONT(32);
         nameLabel.textColor = COLOR_333333;
     }
     return _nameLabel;
@@ -249,7 +417,7 @@
         _phoneLabel = phoneLabel;
         [self.bgView addSubview:phoneLabel];
         phoneLabel.textAlignment = NSTextAlignmentRight;
-        phoneLabel.font = FONT(34);
+        phoneLabel.font = FONT(32);
         phoneLabel.textColor = COLOR_333333;
     }
     return _phoneLabel;
@@ -260,7 +428,7 @@
         _addressLabel = addressLabel;
         [self.bgView addSubview:addressLabel];
         addressLabel.numberOfLines = 0;
-        addressLabel.font = FONT(30);
+        addressLabel.font = FONT(32);
         addressLabel.textColor = COLOR_333333;
     }
     return _addressLabel;
@@ -283,26 +451,26 @@
         maxHeight = itemSize.height;
     }];
     
-    self.codeLF = CGRectMake(kMaxSpace, kMidSpace, maxWidth, maxHeight);
+    self.codeLF = CGRectMake(kMaxSpace, W_RATIO(30), maxWidth, maxHeight);
     self.codeRF = CGRectMake(MaxX(_codeLF)+kMidSpace, Y(_codeLF),SCREEN_WIDTH-W_RATIO(20)*2-MaxX(_codeLF)-kMidSpace*2,HEIGHT(_codeLF) );
     
-    self.buyTimeLF = CGRectMake(X(_codeLF), MaxY(_codeRF)+kMidSpace,  WIDTH(_codeLF),HEIGHT(_codeLF));
+    self.buyTimeLF = CGRectMake(X(_codeLF), MaxY(_codeRF)+W_RATIO(30),  WIDTH(_codeLF),HEIGHT(_codeLF));
     self.buyTimeRF = CGRectMake(X(_codeRF), Y(_buyTimeLF), WIDTH(_codeRF),HEIGHT(_codeRF));
     
-    self.payTimeLF = CGRectMake(X(_codeLF), MaxY(_buyTimeRF)+kMidSpace,  WIDTH(_codeLF),HEIGHT(_codeLF));
+    self.payTimeLF = CGRectMake(X(_codeLF), MaxY(_buyTimeRF)+W_RATIO(30),  WIDTH(_codeLF),HEIGHT(_codeLF));
     self.payTimeRF = CGRectMake(X(_codeRF), Y(_payTimeLF), WIDTH(_codeRF),HEIGHT(_codeRF));
     
-    self.addresssLF = CGRectMake(X(_codeLF), MaxY(_payTimeLF)+kMidSpace,  WIDTH(_codeLF),HEIGHT(_codeLF));
+    self.addresssLF = CGRectMake(X(_codeLF), MaxY(_payTimeLF)+W_RATIO(30),  WIDTH(_codeLF),HEIGHT(_codeLF));
     
     CGSize addressSize = [[dict[@"deliveryaddress"] length]?dict[@"deliveryaddress"]:LocalNothing calculateHightWithWidth:WIDTH(_codeRF) font:FONT(30)];
     
     self.addresssRF = CGRectMake(X(_codeRF), Y(_addresssLF), addressSize.width,addressSize.height);
     
-    self.statusLF = CGRectMake(X(_codeLF), MaxY(_addresssRF)+kMidSpace,  WIDTH(_codeLF),HEIGHT(_codeLF));
+    self.statusLF = CGRectMake(X(_codeLF), MaxY(_addresssRF)+W_RATIO(30),  WIDTH(_codeLF),HEIGHT(_codeLF));
     self.statusRF = CGRectMake(X(_codeRF), Y(_statusLF), WIDTH(_codeRF),HEIGHT(_codeRF));
     
     
-    self.bgViewF = CGRectMake(0,0, SCREEN_WIDTH-W_RATIO(20)*2, MaxY(_statusRF)+kMidSpace);
+    self.bgViewF = CGRectMake(0,0, SCREEN_WIDTH-W_RATIO(20)*2, MaxY(_statusRF)+W_RATIO(30));
     
     self.cellHeight = MaxY(_bgViewF);
 }
@@ -535,6 +703,11 @@
     self.tipsLabel.text = dict[@"tips"];
 }
 
+-(void)layoutSubviews{
+    [super layoutSubviews];
+    CGSize tipsSize = [_tipsLabel.text calculateHightWithFont:_tipsLabel.font maxWidth:0];
+    self.tipsLabel.frame = CGRectMake(MaxXF(_icoImgView)+kMinSpace, 0, tipsSize.width, HEIGHTF(_bgView));
+}
 -(UIView *)bgView{
     if (!_bgView) {
         UIView *bgView = [[UIView alloc] init];
@@ -562,11 +735,9 @@
         [self.bgView addSubview:tipsLabel];
         tipsLabel.textColor = COLOR_666666;
         tipsLabel.font = FONT(28);
-        tipsLabel.frame = CGRectMake(MaxXF(_icoImgView)+kMinSpace, 0, WIDTHF(_bgView)-MaxXF(_icoImgView)-kMinSpace, HEIGHTF(_bgView));
     }
     return _tipsLabel;
 }
-
 @end
 @interface YNOrderDetailsFooterView ()
 

@@ -48,6 +48,8 @@
         if ([response[@"code"] isEqualToString:@"success"]) {
             //do success things
             [self.wkWebView loadHTMLString:response[@"content"] baseURL:nil];
+            [SVProgressHUD showWithStatus:LocalLoading];
+            [SVProgressHUD dismissWithDelay:2.0];
         }else{
             //do failure things
         }

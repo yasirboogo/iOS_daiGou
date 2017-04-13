@@ -50,7 +50,7 @@
 -(void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath{
     [collectionView deselectItemAtIndexPath:indexPath animated:NO];
     if (self.didSelectMoreGoodsCellBlock) {
-        self.didSelectMoreGoodsCellBlock(_dataArray[indexPath.row][@"goodsId"]);
+        self.didSelectMoreGoodsCellBlock(_dataArray[indexPath.row][@"id"]);
     }
 }
 

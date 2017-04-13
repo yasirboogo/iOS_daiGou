@@ -41,6 +41,9 @@
 
 - (void)viewWillDisappear:(BOOL)animated{
     [super viewWillDisappear:animated];
+    if (_collectionView.viewDidDisappearStopTimerBlock) {
+        _collectionView.viewDidDisappearStopTimerBlock();
+    }
 }
 
 - (void)viewDidDisappear:(BOOL)animated{
@@ -132,6 +135,11 @@
             }else{
                 self.btnsView.userInteractionEnabled = NO;
             }
+        }];
+        [collectionView setButtonNoClickStopTimerBlock:^{
+            self.btnsView.userInteractionEnabled = NO;
+            [SVProgressHUD showImage:nil status:@"订单已关闭"];
+            [SVProgressHUD dismissWithDelay:2.0f];
         }];
     }
     return _collectionView;

@@ -106,7 +106,7 @@
     NSMutableDictionary *params = [NSMutableDictionary dictionaryWithObjectsAndKeys:
                                    [DEFAULTS valueForKey:kUserLoginInfors][@"userId"],@"userId",
                                    [NSString stringWithFormat:@"%@",_collectionView.dataDict[@"totalprice"]],@"totalprice",
-                                   [NSString stringWithFormat:@"%@",_collectionView.postMoney],@"postage",
+                                   _collectionView.postMoney,@"postage",
                                    [NSString stringWithFormat:@"%@",self.youhui],@"youhui",
                                    _realprice,@"realprice",
                                    _collectionView.postWay,@"delivery",
@@ -114,11 +114,13 @@
                                    _collectionView.dataDict[@"phone"],@"userphone",
                                    [NSString stringWithFormat:@"%@%@",_collectionView.dataDict[@"region"],_collectionView.dataDict[@"detailed"]],@"address",
                                    self.goodsId,@"goodsId",
-                                   //_style,@"style",
                                    _count,@"count",
+                                   [NSNumber numberWithInteger:_type+1],@"moneytype",
                                    nil];
     if (![self.style isEqualToString:@""]) {
         [params setValue:_style forKey:@"style"];
+    }else{
+        [params setValue:@"默认" forKey:@"style"];
     }
     [YNHttpManagers payNowMoneyWithParams:params success:^(id response) {
         if ([response[@"code"] isEqualToString:@"success"]) {
@@ -156,14 +158,12 @@
                                    [DEFAULTS valueForKey:kUserLoginInfors][@"userId"],@"userId",
                                    [NSString stringWithFormat:@"%@",_collectionView.dataDict[@"totalprice"]],@"totalprice",
                                    [NSString stringWithFormat:@"%@",_collectionView.postMoney],@"postage",
-                                   //[NSString stringWithFormat:@"%@",self.youhui],@"youhui",
                                    _realprice,@"realprice",
                                    _collectionView.postWay,@"delivery",
                                    _shoppingId,@"shoppingId",
                                    _collectionView.dataDict[@"name"],@"username",
                                    _collectionView.dataDict[@"phone"],@"userphone",
                                    [NSString stringWithFormat:@"%@%@",_collectionView.dataDict[@"region"],_collectionView.dataDict[@"detailed"]],@"address",
-                                   //self.goodsId,@"goodsId",
                                    [NSNumber numberWithInteger:_type+1],@"moneytype",
                                    nil];
     if (type == 1) {
