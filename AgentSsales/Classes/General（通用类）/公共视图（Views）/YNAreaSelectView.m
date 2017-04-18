@@ -9,8 +9,6 @@
 #import "YNAreaSelectView.h"
 
 @interface YNAreaSelectView ()<UICollectionViewDelegate,UICollectionViewDataSource,UICollectionViewDelegateFlowLayout>
-@property (nonatomic, strong) NSMutableArray *cityArray;
-
 @property (nonatomic, strong) UIView *baseView;
 
 @property (nonatomic, strong) UICollectionView *collectionView;
@@ -35,6 +33,13 @@
         self.backgroundColor = COLOR_CLEAR;
     }
     return self;
+}
+-(void)setCityArray:(NSMutableArray *)cityArray{
+    _cityArray = cityArray;
+    if (cityArray) {
+        [self showPopView:YES];
+        [self.collectionView reloadData];
+    }
 }
 #pragma mark - 加载数据
 -(UICollectionView *)collectionView{
@@ -68,14 +73,6 @@
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section{
     return 4;
 }
--(NSMutableArray *)cityArray{
-    if (!_cityArray) {
-        _cityArray = [NSDictionary dictionaryWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"ChinaAreaCN.plist" ofType:nil]][@"address"];
-        
-        //_cityArray = [YNChinaProvinceModel arrayOfModelsFromDictionaries:result[@"address"] error:nil];
-    }
-    return _cityArray;
-}
 - (__kindof UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath{
     YNAreaSelectCell *areaCell = [collectionView dequeueReusableCellWithReuseIdentifier:@"areaCell" forIndexPath:indexPath];
     areaCell.headerFrame = CGRectMake(0, 0, SCREEN_WIDTH-2*kMidSpace, W_RATIO(90));
@@ -99,18 +96,11 @@
         }else if (indexPath.row == 3){
             self.districtIndex = index;
             if (self.didSelectAreaSelectResultBlock) {
-                NSString *country = [NSString string];
-                NSString *province = [NSString string];
-                NSString *city = [NSString string];
-                NSString *district = [NSString string];
-                if (_countryIndex == 0) {
-                    country = @"中国";
-                    province = self.cityArray[_provinceIndex][@"name"];
-                    city = self.cityArray[_provinceIndex][@"sub"][_cityIndex][@"name"];
-                    district = self.cityArray[_provinceIndex][@"sub"][_cityIndex][@"sub"][_districtIndex];
-                }else if (_countryIndex == 1){
-                    country = @"马来西亚";
-                }
+                NSString *country = self.cityArray[_countryIndex][@"countryname"];
+                NSString *province = self.cityArray[_countryIndex][@"countryArray"][_provinceIndex][@"shenname"];
+                NSString *city = self.cityArray[_countryIndex][@"countryArray"][_provinceIndex][@"shiArray"][_cityIndex][@"shiname"];
+                NSString *district = self.cityArray[_countryIndex][@"countryArray"][_provinceIndex][@"shiArray"][_cityIndex][@"quArray"][_districtIndex][@"quname"];
+                
                 NSString *area = [NSString stringWithFormat:@"%@%@%@%@",country,province,city,district];
                 self.didSelectAreaSelectResultBlock(area);
             }
@@ -119,17 +109,25 @@
     }];
     NSArray *titles = @[LocalSelectYouCountry,LocalSelectYouProvinces,LocalSelectYouCity,LocalSelectYouArea];
     areaCell.title = titles[indexPath.row];
+    NSMutableArray<NSString*> *tempArrayM = [NSMutableArray array];
     if (indexPath.row == 0) {
-        areaCell.dataArray = @[@"中国",@"马来西亚"];
+        for (NSDictionary *dict in self.cityArray) {
+            [tempArrayM addObject:dict[@"countryname"]];
+        }
     }else if (indexPath.row == 1){
-        if (self.countryIndex == 0) {
-            areaCell.dataArray = self.cityArray;
+        for (NSDictionary *dict in self.cityArray[_countryIndex][@"countryArray"]) {
+            [tempArrayM addObject:dict[@"shenname"]];
         }
     }else if (indexPath.row == 2){
-        areaCell.dataArray = self.cityArray[_provinceIndex][@"sub"];
+        for (NSDictionary *dict in self.cityArray[_countryIndex][@"countryArray"][_provinceIndex][@"shiArray"]) {
+            [tempArrayM addObject:dict[@"shiname"]];
+        }
     }else if (indexPath.row == 3){
-        areaCell.dataArray = self.cityArray[_provinceIndex][@"sub"][_cityIndex][@"sub"];
+        for (NSDictionary *dict in self.cityArray[_countryIndex][@"countryArray"][_provinceIndex][@"shiArray"][_cityIndex][@"quArray"]) {
+            [tempArrayM addObject:dict[@"quname"]];
+        }
     }
+     areaCell.dataArrayM = tempArrayM;
     return areaCell;
 }
 - (void)showPopView:(BOOL)animated
@@ -191,7 +189,6 @@
 {
     [self dismissPopView:YES];
 }
-
 @end
 
 
@@ -206,8 +203,8 @@
     _tableFrame = tableFrame;
     self.tableView.frame = tableFrame;
 }
--(void)setDataArray:(NSArray *)dataArray{
-    _dataArray = dataArray;
+-(void)setDataArrayM:(NSMutableArray *)dataArrayM{
+    _dataArrayM = dataArrayM;
     [self.tableView reloadData];
 }
 -(void)setHeaderFrame:(CGRect)headerFrame{
@@ -247,7 +244,7 @@
     return _tableView;
 }
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
-    return _dataArray.count;
+    return _dataArrayM.count;
 }
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell"];
@@ -260,11 +257,9 @@
         lineView.backgroundColor = COLOR_EDEDED;
         lineView.frame = CGRectMake(0, 0, WIDTHF(cell.contentView), W_RATIO(2));
     }
-    if ([_dataArray.firstObject isKindOfClass:[NSDictionary class]]) {
-        cell.textLabel.text  = _dataArray[indexPath.row][@"name"];
-    }else if ([_dataArray.firstObject isKindOfClass:[NSString class]]){
-        cell.textLabel.text  = _dataArray[indexPath.row];
-    }
+    
+    cell.textLabel.text  = _dataArrayM[indexPath.row];
+    
     return cell;
 }
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{

@@ -76,7 +76,8 @@
 "cartNoGoods" = "Current shopping cart no merchandise";
 "edit" = "Edit";
 "stock" = "Low stocks";
-"shelf" = "undercarriage";
+"shelf" = "Undercarriage";
+"notbuy" = "Not buy";
 "nothing" = "Nothing";
 "totalCost" = "Total (excluding postage)";
 "balance" = "Balance";
@@ -187,6 +188,7 @@
 "myOrder" = "My Order";
 "noOrderTisp" = "No order information currently available";
 "cancelOrder" = "Cancel";
+"invalidOrder" = "Order closed";
 "payment" = "Pay";
 "whyNotPay" = "Why not pay at once?";
 "prompt" = "Remind";
@@ -326,7 +328,6 @@
 "registerSuccess" = "Register success";
 "registerFailure" = "Register failed";
 
-"lowStocks" = "Low stocks";
 "saveFirst" = "Please Save first";
 
 "appUnInstall" = "This device is not installed App";

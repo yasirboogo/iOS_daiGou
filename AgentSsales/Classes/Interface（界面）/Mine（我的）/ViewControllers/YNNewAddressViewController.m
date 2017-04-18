@@ -10,11 +10,15 @@
 #import "YNNewAddressTableView.h"
 #import "YNAreaSelectView.h"
 
+#import "YNSelectAreaViewController.h"
+
 @interface YNNewAddressViewController ()
 
 @property(nonatomic,strong)YNNewAddressTableView *tableView;
 
 @property(nonatomic,strong)YNAreaSelectView *areaSelectView;
+
+@property(nonatomic,strong)NSDictionary *addressDict;
 
 @end
 
@@ -24,10 +28,15 @@
 
 - (void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:animated];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleAddressName:) name:@"AddressName" object:nil];
 }
 
 - (void)viewDidAppear:(BOOL)animated{
     [super viewDidAppear:animated];
+}
+-(void)handleAddressName:(NSNotification*)notification{
+    self.addressDict = notification.userInfo;
+    _tableView.area = self.addressDict[@"address"];
 }
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -40,12 +49,19 @@
 - (void)viewDidDisappear:(BOOL)animated{
     [super viewDidDisappear:animated];
 }
+-(void)dealloc{
+    
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
 #pragma mark - 网路请求
 -(void)startNetWorkingRequestWithSaveNewAddress{
     NSMutableDictionary *params = [NSMutableDictionary dictionaryWithObjectsAndKeys:
                                    _tableView.name,@"name",
                                    _tableView.phone,@"phone",
-                                   _tableView.locality,@"region",
+                                   _addressDict[@"countryid"],@"country",
+                                   _addressDict[@"shenid"],@"province",
+                                   _addressDict[@"shiid"],@"city",
+                                   _addressDict[@"quid"],@"area",
                                    _tableView.details,@"detailed",
                                    _tableView.email,@"email", nil];
     if (self.type == 0) {
@@ -76,8 +92,8 @@
         _tableView  = tableView;
         [self.view addSubview:tableView];
         [tableView setDidSelectAddressCellBlock:^{
-            [self.view endEditing:YES];
-            [self.areaSelectView showPopView:YES];
+            YNSelectAreaViewController *pushVC = [[YNSelectAreaViewController alloc] init];
+            [self.navigationController pushViewController:pushVC animated:NO];
         }];
     }
     return _tableView;

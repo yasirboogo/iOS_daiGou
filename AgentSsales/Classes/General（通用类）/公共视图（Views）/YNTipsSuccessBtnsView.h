@@ -20,4 +20,6 @@ typedef NS_OPTIONS(NSUInteger, UIButtonStyle) {
 
 @property (nonatomic,assign) UIButtonStyle btnStyle;
 
+@property (nonatomic,assign) BOOL isEnable;
+
 @end

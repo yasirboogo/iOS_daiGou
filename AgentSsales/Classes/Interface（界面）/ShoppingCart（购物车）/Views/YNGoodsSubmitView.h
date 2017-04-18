@@ -12,6 +12,6 @@
 
 @property (nonatomic,copy) NSDictionary * dict;
 
-@property (nonatomic,copy) void(^handleSubmitButtonBlock)(void);
+@property (nonatomic,copy) void(^handleSubmitButtonBlock)(NSString*);
 
 @end

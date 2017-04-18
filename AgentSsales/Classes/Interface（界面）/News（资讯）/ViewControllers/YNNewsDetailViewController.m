@@ -105,7 +105,8 @@
 -(void)startNetWorkingRequestWithGetCommentNewsList{
     NSDictionary *params = @{@"messageId":_messageId,
                              @"pageIndex":[NSNumber numberWithInteger:self.pageIndex],
-                             @"pageSize":[NSNumber numberWithInteger:self.pageSize]
+                             @"pageSize":[NSNumber numberWithInteger:self.pageSize],
+                             @"type":[NSNumber numberWithInteger:_type]
                              };
     [YNHttpManagers getCommentNewsListWithParams:params success:^(id response) {
         [self handleEndMJRefresh];

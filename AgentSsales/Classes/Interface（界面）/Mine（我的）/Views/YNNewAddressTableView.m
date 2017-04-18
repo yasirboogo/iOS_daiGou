@@ -34,14 +34,19 @@
     _addressM = addressM;
     self.name = addressM[@"name"];
     self.phone = addressM[@"phone"];
-    self.locality = addressM[@"region"];
+    
+    NSString *country = addressM[@"country"]?addressM[@"country"]:@"";
+    NSString *province = addressM[@"province"]?addressM[@"province"]:@"";
+    NSString *city = addressM[@"city"]?addressM[@"city"]:@"";
+    NSString *area = addressM[@"area"]?addressM[@"area"]:@"";
+    NSString *detailed = addressM[@"detailed"]?addressM[@"detailed"]:@"";
+    self.locality = [NSString stringWithFormat:@"%@%@%@%@%@",country,province,city,area,detailed];
     self.details = addressM[@"detailed"];
     self.email = addressM[@"email"];
     [self reloadData];
 }
 -(void)setArea:(NSString *)area{
     _area = area;
-    [self.addressM setObject:area forKey:@"region"];
     self.locality = area;
     [self reloadData];
 }

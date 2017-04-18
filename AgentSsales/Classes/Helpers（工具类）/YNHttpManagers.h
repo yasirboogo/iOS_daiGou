@@ -150,6 +150,10 @@
  */
 +(void)startPlanPayWithParams:(NSDictionary *)params success:(void (^)(id response))success failure:(void (^)(NSError *error))failure;
 /**
+ 2.26获取地址
+ */
++(void)getProvincesWithParams:(NSDictionary *)params success:(void (^)(id response))success failure:(void (^)(NSError *error))failure;
+/**
  3.1资讯分类
  */
 +(void)getAllNewsClassWithParams:(NSDictionary *)params success:(void (^)(id response))success failure:(void (^)(NSError *error))failure;

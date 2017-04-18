@@ -258,7 +258,7 @@
     _dict = dict;
     self.mapImgView.image = [UIImage imageNamed:@"dingwei_gouwuche"];
     self.arrowImgView.image = [UIImage imageNamed:@"mianbaoxie_you_gouwuche"];
-    
+
     if (dict[@"name"]) {
         self.nameLabel.text = [NSString stringWithFormat:@"%@",dict[@"name"]];
     }else{
@@ -269,8 +269,13 @@
     }else{
         self.phoneLabel.text = [NSString stringWithFormat:@"%@",@"请选择"];
     }
-    if (dict[@"region"]) {
-        self.addressLabel.text = [NSString stringWithFormat:@"%@%@",dict[@"region"],dict[@"detailed"]];
+    if (dict[@"country"]) {
+        NSString *country = dict[@"country"]?dict[@"country"]:@"";
+        NSString *province = dict[@"province"]?dict[@"province"]:@"";
+        NSString *city = dict[@"city"]?dict[@"city"]:@"";
+        NSString *area = dict[@"area"]?dict[@"area"]:@"";
+        NSString *detailed = dict[@"detailed"]?dict[@"detailed"]:@"";
+        self.addressLabel.text = [NSString stringWithFormat:@"%@%@%@%@%@",country,province,city,area,detailed];
     }else{
         self.addressLabel.text = [NSString stringWithFormat:@"%@",@"请选择"];
     }

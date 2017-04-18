@@ -11,12 +11,14 @@
 #import "YNShoppingCartViewController.h"
 #import "YNAreaSelectView.h"
 #import "YNFirmOrderViewController.h"
+#import "YNSelectAreaViewController.h"
 
 @interface YNPrefectInforViewController ()
 
 @property(nonatomic,strong)YNPrefectInforTableView *tableView;
 
-@property(nonatomic,strong)YNAreaSelectView *areaSelectView;
+@property(nonatomic,strong)NSDictionary *address;
+//@property(nonatomic,strong)YNAreaSelectView *areaSelectView;
 
 @property (nonatomic,weak) UIButton *submitBtn;
 
@@ -28,8 +30,8 @@
 
 - (void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:animated];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleAddressName:) name:@"AddressName" object:nil];
 }
-
 - (void)viewDidAppear:(BOOL)animated{
     [super viewDidAppear:animated];
 }
@@ -44,11 +46,14 @@
 - (void)viewDidDisappear:(BOOL)animated{
     [super viewDidDisappear:animated];
 }
-
+-(void)dealloc{
+    
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
 #pragma mark - 网路请求
 -(void)startNetWorkingRequestWithPrefectUserInfor{
-    NSMutableDictionary *params = [NSMutableDictionary dictionaryWithObjectsAndKeys:[DEFAULTS valueForKey:kUserLoginInfors][@"userId"],@"userId",_tableView.name,@"username",_tableView.phone,@"phone",_tableView.locality,@"region",_tableView.details,@"detailed",_tableView.emial,@"emial", nil];
-    
+    NSMutableDictionary *params = [NSMutableDictionary dictionaryWithObjectsAndKeys:[DEFAULTS valueForKey:kUserLoginInfors][@"userId"],@"userId",_tableView.name,@"username",_tableView.phone,@"phone",_tableView.locality,@"region",_tableView.details,@"detailed",_tableView.emial,@"emial",_address[@"countryid"],@"country",_address[@"shenid"],@"province",_address[@"shiid"],@"city",_address[@"quid"],@"area", nil];
+
     if (_tableView.numberID.length) {
         [params setValue:_tableView.numberID forKey:@"idCard"];
     }
@@ -69,6 +74,7 @@
     }];
 }
 #pragma mark - 视图加载
+/*
 -(YNAreaSelectView *)areaSelectView{
     if (!_areaSelectView) {
         CGRect frame = CGRectMake(0,(SCREEN_HEIGHT-W_RATIO(100)*9)/2.0, SCREEN_WIDTH, W_RATIO(100)*9);
@@ -80,14 +86,15 @@
     }
     return _areaSelectView;
 }
+ */
 -(YNPrefectInforTableView *)tableView{
     if (!_tableView) {
         YNPrefectInforTableView *tableView = [[YNPrefectInforTableView alloc] init];
         _tableView  = tableView;
         [self.view addSubview:tableView];
         [tableView setDidSelectAddressCellBlock:^{
-            [self.view endEditing:YES];
-            [self.areaSelectView showPopView:YES];
+            YNSelectAreaViewController *pushVC = [[YNSelectAreaViewController alloc] init];
+            [self.navigationController pushViewController:pushVC animated:NO];
         }];
     }
     return _tableView;
@@ -110,6 +117,11 @@
 #pragma mark - 代理实现
 
 #pragma mark - 函数、消息
+-(void)handleAddressName:(NSNotification*)notification{
+    self.address = notification.userInfo;
+
+    _tableView.locality = _address[@"address"];
+}
 -(void)handlePrefectInforSubmitButtonClick:(UIButton*)btn{
     [self startNetWorkingRequestWithPrefectUserInfor];
 }

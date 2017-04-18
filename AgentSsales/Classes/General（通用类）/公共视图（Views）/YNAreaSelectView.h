@@ -12,6 +12,8 @@
 
 @property (nonatomic, assign) BOOL isTapGesture;
 
+@property (nonatomic, strong) NSMutableArray *cityArray;
+
 @property (nonatomic,copy) void(^didSelectAreaSelectResultBlock)(NSString *);
 
 - (void)showPopView:(BOOL)animated;
@@ -23,7 +25,7 @@
 
 @property (nonatomic,copy) NSString * title;
 
-@property (nonatomic,strong) NSArray * dataArray;
+@property (nonatomic,strong) NSMutableArray * dataArrayM;
 
 @property (nonatomic,assign) CGRect tableFrame;
 

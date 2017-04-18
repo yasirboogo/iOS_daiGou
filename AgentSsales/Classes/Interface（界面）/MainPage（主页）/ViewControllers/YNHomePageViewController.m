@@ -168,7 +168,7 @@
             [self.navigationController pushViewController:pushVC animated:NO];
         }];
         [collectionView setDidSelectMoreBtnClickBlock:^(NSInteger index) {
-            if (index == 3) {
+            if (index == 1) {
                 YNShowMoreClassViewController *pushVC = [[YNShowMoreClassViewController alloc] init];
                 [self.navigationController pushViewController:pushVC animated:NO];
             }else if (index == 4){

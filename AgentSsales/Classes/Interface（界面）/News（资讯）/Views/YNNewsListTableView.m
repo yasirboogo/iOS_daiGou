@@ -36,6 +36,9 @@
     }
     return kZero;
 }
+-(CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section{
+    return kZero;
+}
 -(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
     if ((indexPath.row+1)%4 == 0 || indexPath.row == _adArrayM.count+_dataArrayM.count-1) {
         return W_RATIO(150);

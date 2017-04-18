@@ -17,7 +17,7 @@
 +(void)setupHttpTool{
     [HttpTool updateBaseUrl:kBaseUrl];
     [HttpTool enableInterfaceDebug:NO];
-    [HttpTool setTimeout:5.0f];
+    [HttpTool setTimeout:15.0f];
     //[HttpTool configCommonHttpHeaders:nil];
     [HttpTool clearCaches];
     
@@ -498,13 +498,17 @@
 /**
  2.21新增或者保存地址
  修改请求路径:
- http://192.168.1.138/daigou/app/appUserController/editorAddress.do?id=1&name=唉声叹气&phone=14564872121&region=上海&detailed=海外
- 保存请求路径:
- http://192.168.1.138/daigou/app/appUserController/editorAddress.do?userid=3&name=真心累&phone=14564872121&region=天津&detailed=海外&email=110@qq.com
+ http://192.168.1.138/daigou/app/appUserController/editorAddress.do?userid=3&name=%E7%9C%9F%E5%BF%83%E7%B4%AF&phone=14564872121&country=3357&province=1593&city=1594&area=1597&detailed=%E6%B5%B7%E5%A4%96&email=978392564@qq.com
+  保存请求路径:
+ http://192.168.1.138/daigou/app/appUserController/editorAddress.do?userid=3&name=%E7%9C%9F%E5%BF%83%E7%B4%AF&phone=14564872121&province=1593&city=1594&area=1597&detailed=%E6%B5%B7%E5%A4%96&email=978392564
  params:
  name:收货人名称
  phone:电话号码
- region:省市区
+ country:国
+ province:省
+ city:市
+ area:区
+ email:邮箱
  detailed:详细地址
  userid:用户id
  id:地址id
@@ -570,6 +574,21 @@
  */
 +(void)startPlanPayWithParams:(NSDictionary *)params success:(void (^)(id response))success failure:(void (^)(NSError *error))failure{
     NSString *url = @"appOrderController/payment.do?";
+    [YNHttpManagers handleRequestWithUrl:url refreshCache:kSetCache params:params Success:^(id response) {
+        success(response);
+    } failure:^(NSError *error) {
+        failure(error);
+    } isTipsSuccess:NO isTipsFailure:YES];
+}
+/**
+ 2.26获取地址
+ http://192.168.1.138/daigou/app/appIndexController/provinces.do?code=0&type=0
+ params:
+ type:0国语1马来语2英语
+ code:0国家
+ */
++(void)getProvincesWithParams:(NSDictionary *)params success:(void (^)(id response))success failure:(void (^)(NSError *error))failure{
+    NSString *url = @"appIndexController/provinces.do?";
     [YNHttpManagers handleRequestWithUrl:url refreshCache:kSetCache params:params Success:^(id response) {
         success(response);
     } failure:^(NSError *error) {
@@ -645,6 +664,7 @@
  messageId:资讯id
  pageIndex:当前页
  pageSize:显示条数
+ type:0国语1马来语2英语
  */
 +(void)getCommentNewsListWithParams:(NSDictionary *)params success:(void (^)(id response))success failure:(void (^)(NSError *error))failure{
     NSString *url = @"appIndexController/infoReview.do?";
@@ -734,12 +754,16 @@
 }
 /**
  4.5完善资料保存
- http://192.168.1.138/daigou/app/appShoppingController/saveInfo.do?userId=3&&username=小孩&phone=15820355704&region=北街&detailed=小小市&idCard=4521212
+ 
+ http://192.168.1.138/daigou/app/appShoppingController/saveInfo.do?userId=44&username=ss&phone=15820355704&country=3358&province=1593&city=1594&area=1597&detailed=ss&idCard=441481199504021774
  params:
  userId:用户id
  username:收货人
  phone:电话号码
- region:省市区
+ country:国家
+ province:省
+ city:城市
+ area:地区
  detailed:详细地址
  idCard:身份证号
  */

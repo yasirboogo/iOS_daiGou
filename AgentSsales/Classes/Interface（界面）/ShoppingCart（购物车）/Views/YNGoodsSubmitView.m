@@ -98,7 +98,7 @@
 }
 -(void)handleSubmitButtonClick:(UIButton*)btn{
     if (self.handleSubmitButtonBlock) {
-        self.handleSubmitButtonBlock();
+        self.handleSubmitButtonBlock(@"");
     }
 }
 

@@ -126,15 +126,15 @@
         YNGoodsSubmitView *submitView = [[YNGoodsSubmitView alloc] initWithFrame:frame];
         _submitView = submitView;
         [self.view addSubview:submitView];
-        [submitView setHandleSubmitButtonBlock:^{
+        [submitView setHandleSubmitButtonBlock:^(NSString *showInfor) {
             if (self.isUnAble) {
-                [SVProgressHUD showImage:nil status:LocalLowStocks];
+                [SVProgressHUD showImage:nil status:LocalStock];
                 [SVProgressHUD dismissWithDelay:2.0f];
             }else{
                 if (!self.isEditing) {
                     [self startNetWorkingRequestWithStartSubmitOrder];
                 }else{
-                    [SVProgressHUD showImage:nil status:LocalSaveFirst];
+                    [SVProgressHUD showImage:nil status:LocalNotbuy];
                     [SVProgressHUD dismissWithDelay:2.0f];
                 }
             }

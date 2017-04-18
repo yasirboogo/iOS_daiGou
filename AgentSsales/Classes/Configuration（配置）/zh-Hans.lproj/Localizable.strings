@@ -80,6 +80,7 @@
 "edit" = "编辑";
 "stock" = "库存不足";
 "shelf" = "已下架";
+"notbuy" = "无法购买";
 "nothing" = "暂无";
 "totalCost" = "总计(不含邮费)";
 "balance" = "结算";
@@ -188,6 +189,7 @@
 "myOrder" = "我的订单";
 "noOrderTisp" = "当前没有订单信息";
 "cancelOrder" = "取消订单";
+"invalidOrder" = "订单已关闭";
 "payment" = "马上付款";
 "whyNotPay" = "为何不能马上付款？";
 "prompt" = "提醒发货";
@@ -331,8 +333,7 @@
 "registerSuccess" = "注册成功";
 "registerFailure" = "注册失败";
 
-"lowStocks" = "库存不足";
-"lowStocks" = "请先保存";
+"saveFirst" = "请先保存";
 
 "appUnInstall" = "此设备未安装相应App";
 

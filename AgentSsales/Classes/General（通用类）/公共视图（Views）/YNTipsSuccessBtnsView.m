@@ -10,6 +10,12 @@
 
 @implementation YNTipsSuccessBtnsView
 
+-(void)setIsEnable:(BOOL)isEnable{
+    _isEnable = isEnable;
+    for (UIButton *btn in self.subviews) {
+        btn.userInteractionEnabled = isEnable;
+    }
+}
 
 -(void)setBtnTitles:(NSArray<NSString *> *)btnTitles{
     _btnTitles = btnTitles;

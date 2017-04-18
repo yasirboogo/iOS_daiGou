@@ -9,7 +9,7 @@
 #ifndef APIMacro_h
 #define APIMacro_h
 
-#if 0
+#if 1
 /* 本地 */
     #define kBaseUrl @"http://192.168.1.138/daigou/app"
 #else

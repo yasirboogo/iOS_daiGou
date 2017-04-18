@@ -137,9 +137,11 @@
             }
         }];
         [collectionView setButtonNoClickStopTimerBlock:^{
-            self.btnsView.userInteractionEnabled = NO;
-            [SVProgressHUD showImage:nil status:@"订单已关闭"];
-            [SVProgressHUD dismissWithDelay:2.0f];
+            self.btnsView.isEnable = NO;
+            [SVProgressHUD showImage:nil status:LocalInvalidOrder];
+            [SVProgressHUD dismissWithDelay:2.0f completion:^{
+                [self.navigationController popViewControllerAnimated:NO];
+            }];
         }];
     }
     return _collectionView;

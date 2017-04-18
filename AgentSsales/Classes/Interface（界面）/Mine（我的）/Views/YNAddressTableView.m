@@ -81,7 +81,13 @@
     
     self.phoneF = CGRectMake(MaxX(_nameF)+kMinSpace,Y(_nameF),SCREEN_WIDTH-W_RATIO(20)*2-kMidSpace-MaxX(_nameF)-kMinSpace ,HEIGHT(_nameF));
 
-    CGSize addressSize = [[NSString stringWithFormat:@"%@%@",dict[@"region"],dict[@"detailed"]] calculateHightWithWidth:MaxX(_phoneF)-kMidSpace font:FONT(30)];
+    NSString *country = dict[@"country"]?dict[@"country"]:@"";
+    NSString *province = dict[@"province"]?dict[@"province"]:@"";
+    NSString *city = dict[@"city"]?dict[@"city"]:@"";
+    NSString *area = dict[@"area"]?dict[@"area"]:@"";
+    NSString *detailed = dict[@"detailed"]?dict[@"detailed"]:@"";
+    
+    CGSize addressSize = [[NSString stringWithFormat:@"%@%@%@%@%@",country,province,city,area,detailed]calculateHightWithWidth:MaxX(_phoneF)-kMidSpace font:FONT(30)];
     self.addresssF = CGRectMake(X(_nameF),MaxY(_nameF)+W_RATIO(20),addressSize.width,addressSize.height);
     
     CGSize delectSize = [LocalDelete calculateHightWithFont:FONT(26) maxWidth:0];
@@ -170,7 +176,14 @@
     
     self.nameLabel.text = cellFrame.dict[@"name"];
     self.phoneLabel.text = cellFrame.dict[@"phone"];
-    self.addressLabel.text = [NSString stringWithFormat:@"%@%@",cellFrame.dict[@"region"],cellFrame.dict[@"detailed"]];
+    
+    NSString *country = cellFrame.dict[@"country"]?cellFrame.dict[@"country"]:@"";
+    NSString *province = cellFrame.dict[@"province"]?cellFrame.dict[@"province"]:@"";
+    NSString *city = cellFrame.dict[@"city"]?cellFrame.dict[@"city"]:@"";
+    NSString *area = cellFrame.dict[@"area"]?cellFrame.dict[@"area"]:@"";
+    NSString *detailed = cellFrame.dict[@"detailed"]?cellFrame.dict[@"detailed"]:@"";
+    
+    self.addressLabel.text = [NSString stringWithFormat:@"%@%@%@%@%@",country,province,city,area,detailed];
     self.selectLabel.text = LocalDefaultAddress;
     self.delectLabel.text = LocalDelete;
 

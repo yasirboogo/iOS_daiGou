@@ -44,15 +44,12 @@
 
 @interface YNPlatSelectsCell : UICollectionViewCell
 /** 代购平台图片 */
-@property (nonatomic,strong) NSArray<NSString*> * platImgs;
-/** 点击代购平台回调 */
-@property (nonatomic,copy)void(^didSelectPlatImgClickBlock)(NSInteger);
-
+@property (nonatomic,strong) NSString * platImg;
 @end
 
 @interface YNHotClassesCell : UICollectionViewCell
-/** 热门分类图片URLString */
-@property (nonatomic,strong) NSArray<NSString*> * imageURLs;
+/** 热门分类图片URLString 标题*/
+@property (nonatomic,strong) NSDictionary* dict;
 /** 点击热门分类回调 */
 @property (nonatomic,copy)void(^didSelectHotClassImgClickBlock)(NSInteger);
 
@@ -84,7 +81,14 @@
 
 @end
 
+@interface YNSpecialBuyCell : UICollectionViewCell
+
+@property (nonatomic,strong) NSDictionary * dict;
+@property (nonatomic,copy)void(^didBuyNowButtonClickBlock)();
+@end
+
 typedef void(^moreButtonClickBlock)();
+
 @interface YNHeaderBarView : UICollectionReusableView
 
 @property (nonatomic,copy)moreButtonClickBlock moreButtonClickBlock;
@@ -97,5 +101,15 @@ typedef void(^moreButtonClickBlock)();
             moreImg:(UIImage*)moreImg
               color:(UIColor*)color
      moreClickBlock:(moreButtonClickBlock)moreClickBlock;
+
+@end
+
+typedef void(^showButtonClickBlock)(BOOL);
+@interface YNHeaderShowBarView : UICollectionReusableView
+@property (nonatomic,copy)showButtonClickBlock showButtonClickBlock;
+-(void)setWithTitle:(NSString*)title
+            leftImg:(UIImage*)leftImg
+            isShow:(BOOL)isShow
+     showClickBlock:(showButtonClickBlock)showClickBlock;
 
 @end

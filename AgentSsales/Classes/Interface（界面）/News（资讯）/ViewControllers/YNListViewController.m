@@ -65,12 +65,6 @@
     }];
 }
 -(void)startNetWorkingRequestWithGetOneNewsList{
-    /*
-    NSDictionary *params = @{@"infoId":[NSString stringWithFormat:@"%@",self.imgInfor[@"infoId"]],
-                             @"type":[NSNumber numberWithInteger:_type],
-                             @"pageIndex":[NSNumber numberWithInteger:_pageIndex],
-                             @"pageSize":[NSNumber numberWithInteger:_pageSize]};
-*/
     NSString *infoId = [NSString stringWithFormat:@"%@",self.imgInfor[@"infoId"]];
     NSNumber *type = [NSNumber numberWithInteger:_type];
     NSNumber *pageIndex = [NSNumber numberWithInteger:_pageIndex];

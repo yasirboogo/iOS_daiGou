@@ -127,6 +127,8 @@
 		BF6870B21E6FADBE006A6F82 /* UIView+HDExtension.m in Sources */ = {isa = PBXBuildFile; fileRef = BF6870AE1E6FADBE006A6F82 /* UIView+HDExtension.m */; };
 		BF6871451E723528006A6F82 /* YNShoppingCartModel.m in Sources */ = {isa = PBXBuildFile; fileRef = BF6871441E723528006A6F82 /* YNShoppingCartModel.m */; };
 		BF69E3B71E25D1B90096B2D9 /* YNClearCache.m in Sources */ = {isa = PBXBuildFile; fileRef = BF69E3B61E25D1B90096B2D9 /* YNClearCache.m */; };
+		BF74421B1EA4C83200DCC1B5 /* YNSelectAreaViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = BF74421A1EA4C83200DCC1B5 /* YNSelectAreaViewController.m */; };
+		BF74421E1EA4C9DD00DCC1B5 /* YNSelectAreaTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = BF74421D1EA4C9DD00DCC1B5 /* YNSelectAreaTableView.m */; };
 		BF80B97C1E4565F600AA2C54 /* libMasonry.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BF80B97B1E4565F600AA2C54 /* libMasonry.a */; };
 		BF80B97F1E45DF4400AA2C54 /* YNTerraceGoodsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = BF80B97E1E45DF4400AA2C54 /* YNTerraceGoodsViewController.m */; };
 		BF80B9861E48082000AA2C54 /* YNGoodsDetailBtnsView.m in Sources */ = {isa = PBXBuildFile; fileRef = BF80B9851E48082000AA2C54 /* YNGoodsDetailBtnsView.m */; };
@@ -534,6 +536,10 @@
 		BF6871441E723528006A6F82 /* YNShoppingCartModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YNShoppingCartModel.m; sourceTree = "<group>"; };
 		BF69E3B51E25D1B90096B2D9 /* YNClearCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YNClearCache.h; sourceTree = "<group>"; };
 		BF69E3B61E25D1B90096B2D9 /* YNClearCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YNClearCache.m; sourceTree = "<group>"; };
+		BF7442191EA4C83200DCC1B5 /* YNSelectAreaViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YNSelectAreaViewController.h; sourceTree = "<group>"; };
+		BF74421A1EA4C83200DCC1B5 /* YNSelectAreaViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YNSelectAreaViewController.m; sourceTree = "<group>"; };
+		BF74421C1EA4C9DD00DCC1B5 /* YNSelectAreaTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YNSelectAreaTableView.h; sourceTree = "<group>"; };
+		BF74421D1EA4C9DD00DCC1B5 /* YNSelectAreaTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YNSelectAreaTableView.m; sourceTree = "<group>"; };
 		BF80B97B1E4565F600AA2C54 /* libMasonry.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libMasonry.a; path = "Pods/../build/Release-iphoneos/Masonry/libMasonry.a"; sourceTree = "<group>"; };
 		BF80B97D1E45DF4400AA2C54 /* YNTerraceGoodsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YNTerraceGoodsViewController.h; sourceTree = "<group>"; };
 		BF80B97E1E45DF4400AA2C54 /* YNTerraceGoodsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YNTerraceGoodsViewController.m; sourceTree = "<group>"; };
@@ -2182,6 +2188,8 @@
 				BFBEE8871E1DD65F00FB6E3D /* YNMineImgHeaderView.m */,
 				BFBEE89D1E1E400000FB6E3D /* YNPaymentTableView.h */,
 				BFBEE89E1E1E400000FB6E3D /* YNPaymentTableView.m */,
+				BF74421C1EA4C9DD00DCC1B5 /* YNSelectAreaTableView.h */,
+				BF74421D1EA4C9DD00DCC1B5 /* YNSelectAreaTableView.m */,
 			);
 			name = "公用";
 			sourceTree = "<group>";
@@ -2215,6 +2223,8 @@
 				BFA0D9011E248262006897DB /* YNAddressViewController.m */,
 				BFA0D9061E24E650006897DB /* YNNewAddressViewController.h */,
 				BFA0D9071E24E650006897DB /* YNNewAddressViewController.m */,
+				BF7442191EA4C83200DCC1B5 /* YNSelectAreaViewController.h */,
+				BF74421A1EA4C83200DCC1B5 /* YNSelectAreaViewController.m */,
 			);
 			name = "收货地址管理";
 			sourceTree = "<group>";
@@ -2833,6 +2843,8 @@
 				BF322A911E4C72E000E51BB1 /* YNInputPhoneViewController.m in Sources */,
 				BFBEE8811E1CAA1B00FB6E3D /* YNDistributionTableView.m in Sources */,
 				BF0945F51E5D81F100FA2464 /* YNDocumentExplainViewController.m in Sources */,
+				BF74421E1EA4C9DD00DCC1B5 /* YNSelectAreaTableView.m in Sources */,
+				BF74421B1EA4C83200DCC1B5 /* YNSelectAreaViewController.m in Sources */,
 				BF8DAD411E94CC8B00549DFB /* CRToastWindow.m in Sources */,
 				55DCA9F21E038D07003041CF /* AppDelegate.m in Sources */,
 				BF93031A1E2CB7A000227EF0 /* NSString+Category.m in Sources */,
