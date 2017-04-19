@@ -13,12 +13,18 @@
 #import "YNSelectAreaViewController.h"
 
 @interface YNNewAddressViewController ()
+{
+    NSInteger _type;
+}
+
+@property (nonatomic,strong) NSArray * dataArray;
+
+@property (nonatomic,copy) NSString * addressId;
 
 @property(nonatomic,strong)YNNewAddressTableView *tableView;
 
 @property(nonatomic,strong)YNAreaSelectView *areaSelectView;
 
-@property(nonatomic,strong)NSDictionary *addressDict;
 
 @end
 
@@ -33,10 +39,16 @@
 
 - (void)viewDidAppear:(BOOL)animated{
     [super viewDidAppear:animated];
+    
+    dispatch_async(dispatch_get_global_queue(0, 0), ^{
+        // 处理耗时操作的代码块...
+        [self startNetWorkingRequestWithGetProvincesWithisPush:NO];
+    });
+    
 }
 -(void)handleAddressName:(NSNotification*)notification{
-    self.addressDict = notification.userInfo;
-    _tableView.area = self.addressDict[@"address"];
+    self.address = notification.userInfo;
+    _tableView.area = self.address[@"address"];
 }
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -54,19 +66,45 @@
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 #pragma mark - 网路请求
+-(void)startNetWorkingRequestWithGetProvincesWithisPush:(BOOL)isPush{
+    if (isPush) {
+        [SVProgressHUD showWithStatus:LocalLoading];
+    }
+    NSMutableDictionary *params = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+                                   @"0",@"code",
+                                   [NSNumber numberWithInteger:_type],@"type", nil];
+    [YNHttpManagers getProvincesWithParams:params success:^(id response) {
+        if ([response[@"code"] isEqualToString:@"success"]) {
+            //do success things
+            [SVProgressHUD dismiss];
+            self.dataArray = response[@"countryArray"];
+            if (isPush) {
+                YNSelectAreaViewController *pushVC = [[YNSelectAreaViewController alloc] init];
+                pushVC.dataArray = _dataArray;
+                [self.navigationController pushViewController:pushVC animated:NO];
+            }
+        }else{
+            //do failure things
+            [SVProgressHUD showImage:nil status:LocalSaveFailure];
+            [SVProgressHUD dismissWithDelay:2.0f];
+        }
+    } failure:^(NSError *error) {
+        //do error things
+    }];
+}
 -(void)startNetWorkingRequestWithSaveNewAddress{
     NSMutableDictionary *params = [NSMutableDictionary dictionaryWithObjectsAndKeys:
                                    _tableView.name,@"name",
                                    _tableView.phone,@"phone",
-                                   _addressDict[@"countryid"],@"country",
-                                   _addressDict[@"shenid"],@"province",
-                                   _addressDict[@"shiid"],@"city",
-                                   _addressDict[@"quid"],@"area",
+                                   _address[@"countryid"],@"country",
+                                   _address[@"provinceid"],@"province",
+                                   _address[@"cityid"],@"city",
+                                   _address[@"areaid"],@"area",
                                    _tableView.details,@"detailed",
                                    _tableView.email,@"email", nil];
-    if (self.type == 0) {
-        [params setValue:_address[@"addressId"] forKey:@"id"];
-    }else if (self.type == 1){
+    if (_viewType == 0) {
+        [params setValue:_addressId forKey:@"id"];
+    }else if (_viewType == 1){
         [params setValue:[DEFAULTS valueForKey:kUserLoginInfors][@"userId"] forKey:@"userid"];
     }
     [YNHttpManagers saveNewAddressWithParams:params success:^(id response) {
@@ -92,8 +130,13 @@
         _tableView  = tableView;
         [self.view addSubview:tableView];
         [tableView setDidSelectAddressCellBlock:^{
-            YNSelectAreaViewController *pushVC = [[YNSelectAreaViewController alloc] init];
-            [self.navigationController pushViewController:pushVC animated:NO];
+            if (self.dataArray) {
+                YNSelectAreaViewController *pushVC = [[YNSelectAreaViewController alloc] init];
+                pushVC.dataArray = self.dataArray;
+                [self.navigationController pushViewController:pushVC animated:NO];
+            }else{
+                [self startNetWorkingRequestWithGetProvincesWithisPush:YES];
+            }
         }];
     }
     return _tableView;
@@ -114,8 +157,10 @@
 #pragma mark - 函数、消息
 -(void)makeData{
     [super makeData];
+    _type = [LanguageManager currentLanguageIndex];
     if (self.address) {
         self.tableView.addressM = [self.address mutableCopy];
+        self.addressId = self.address[@"addressId"];
     }
 }
 -(void)makeNavigationBar{
@@ -134,9 +179,9 @@
             [SVProgressHUD dismissWithDelay:2.0f];
         }
     }];
-    if (self.type == 0) {
+    if (self.viewType == 0) {
         self.titleLabel.text = LocalChangeAddress;
-    }else if (self.type == 1){
+    }else if (self.viewType == 1){
         self.titleLabel.text = LocalNewAddress;
     }
 }

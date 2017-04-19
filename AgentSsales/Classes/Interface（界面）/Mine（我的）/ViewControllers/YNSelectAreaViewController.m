@@ -11,9 +11,6 @@
 
 
 @interface YNSelectAreaViewController ()
-{
-    NSInteger _type;
-}
 @property (nonatomic,weak) YNSelectAreaTableView * tableView;
 @end
 
@@ -30,7 +27,6 @@
 }
 - (void)viewDidLoad {
     [super viewDidLoad];
-    [self startNetWorkingRequestWithGetProvinces];
 }
 
 - (void)viewWillDisappear:(BOOL)animated{
@@ -41,24 +37,6 @@
     [super viewDidDisappear:animated];
 }
 
-#pragma mark - 网路请求
--(void)startNetWorkingRequestWithGetProvinces{
-    NSMutableDictionary *params = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-                                   @"0",@"code",
-                                   [NSNumber numberWithInteger:_type],@"type", nil];
-    [YNHttpManagers getProvincesWithParams:params success:^(id response) {
-        if ([response[@"code"] isEqualToString:@"success"]) {
-            //do success things
-            self.tableView.dataArray = response[@"countryArray"];
-        }else{
-            //do failure things
-            [SVProgressHUD showImage:nil status:LocalSaveFailure];
-            [SVProgressHUD dismissWithDelay:2.0f];
-        }
-    } failure:^(NSError *error) {
-        //do error things
-    }];
-}
 #pragma mark - 视图加载
 -(YNSelectAreaTableView *)tableView{
     if (!_tableView) {
@@ -67,7 +45,7 @@
         _tableView = tableView;
         [self.view addSubview:tableView];
         [tableView setDidSelectAddressName:^(NSString *address,NSString *countryid, NSString *shenid, NSString *shiid, NSString *quid) {
-            [[NSNotificationCenter defaultCenter] postNotificationName:@"AddressName" object:nil userInfo:@{@"address":address,@"countryid":countryid,@"shenid":shenid,@"shiid":shiid,@"quid":quid}];
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"AddressName" object:nil userInfo:@{@"address":address,@"countryid":countryid,@"provinceid":shenid,@"cityid":shiid,@"areaid":quid}];
             [self.navigationController popViewControllerAnimated:NO];
         }];
     }
@@ -78,8 +56,7 @@
 #pragma mark - 函数、消息
 -(void)makeData{
     [super makeData];
-    _type = [LanguageManager currentLanguageIndex];
-
+    self.tableView.dataArray = self.dataArray;
 }
 -(void)makeNavigationBar{
     [super makeNavigationBar];

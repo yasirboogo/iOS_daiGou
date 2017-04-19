@@ -103,6 +103,14 @@
 -(void)startNetWorkingRequestWithPayNowMoney{
     
     self.realprice = [NSString stringWithFormat:@"%.2f",[_collectionView.dataDict[@"totalprice"] floatValue] + [_youhui floatValue] - [_subMoney floatValue]];
+    
+    NSString *country = _collectionView.dataDict[@"country"]?_collectionView.dataDict[@"country"]:@"";
+    NSString *province = _collectionView.dataDict[@"province"]?_collectionView.dataDict[@"province"]:@"";
+    NSString *city = _collectionView.dataDict[@"city"]?_collectionView.dataDict[@"city"]:@"";
+    NSString *area = _collectionView.dataDict[@"area"]?_collectionView.dataDict[@"area"]:@"";
+    NSString *detailed = _collectionView.dataDict[@"detailed"]?_collectionView.dataDict[@"detailed"]:@"";
+    NSString *locality = [NSString stringWithFormat:@"%@%@%@%@%@",country,province,city,area,detailed];
+    
     NSMutableDictionary *params = [NSMutableDictionary dictionaryWithObjectsAndKeys:
                                    [DEFAULTS valueForKey:kUserLoginInfors][@"userId"],@"userId",
                                    [NSString stringWithFormat:@"%@",_collectionView.dataDict[@"totalprice"]],@"totalprice",
@@ -112,7 +120,7 @@
                                    _collectionView.postWay,@"delivery",
                                    _collectionView.dataDict[@"name"],@"username",
                                    _collectionView.dataDict[@"phone"],@"userphone",
-                                   [NSString stringWithFormat:@"%@%@",_collectionView.dataDict[@"region"],_collectionView.dataDict[@"detailed"]],@"address",
+                                   locality,@"address",
                                    self.goodsId,@"goodsId",
                                    _count,@"count",
                                    [NSNumber numberWithInteger:_type+1],@"moneytype",
@@ -154,6 +162,13 @@
 -(void)startNetWorkingRequestWithStartPayMoneyParameterWithType:(NSInteger)type{
     self.realprice = [NSString stringWithFormat:@"%.2f",[_collectionView.dataDict[@"totalprice"] floatValue] + [_youhui floatValue] - [_subMoney floatValue]];
     
+    NSString *country = _collectionView.dataDict[@"country"]?_collectionView.dataDict[@"country"]:@"";
+    NSString *province = _collectionView.dataDict[@"province"]?_collectionView.dataDict[@"province"]:@"";
+    NSString *city = _collectionView.dataDict[@"city"]?_collectionView.dataDict[@"city"]:@"";
+    NSString *area = _collectionView.dataDict[@"area"]?_collectionView.dataDict[@"area"]:@"";
+    NSString *detailed = _collectionView.dataDict[@"detailed"]?_collectionView.dataDict[@"detailed"]:@"";
+    NSString *locality = [NSString stringWithFormat:@"%@%@%@%@%@",country,province,city,area,detailed];
+    
     NSMutableDictionary *params = [NSMutableDictionary dictionaryWithObjectsAndKeys:
                                    [DEFAULTS valueForKey:kUserLoginInfors][@"userId"],@"userId",
                                    [NSString stringWithFormat:@"%@",_collectionView.dataDict[@"totalprice"]],@"totalprice",
@@ -162,8 +177,8 @@
                                    _collectionView.postWay,@"delivery",
                                    _shoppingId,@"shoppingId",
                                    _collectionView.dataDict[@"name"],@"username",
-                                   _collectionView.dataDict[@"phone"],@"userphone",
-                                   [NSString stringWithFormat:@"%@%@",_collectionView.dataDict[@"region"],_collectionView.dataDict[@"detailed"]],@"address",
+                                   locality,@"address",
+                                  [NSString stringWithFormat:@"%@",_collectionView.dataDict[@"phone"]],@"userphone",
                                    [NSNumber numberWithInteger:_type+1],@"moneytype",
                                    nil];
     if (type == 1) {
@@ -175,7 +190,7 @@
                 YNPayMoneyViewController *pushVC = [[YNPayMoneyViewController alloc] init];
                 pushVC.orderId = response[@"orderId"];
                 pushVC.postage = @"";
-                pushVC.index = 1;
+                pushVC.shopIndex = type;
                 [self.navigationController pushViewController:pushVC animated:NO];
             }else{
                 //do failure things
@@ -193,7 +208,7 @@
                 YNPayMoneyViewController *pushVC = [[YNPayMoneyViewController alloc] init];
                 pushVC.orderId = response[@"orderId"];
                 pushVC.postage = @"";
-                pushVC.index = 2;
+                pushVC.shopIndex = type;
                 [self.navigationController pushViewController:pushVC animated:NO];
             }else{
                 //do failure things

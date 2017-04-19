@@ -186,7 +186,7 @@
     }else if (status == 2){
         self.btnsView.btnTitles = @[LocalCancelOrder];
     }else if (status == 3){
-        self.btnsView.btnTitles = @[LocalPayment,LocalCancelOrder];
+        self.btnsView.btnTitles = @[LocalPayment];
     }else if (status == 4){
         self.btnsView.btnTitles = @[LocalPrompt];
     }else if (status == 5){

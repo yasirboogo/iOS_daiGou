@@ -39,8 +39,7 @@
     NSString *province = addressM[@"province"]?addressM[@"province"]:@"";
     NSString *city = addressM[@"city"]?addressM[@"city"]:@"";
     NSString *area = addressM[@"area"]?addressM[@"area"]:@"";
-    NSString *detailed = addressM[@"detailed"]?addressM[@"detailed"]:@"";
-    self.locality = [NSString stringWithFormat:@"%@%@%@%@%@",country,province,city,area,detailed];
+    self.locality = [NSString stringWithFormat:@"%@%@%@%@",country,province,city,area];
     self.details = addressM[@"detailed"];
     self.email = addressM[@"email"];
     [self reloadData];

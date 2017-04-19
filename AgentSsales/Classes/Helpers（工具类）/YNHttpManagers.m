@@ -27,7 +27,9 @@
 }
 
 +(void)handleRequestWithUrl:(NSString*)url refreshCache:(BOOL)refreshCache params:params Success:(void (^)(id response))success failure:(void (^)(NSError *error))failure isTipsSuccess:(BOOL)isTipsSuccess isTipsFailure:(BOOL)isTipsFailure{
-    [SVProgressHUD showWithStatus:@"loading"];
+    if (isTipsSuccess || isTipsFailure) {
+        [SVProgressHUD showWithStatus:@"loading"];
+    }
     [HttpTool getWithUrl:url refreshCache:refreshCache params:params success:^(id response) {
         success(response);
         [SVProgressHUD dismissWithDelay:0.5f completion:^{
@@ -593,7 +595,7 @@
         success(response);
     } failure:^(NSError *error) {
         failure(error);
-    } isTipsSuccess:NO isTipsFailure:YES];
+    } isTipsSuccess:NO isTipsFailure:NO];
 }
 /**
  3.1资讯分类

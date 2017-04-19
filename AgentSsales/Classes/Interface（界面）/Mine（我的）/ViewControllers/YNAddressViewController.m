@@ -95,7 +95,7 @@
         [self.view addSubview:tableView];
         [tableView setDidSelectAddressCellBlock:^(NSIndexPath *indexPath) {
             YNNewAddressViewController *pushVC = [[YNNewAddressViewController alloc] init];
-            pushVC.type = 0;
+            pushVC.viewType = 0;
             YNAddressCellFrame *cellFrame = _tableView.dataArrayM[indexPath.row];
             pushVC.address = cellFrame.dict;
             [self.navigationController pushViewController:pushVC animated:NO];
@@ -163,7 +163,7 @@
     __weak typeof(self) weakSelf = self;
     [self addNavigationBarBtnWithTitle:LocalNewOne selectTitle:LocalNewOne font:FONT_15 img:[UIImage imageNamed:@"xinjian"] selectImg:[UIImage imageNamed:@"xinjian"] imgWidth:W_RATIO(30) isOnRight:YES btnClickBlock:^(BOOL isSelect) {
         YNNewAddressViewController *pushVC = [[YNNewAddressViewController alloc] init];
-        pushVC.type = 1;
+        pushVC.viewType = 1;
         [weakSelf.navigationController pushViewController:pushVC animated:NO];
     }];
     self.titleLabel.text = LocalAddressManager;

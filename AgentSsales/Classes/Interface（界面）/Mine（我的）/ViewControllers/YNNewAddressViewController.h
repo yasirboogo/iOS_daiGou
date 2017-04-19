@@ -12,7 +12,7 @@
 
 @property (nonatomic,copy) NSString * titleStr;
 
-@property (nonatomic,assign) NSInteger type;
+@property (nonatomic,assign) NSInteger viewType;
 
 @property (nonatomic,copy) NSDictionary * address;
 

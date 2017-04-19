@@ -15,6 +15,8 @@
 
 @property (nonatomic,copy) NSString<Optional> * orderId;
 
+@property (nonatomic,copy) NSString<Optional> * type;
+
 @property (nonatomic,copy) NSString<Optional> * ordernumber;
 
 @property (nonatomic,copy) NSString<Optional> * totalprice;

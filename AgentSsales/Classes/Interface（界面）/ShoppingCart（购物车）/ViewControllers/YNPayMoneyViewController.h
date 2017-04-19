@@ -14,6 +14,6 @@
 
 @property (nonatomic,copy) NSString * postage;
 
-@property (nonatomic,assign) NSInteger index;
+@property (nonatomic,assign) NSInteger shopIndex;
 
 @end

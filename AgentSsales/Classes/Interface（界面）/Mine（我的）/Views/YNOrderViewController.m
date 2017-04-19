@@ -153,15 +153,14 @@
         [collectionView setDidFooterViewQuestionButtonBlock:^{
             [self.inforView showPopView:YES];
         }];
-        [collectionView setDidFooterViewLeftButtonBlock:^(NSInteger index,NSInteger orderId,NSInteger section,NSString *postage) {
+        [collectionView setDidFooterViewLeftButtonBlock:^(NSInteger index,NSInteger orderId,NSInteger section,NSString *postage,NSInteger shopIndex) {
             _orderId = orderId;
             self.section = section;
             if (index == 100 + 1) {//取消订单
                 [self startNetWorkingRequestWithCancelUserOrder];
             }else if (index == 100 + 2){//取消订单
                 [self startNetWorkingRequestWithCancelUserOrder];
-            }else if (index == 100 + 3){//取消订单
-                [self startNetWorkingRequestWithCancelUserOrder];
+            }else if (index == 100 + 3){
             }else if (index == 100 + 4){
             }else if (index == 100 + 5){//查看物流
                 YNLogisticalMsgViewController *pushVC = [[YNLogisticalMsgViewController alloc] init];
@@ -171,19 +170,21 @@
                 [self startNetWorkingRequestWithAnotherOrder];
             }
         }];
-        [collectionView setDidFooterViewRightButtonBlock:^(NSInteger index,NSInteger orderId,NSInteger section,NSString *postage) {
+        [collectionView setDidFooterViewRightButtonBlock:^(NSInteger index,NSInteger orderId,NSInteger section,NSString *postage,NSInteger shopIndex) {
             _orderId = orderId;
             self.section = section;
             if (index == 200 + 1) {//马上付款
                 YNPayMoneyViewController *pushVC = [[YNPayMoneyViewController alloc] init];
                 pushVC.orderId = [NSString stringWithFormat:@"%ld",(long)orderId];
                 pushVC.postage = postage;
+                pushVC.shopIndex = shopIndex == 2?1:2;
                 [self.navigationController pushViewController:pushVC animated:NO];
             }else if (index == 200 + 2){//马上付款(点击不了)
             }else if (index == 200 + 3){//马上付款
                 YNPayMoneyViewController *pushVC = [[YNPayMoneyViewController alloc] init];
                 pushVC.orderId = [NSString stringWithFormat:@"%ld",(long)orderId];
                 pushVC.postage = postage;
+                pushVC.shopIndex = shopIndex == 2?1:2;
                 [self.navigationController pushViewController:pushVC animated:NO];
             }else if (index == 200 + 4){//提醒发货
                 [self startNetWorkingRequestWithPromptShipment];

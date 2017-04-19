@@ -57,10 +57,10 @@
         YNOrderGoodsFooterView *footerView = [collectionView dequeueReusableSupplementaryViewOfKind:kind withReuseIdentifier:@"footerView" forIndexPath:indexPath];
         footerView.dict = @{@"price":myOrderListModel.totalprice,@"status":myOrderListModel.ordernumber};
         [footerView setDidFooterViewRightButtonBlock:^(NSInteger index) {
-            self.didFooterViewRightButtonBlock(index,[myOrderListModel.orderId integerValue],indexPath.section,[NSString stringWithFormat:@"%@",myOrderListModel.postage]);
+            self.didFooterViewRightButtonBlock(index,[myOrderListModel.orderId integerValue],indexPath.section,[NSString stringWithFormat:@"%@",myOrderListModel.postage],[myOrderListModel.type integerValue]);
         }];
         [footerView setDidFooterViewLeftButtonBlock:^(NSInteger index) {
-            self.didFooterViewLeftButtonBlock(index,[myOrderListModel.orderId integerValue],indexPath.section,[NSString stringWithFormat:@"%@",myOrderListModel.postage]);
+            self.didFooterViewLeftButtonBlock(index,[myOrderListModel.orderId integerValue],indexPath.section,[NSString stringWithFormat:@"%@",myOrderListModel.postage],[myOrderListModel.type integerValue]);
         }];
         [footerView setDidFooterViewQuestionButtonBlock:^{
             self.didFooterViewQuestionButtonBlock();

@@ -14,13 +14,17 @@
 #import "YNSelectAreaViewController.h"
 
 @interface YNPrefectInforViewController ()
-
+{
+    NSInteger _type;
+}
 @property(nonatomic,strong)YNPrefectInforTableView *tableView;
 
 @property(nonatomic,strong)NSDictionary *address;
 //@property(nonatomic,strong)YNAreaSelectView *areaSelectView;
 
 @property (nonatomic,weak) UIButton *submitBtn;
+
+@property (nonatomic,strong) NSArray * dataArray;
 
 @end
 
@@ -37,6 +41,10 @@
 }
 - (void)viewDidLoad {
     [super viewDidLoad];
+    dispatch_async(dispatch_get_global_queue(0, 0), ^{
+        // 处理耗时操作的代码块...
+        [self startNetWorkingRequestWithGetProvincesWithisPush:NO];
+    });
 }
 
 - (void)viewWillDisappear:(BOOL)animated{
@@ -51,8 +59,44 @@
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 #pragma mark - 网路请求
+-(void)startNetWorkingRequestWithGetProvincesWithisPush:(BOOL)isPush{
+    if (isPush) {
+        [SVProgressHUD showWithStatus:LocalLoading];
+    }
+    NSMutableDictionary *params = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+                                   @"0",@"code",
+                                   [NSNumber numberWithInteger:_type],@"type", nil];
+    [YNHttpManagers getProvincesWithParams:params success:^(id response) {
+        if ([response[@"code"] isEqualToString:@"success"]) {
+            //do success things
+            [SVProgressHUD dismiss];
+            self.dataArray = response[@"countryArray"];
+            if (isPush) {
+                YNSelectAreaViewController *pushVC = [[YNSelectAreaViewController alloc] init];
+                pushVC.dataArray = _dataArray;
+                [self.navigationController pushViewController:pushVC animated:NO];
+            }
+        }else{
+            //do failure things
+            [SVProgressHUD showImage:nil status:LocalSaveFailure];
+            [SVProgressHUD dismissWithDelay:2.0f];
+        }
+    } failure:^(NSError *error) {
+        //do error things
+    }];
+}
+
 -(void)startNetWorkingRequestWithPrefectUserInfor{
-    NSMutableDictionary *params = [NSMutableDictionary dictionaryWithObjectsAndKeys:[DEFAULTS valueForKey:kUserLoginInfors][@"userId"],@"userId",_tableView.name,@"username",_tableView.phone,@"phone",_tableView.locality,@"region",_tableView.details,@"detailed",_tableView.emial,@"emial",_address[@"countryid"],@"country",_address[@"shenid"],@"province",_address[@"shiid"],@"city",_address[@"quid"],@"area", nil];
+    NSMutableDictionary *params = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+                                   [DEFAULTS valueForKey:kUserLoginInfors][@"userId"],@"userId",
+                                   _tableView.name,@"username",
+                                   _tableView.phone,@"phone",
+                                   _tableView.details,@"detailed",
+                                   _tableView.emial,@"emial",
+                                   _address[@"countryid"],@"country",
+                                   _address[@"provinceid"],@"province",
+                                   _address[@"cityid"],@"city",
+                                   _address[@"areaid"],@"area", nil];
 
     if (_tableView.numberID.length) {
         [params setValue:_tableView.numberID forKey:@"idCard"];
@@ -94,6 +138,7 @@
         [self.view addSubview:tableView];
         [tableView setDidSelectAddressCellBlock:^{
             YNSelectAreaViewController *pushVC = [[YNSelectAreaViewController alloc] init];
+            pushVC.dataArray = self.dataArray;
             [self.navigationController pushViewController:pushVC animated:NO];
         }];
     }
@@ -127,6 +172,7 @@
 }
 -(void)makeData{
     [super makeData];
+    _type = [LanguageManager currentLanguageIndex];
 }
 -(void)makeNavigationBar{
     [super makeNavigationBar];

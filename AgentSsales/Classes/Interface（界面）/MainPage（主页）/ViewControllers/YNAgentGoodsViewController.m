@@ -123,16 +123,13 @@
     self.getUrl = [NSString stringWithFormat:@"%@",webView.backForwardList.currentItem.URL];
     if ([self.getUrl hasPrefix:@"http://h5.m.taobao.com/awp/core/detail.htm?"]//天猫
         || [self.getUrl hasPrefix:@"https://ju.taobao.com/m/jusp/alone/detailwap/mtp.htm?"]//聚划算
-        || [self.getUrl hasPrefix:@"https://detail.m.tmall.com/item.htm?"]//天猫国际
-        || [self.getUrl hasPrefix:@"https://h5.m.taobao.com/awp/core/detail.htm?"]//海抢购
+        || [self.getUrl hasPrefix:@"https://detail.m.tmall.hk/item.htm?"]//天猫国际
         || [self.getUrl hasPrefix:@"http://m.vip.com/product"]//唯品会
         || [self.getUrl hasPrefix:@"https://item.m.jd.com/"])//京东
     {
-        
         NSString *htmlString = [NSString stringWithContentsOfURL:[NSURL URLWithString:self.urlStr] encoding:NSUTF8StringEncoding error:nil];
         //NSLog(@"html = %@",html);
         self.isBuy = YES;
-        NSLog(@"getUrl===%@",self.getUrl);
         self.buyBtn.hidden = NO;
         //OGDocument *document = [ObjectiveGumbo parseDocumentWithUrl:[NSURL URLWithString:self.urlStr]];
         //NSLog(@"document = %@",document);

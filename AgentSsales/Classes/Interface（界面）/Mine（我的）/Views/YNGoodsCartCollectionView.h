@@ -14,9 +14,9 @@
 
 @property (nonatomic,strong) void(^didSelectOrderGoodsCell)(NSInteger,NSInteger,NSString*);
 
-@property (nonatomic,copy) void(^didFooterViewLeftButtonBlock)(NSInteger,NSInteger,NSInteger,NSString*);
+@property (nonatomic,copy) void(^didFooterViewLeftButtonBlock)(NSInteger,NSInteger,NSInteger,NSString*,NSInteger);
 
-@property (nonatomic,copy) void(^didFooterViewRightButtonBlock)(NSInteger,NSInteger,NSInteger,NSString*);
+@property (nonatomic,copy) void(^didFooterViewRightButtonBlock)(NSInteger,NSInteger,NSInteger,NSString*,NSInteger);
 
 @property (nonatomic,copy) void(^didFooterViewQuestionButtonBlock)();
 

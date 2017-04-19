@@ -41,6 +41,14 @@
 }
 - (void)viewDidLoad {
     [super viewDidLoad];
+    NSString *url = @"http://192.168.1.138/daigou/app/appIndexController/taobao.do?url=https://detail.m.tmall.com/item.htm?spm=a223v.211525.t1024.d1\&abtest=_AB-LR1191-PR1191&pos=1\&abbucket=_AB-M1191_B1\&acm=201608161.1003.1.1095224\&id=14827645243\&scm=1003.1.201608161.ITEM_14827645243_1095224\&skuId=92571191291&decision=sku";
+    
+    NSString *url1 = [url stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet characterSetWithCharactersInString:@"&#%<>[\\]^`{|}\"]+"].invertedSet];
+    
+    NSString *url2 = [url1 stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+    
+    NSLog(@"url1=====>%@\n url2=====>%@",url1,url2);
+    
     [self startNetWorkingRequestWithGetAdvertise];
 }
 
@@ -140,9 +148,9 @@
         _collectionView = collectionView;
         [collectionView setDidSelectPlatImgClickBlock:^(NSInteger index) {
             YNAgentGoodsViewController *pushVC = [[YNAgentGoodsViewController alloc] init];
-            NSArray *urlStrArr = @[@"https://www.taobao.com/",
-                                   @"http://www.vip.com/",
-                                   @"https://www.jd.com/"];
+            NSArray *urlStrArr = @[@"https://www.tmall.com",
+                                   @"http://www.vip.com",
+                                   @"https://www.jd.com"];
             pushVC.urlStr = urlStrArr[index];
             [self.navigationController pushViewController:pushVC animated:NO];
         }];

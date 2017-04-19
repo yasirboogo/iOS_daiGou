@@ -66,7 +66,6 @@
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"cell"];
         cell.textLabel.font = FONT(32);
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
-        cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator; //显示最右边的箭头 
         if ([cell respondsToSelector:@selector(setSeparatorInset:)]) {
             [cell setSeparatorInset:UIEdgeInsetsZero];
         }
@@ -89,6 +88,8 @@
     }
     if (!tempArray.count) {
         cell.accessoryType = UITableViewCellAccessoryNone;
+    }else{
+        cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator; //显示最右边的箭头
     }
     return cell;
 }

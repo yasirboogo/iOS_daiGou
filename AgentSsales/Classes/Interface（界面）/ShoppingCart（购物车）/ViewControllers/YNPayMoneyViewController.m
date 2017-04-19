@@ -101,7 +101,7 @@
     [YNHttpManagers startPayMoneyParameter1WithParams:params success:^(id response) {
         if ([response[@"code"] isEqualToString:@"success"]) {
             //do success things
-            if (self.typeIndex == 0) {
+            if (self.typeIndex == 0) {//支付宝
                 [[AlipaySDK defaultService] payOrder:response[@"str"] fromScheme:@"ap20170316235959" callback:^(NSDictionary *resultDic) {
                     NSInteger resultStatus = [resultDic[@"resultStatus"] integerValue];
                     if (resultStatus == 9000) {
@@ -116,7 +116,7 @@
                         [SVProgressHUD dismissWithDelay:2.0f];
                     }
                 }];
-            }else if (self.typeIndex == 1){
+            }else if (self.typeIndex == 1){//微信
                 NSDictionary *dict = response[@"map"];
                 PayReq *request = [[PayReq alloc] init];
                 request.openID      =               [dict objectForKey:@"appid"];
@@ -133,7 +133,7 @@
                     [SVProgressHUD showImage:nil status:LocalAppUnInstall];
                     [SVProgressHUD dismissWithDelay:2.0f];
                 }
-            }else if (self.typeIndex == 2){
+            }else if (self.typeIndex == 2){//
                 
             }else if (self.typeIndex == 3){
                 YNPaySuccessViewController *pushVC = [[YNPaySuccessViewController alloc] init];
@@ -247,7 +247,7 @@
         
         [self handleRechargeButtonWithStasus:NO];
         
-        [rechargeBtn addTarget:self action:@selector(rechargeButtonClick:) forControlEvents:UIControlEventTouchUpInside];
+        [rechargeBtn addTarget:self action:@selector(rechargeButtonClick) forControlEvents:UIControlEventTouchUpInside];
         rechargeBtn.frame = CGRectMake(0, SCREEN_HEIGHT-W_RATIO(100), SCREEN_WIDTH, W_RATIO(100));
     }
     return _rechargeBtn;
@@ -284,10 +284,10 @@
         [SVProgressHUD dismissWithDelay:2.0f ];
     }
 }
--(void)rechargeButtonClick:(UIButton*)btn{
-    if (self.index == 1) {
+-(void)rechargeButtonClick{
+    if (_shopIndex == 1) {
         [self startNetWorkingRequestWithStartPayMoneyParameter1];
-    }else if (self.index == 2){
+    }else if (_shopIndex == 2){
         [self startNetWorkingRequestWithStartPayMoneyParameter2];
     }
 }

@@ -51,7 +51,6 @@
 
 -(void)setDataDict:(NSDictionary *)dataDict{
     _dataDict = dataDict;
-    [self.imagesPlayer addNetWorkImages:dataDict[@"imgArray"] placeholder:[UIImage imageNamed:@"zhanwei2"]];
     self.hotLabel.text = LocalHot;
     self.nameLabel.text = dataDict[@"name"];
     [self.shareBtn setTitle:LocalShare forState:UIControlStateNormal];
@@ -64,6 +63,7 @@
         self.msgLabel.text = LocalStock;
     }
     self.index = 0;
+    [self.imagesPlayer addNetWorkImages:dataDict[@"imgArray"] placeholder:[UIImage imageNamed:@"zhanwei2"]];
 }
 -(void)setIndex:(NSInteger)index{
     _index = index;
@@ -72,19 +72,20 @@
     }else if (index == 1){
         self.detailUrls = [YNDetailImgCellFrame initWithFromDictionaries:@[_dataDict[@"paraimg"]]];
     }
+
     [self.tableView reloadData];
 }
 -(void)layoutSubviews{
     [super layoutSubviews];
-    
+
     CGSize hotSize = [_hotLabel.text calculateHightWithFont:_hotLabel.font maxWidth:0];
     self.hotLabel.frame = CGRectMake(kMidSpace,(W_RATIO(100)-hotSize.height-kMinSpace)/2.0, hotSize.width+kMinSpace,hotSize.height+kMinSpace);
     
-    CGSize nameSize = [_nameLabel.text calculateHightWithFont:_nameLabel.font maxWidth:W_RATIO(450)];
-    self.nameLabel.frame = CGRectMake(MaxXF(_hotLabel)+kMinSpace,(W_RATIO(100)-nameSize.height)/2.0, nameSize.width, nameSize.height);
+    CGSize nameSize = [_nameLabel.text calculateHightWithWidth:W_RATIO(450) font:_nameLabel.font];
+    self.nameLabel.frame = CGRectMake(MaxXF(_hotLabel)+kMinSpace,YF(_hotLabel), nameSize.width, nameSize.height);
     
     CGSize detailSize = [_detailLabel.text calculateHightWithWidth:WIDTHF(self)-kMidSpace*2 font:_detailLabel.font];
-    self.detailLabel.frame = CGRectMake(kMidSpace, MaxYF(_hotLabel)+kMidSpace, detailSize.width, detailSize.height);
+    self.detailLabel.frame = CGRectMake(kMidSpace, MaxYF(_nameLabel)+kMidSpace, detailSize.width, detailSize.height);
     
     CGSize msgSize = [_msgLabel.text calculateHightWithWidth:WIDTHF(self)-kMidSpace*2 font:_msgLabel.font];
     if (_msgLabel.text.length) {
@@ -164,6 +165,7 @@
         [self.goodsInforView addSubview:nameLabel];
         nameLabel.textColor = COLOR_333333;
         nameLabel.font = FONT(34);
+        nameLabel.numberOfLines = 0;
     }
     return _nameLabel;
 }
